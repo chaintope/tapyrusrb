@@ -1,4 +1,4 @@
-# Tapyrusrb [![Build Status](https://travis-ci.org/chaintope/bitcoinrb.svg?branch=master)](https://travis-ci.org/chaintope/bitcoinrb) [![Gem Version](https://badge.fury.io/rb/tapyrus.svg)](https://badge.fury.io/rb/tapyrus) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+# Tapyrusrb [![Build Status](https://travis-ci.org/chaintope/tapyrusrb.svg?branch=master)](https://travis-ci.org/chaintope/tapyrusrb) [![Gem Version](https://badge.fury.io/rb/tapyrus.svg)](https://badge.fury.io/rb/tapyrus) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 
 Tapyrusrb is a Ruby implementation of [Tapyrus](https://github.com/chaintope/tapyrus-core) Protocol.
