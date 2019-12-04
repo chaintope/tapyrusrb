@@ -1,5 +1,3 @@
-require 'leveldb'
-
 module Tapyrus
   module Store
 

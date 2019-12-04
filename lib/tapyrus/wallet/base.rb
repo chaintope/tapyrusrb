@@ -1,4 +1,5 @@
-require 'leveldb'
+require 'leveldb-native'
+
 module Tapyrus
   module Wallet
 
