@@ -1,21 +1,21 @@
 require 'spec_helper'
-include Bitcoin::Opcodes
+include Tapyrus::Opcodes
 
-describe Bitcoin do
+describe Tapyrus do
 
   it 'has a version number' do
-    expect(Bitcoin::VERSION).not_to be nil
+    expect(Tapyrus::VERSION).not_to be nil
   end
 
   describe '#chain_params' do
-    it 'should be change bitcoin network' do
-      Bitcoin.chain_params = :mainnet
-      expect(Bitcoin.chain_params.network).to eq('mainnet')
-      Bitcoin.chain_params = :testnet
-      expect(Bitcoin.chain_params.network).to eq('testnet')
-      Bitcoin.chain_params = :regtest
-      expect(Bitcoin.chain_params.network).to eq('regtest')
-      expect { Bitcoin.chain_params = :hoge }.to raise_error(RuntimeError)
+    it 'should be change tapyrus network' do
+      Tapyrus.chain_params = :mainnet
+      expect(Tapyrus.chain_params.network).to eq('mainnet')
+      Tapyrus.chain_params = :testnet
+      expect(Tapyrus.chain_params.network).to eq('testnet')
+      Tapyrus.chain_params = :regtest
+      expect(Tapyrus.chain_params.network).to eq('regtest')
+      expect { Tapyrus.chain_params = :hoge }.to raise_error(RuntimeError)
     end
   end
 

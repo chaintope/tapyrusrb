@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe OpenAssets::Util do
   describe  '.script_to_asset_id' do
-    before { Bitcoin.chain_params = chain }
+    before { Tapyrus.chain_params = chain }
 
     context 'mainnet' do
       let(:chain) { :mainnet }

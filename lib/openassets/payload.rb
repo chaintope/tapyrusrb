@@ -23,13 +23,13 @@ module OpenAssets
       marker = buf.read(2)
       version = buf.read(2)
       return nil if marker != MARKER || version != VERSION
-      count = Bitcoin.unpack_var_int_from_io(buf)
+      count = Tapyrus.unpack_var_int_from_io(buf)
       return nil unless count
       quantities = []
       count.times do
         quantities << LEB128.decode_unsigned(buf, buf.pos)
       end
-      metadata_length = Bitcoin.unpack_var_int_from_io(buf)
+      metadata_length = Tapyrus.unpack_var_int_from_io(buf)
       return nil if metadata_length.nil? || buf.length < metadata_length + buf.pos
       metadata = buf.read(metadata_length).each_byte.map(&:chr).join
       new(quantities, metadata)
@@ -44,8 +44,8 @@ module OpenAssets
       payload = String.new
       payload << MARKER
       payload << VERSION
-      payload << Bitcoin.pack_var_int(quantities.size) << quantities.map{|q| LEB128.encode_unsigned(q).read }.join
-      payload << Bitcoin.pack_var_int(metadata.length) << metadata.bytes.map{|b| sprintf("%02x", b)}.join.htb
+      payload << Tapyrus.pack_var_int(quantities.size) << quantities.map{|q| LEB128.encode_unsigned(q).read }.join
+      payload << Tapyrus.pack_var_int(metadata.length) << metadata.bytes.map{|b| sprintf("%02x", b)}.join.htb
       payload
     end
 

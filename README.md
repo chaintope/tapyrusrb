@@ -1,22 +1,19 @@
-# Bitcoinrb [![Build Status](https://travis-ci.org/chaintope/bitcoinrb.svg?branch=master)](https://travis-ci.org/chaintope/bitcoinrb) [![Gem Version](https://badge.fury.io/rb/bitcoinrb.svg)](https://badge.fury.io/rb/bitcoinrb) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) <img src="http://segwit.co/static/public/images/logo.png" width="100">
+# Tapyrusrb [![Build Status](https://travis-ci.org/chaintope/bitcoinrb.svg?branch=master)](https://travis-ci.org/chaintope/bitcoinrb) [![Gem Version](https://badge.fury.io/rb/tapyrus.svg)](https://badge.fury.io/rb/tapyrus) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 
-Bitcoinrb is a Ruby implementation of Bitcoin Protocol.
+Tapyrusrb is a Ruby implementation of [Tapyrus](https://github.com/chaintope/tapyrus-core) Protocol.
 
-NOTE: Bitcoinrb work in progress, and there is a possibility of incompatible change. 
+NOTE: Tapyrusrb work in progress, and there is a possibility of incompatible change. 
 
 ## Features
 
-Bitcoinrb supports following feature:
+Tapyrusrb supports following feature:
 
-* Bitcoin script interpreter(including [BIP-65](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki), [BIP-68](https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki), [BIP-112](https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki))
-* De/serialization of Bitcoin protocol network messages
+* Tapyrus script interpreter
+* De/serialization of Tapyrus protocol network messages
 * De/serialization of blocks and transactions
 * Key generation and verification for ECDSA, including [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) supports.
 * ECDSA signature(RFC6979 -Deterministic ECDSA, LOW-S, LOW-R support)
-* Segwit support (parsing segwit payload, Bech32 address, sign for segwit tx, [BIP-141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki), [BIP-143](https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki), [BIP-144](https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki))
-* [BIP-173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki) Bech32 address support
-* [BIP-174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) PSBT(Partially Signed Bitcoin Transaction) support
 * [WIP] SPV node
 * [WIP] 0ff-chain protocol
 
@@ -47,7 +44,7 @@ gem leveldb-ruby
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'bitcoinrb', require: 'bitcoin'
+gem 'tapyrus'
 ```
 
 And then execute:
@@ -56,45 +53,45 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install bitcoinrb
+    $ gem install tapyrus
 
 And then add to your .rb file:
 
-    require 'bitcoin'
+    require 'tapyrus'
 
 ## Usage
 
 ### Chain selection
 
-The parameters of the blockchain are managed by `Bitcoin::ChainParams`. Switch chain parameters as follows:
+The parameters of the blockchain are managed by `Tapyrus::ChainParams`. Switch chain parameters as follows:
 
 * mainnet
 
 ```ruby
-Bitcoin.chain_params = :mainnet
+Tapyrus.chain_params = :mainnet
 ```
 
-This parameter is described in https://github.com/chaintope/bitcoinrb/blob/master/lib/bitcoin/chainparams/mainnet.yml.
+This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/mainnet.yml.
 
 * testnet
 
 ```ruby
-Bitcoin.chain_params = :testnet
+Tapyrus.chain_params = :testnet
 ```
 
-This parameter is described in https://github.com/chaintope/bitcoinrb/blob/master/lib/bitcoin/chainparams/testnet.yml.
+This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/testnet.yml.
 
 * regtest
 
 ```ruby
-Bitcoin.chain_params = :regtest
+Tapyrus.chain_params = :regtest
 ```
 
-This parameter is described in https://github.com/chaintope/bitcoinrb/blob/master/lib/bitcoin/chainparams/regtest.yml.
+This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/regtest.yml.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bitcoinrb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tapyrusrb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License

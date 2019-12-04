@@ -1,14 +1,14 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'bitcoin'
+require 'tapyrus'
 require 'logger'
 require 'timecop'
 
 RSpec.configure do |config|
   config.before(:each) do |example|
     if example.metadata[:network]
-      Bitcoin.chain_params = example.metadata[:network]
+      Tapyrus.chain_params = example.metadata[:network]
     else
-      Bitcoin.chain_params = :testnet
+      Tapyrus.chain_params = :testnet
     end
     if example.metadata[:use_secp256k1]
       use_secp256k1
@@ -51,7 +51,7 @@ TEST_DB_PATH = "#{Dir.tmpdir}/#{ENV['TEST_ENV_NUMBER']}/spv"
 
 def create_test_chain
   FileUtils.rm_r(TEST_DB_PATH) if Dir.exist?(TEST_DB_PATH)
-  Bitcoin::Store::SPVChain.new(Bitcoin::Store::DB::LevelDB.new(TEST_DB_PATH))
+  Tapyrus::Store::SPVChain.new(Tapyrus::Store::DB::LevelDB.new(TEST_DB_PATH))
 end
 
 TEST_WALLET_PATH = "#{Dir.tmpdir}/#{ENV['TEST_ENV_NUMBER']}/wallet-test/"
@@ -63,16 +63,16 @@ end
 def create_test_wallet(wallet_id = 1)
   path = test_wallet_path(wallet_id)
   FileUtils.rm_r(path) if Dir.exist?(path)
-  Bitcoin::Wallet::Base.create(wallet_id, TEST_WALLET_PATH)
+  Tapyrus::Wallet::Base.create(wallet_id, TEST_WALLET_PATH)
 end
 
 def test_master_key
   words = %w(abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about)
-  Bitcoin::Wallet::MasterKey.recover_from_words(words)
+  Tapyrus::Wallet::MasterKey.recover_from_words(words)
 end
 
-module Bitcoin
-  autoload :TestScriptParser, 'bitcoin/script/test_script_parser'
+module Tapyrus
+  autoload :TestScriptParser, 'tapyrus/script/test_script_parser'
 end
 
 RSpec::Matchers.define :custom_object do |clazz, properties|

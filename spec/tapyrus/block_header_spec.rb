@@ -1,0 +1,97 @@
+require 'spec_helper'
+
+describe Tapyrus::BlockHeader do
+
+  describe 'parse from payload' do
+    subject {Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)}
+    it 'should be parsed' do
+      expect(subject.block_hash).to eq('1df1ced8582ca556592c2133d6ccd6e409c50078d932205ac2a7000000000000')
+      expect(subject.time).to eq(1497939217)
+      expect(subject.nonce).to eq(3414637773)
+      expect(subject.prev_hash).to eq('f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000')
+      expect(subject.merkle_root).to eq('e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d')
+      expect(subject.bits).to eq(453039627)
+    end
+  end
+
+  describe 'to_payload' do
+    subject {
+      Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
+    }
+    it 'should be generate payload' do
+      expect(subject.to_payload.bth).to eq('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb')
+    end
+  end
+
+  describe '#bits_to_target' do
+    it 'return difficulty target' do
+      header = Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
+      expect(header.difficulty_target).to eq(0x000000000000d60b000000000000000000000000000000000000000000000000)
+
+      header.bits = 0x1d00ffff
+      expect(header.difficulty_target).to eq(0x00000000ffff0000000000000000000000000000000000000000000000000000)
+
+      header.bits = 0x1b0ffff0
+      expect(header.difficulty_target).to eq(0x00000000000ffff0000000000000000000000000000000000000000000000000)
+
+      header.bits = 0x03000000
+      expect(header.difficulty_target).to eq(0x00)
+
+      header.bits = 0x1b00b5ac
+      expect(header.difficulty_target).to eq(0x000000000000b5ac000000000000000000000000000000000000000000000000)
+
+      header.bits = 0x1c654657
+      expect(header.difficulty_target).to eq(0x0000000065465700000000000000000000000000000000000000000000000000)
+    end
+  end
+
+  describe '#valid_pow?' do
+    subject {
+      payload = load_block('0000000000343e7e31a6233667fd6ed5288d60ed7e894ae5d53beb0dffc89170').htb
+      Tapyrus::Message::Block.parse_from_payload(payload).header
+    }
+    it 'evaluate pow' do
+      expect(subject.valid_pow?).to be true
+      subject.bits = 496604799
+      expect(subject.valid_pow?).to be false
+    end
+  end
+
+  describe '#valid_timestamp?' do
+    subject {
+      Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
+    }
+
+    before {
+      Timecop.freeze(Time.utc(2017, 9, 22, 15, 13, 25))
+    }
+
+    context 'too future' do
+      it 'should be false' do
+        subject.time = Time.utc(2017, 9, 22, 17, 13, 26).to_i
+        expect(subject.valid_timestamp?).to be false
+      end
+    end
+
+    context 'recent time' do
+      it 'should be true' do
+        subject.time = Time.utc(2017, 9, 22, 17, 13, 25).to_i
+        expect(subject.valid_timestamp?).to be true
+      end
+    end
+
+    after {
+      Timecop.return
+    }
+  end
+
+  describe '#work' do
+    subject {
+      Tapyrus::BlockHeader.parse_from_payload('000000207d7a225081665d83116ce0f1c3eaf10d26ee917d03fbd7aad6895f9800000000b5c7027f92cbca51da5b758af41b7cc23d43a456d7abd4f54357b492c233347294dccd59ffff001d00ff2046'.htb)
+    }
+    it 'should be calculate' do
+      expect(subject.work).to eq(4295032833)
+    end
+  end
+
+end
