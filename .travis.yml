@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.4.6
+  - 2.5.5
+  - 2.6.3
+addons:
+  apt:
+    packages:
+      - libleveldb-dev
+bundler_args: --jobs=2
+script:
+  - bundle exec rake spec
