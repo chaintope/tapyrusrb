@@ -8,7 +8,7 @@ describe Tapyrus::Message::Block do
     it 'should be parsed' do
       expect(subject.header.block_hash).to eq('1df1ced8582ca556592c2133d6ccd6e409c50078d932205ac2a7000000000000')
       expect(subject.transactions.length).to eq(1)
-      expect(subject.transactions.first.txid).to eq('2da1db11dea21799d0b8f351a4516b5e3f8f6729da5aee2d43176a188045e2e4')
+      expect(subject.transactions.first.txid).to eq('71d91ef4e7aff57d5f1383f681d36d9bcdfde43b2b6bab44a2221cf33a43e202')
     end
   end
 

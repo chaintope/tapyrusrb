@@ -51,10 +51,13 @@ module Tapyrus
       out_point.coinbase?
     end
 
-    def to_payload(script_sig = @script_sig, sequence = @sequence)
+    def to_payload(script_sig = @script_sig, sequence = @sequence, use_malfix: false)
       p = out_point.to_payload
-      p << Tapyrus.pack_var_int(script_sig.to_payload.bytesize)
-      p << script_sig.to_payload << [sequence].pack('V')
+      unless use_malfix
+        p << Tapyrus.pack_var_int(script_sig.to_payload.bytesize)
+        p << script_sig.to_payload
+      end
+      p << [sequence].pack('V')
       p
     end
 

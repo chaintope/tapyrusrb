@@ -78,7 +78,11 @@ module Tapyrus
     end
 
     def txid
-      tx_hash.rhex
+      buf = [version].pack('V')
+      buf << Tapyrus.pack_var_int(inputs.length) << inputs.map{|i|i.to_payload(use_malfix: true)}.join
+      buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
+      buf << [lock_time].pack('V')
+      Tapyrus.double_sha256(buf).reverse.bth
     end
 
     def witness_hash

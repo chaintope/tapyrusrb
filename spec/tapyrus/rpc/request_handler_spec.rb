@@ -91,7 +91,7 @@ describe Tapyrus::RPC::RequestHandler do
   describe '#sendrawtransaction' do
     it 'should return txid' do
       raw_tx = '0100000001b827a4b3edeb56a5598e22c1a54205de3b9c6b749fbfdb6a494bd1cb550cc93f000000006b483045022100aedbe7fa2f0dff58222d15665471266ff539bf1285b0ce69b22ae030d13535f602206d1272f2437e2e8c5185d59dc51a8169b0fb61b8a7aaa9576a878e8a4baafbe8012103fd8474629e95865deff1b8d72004055b03a87714d8288e33330f2b0a966f46b8ffffffff01adfcdf07000000001976a914f38f47c0b9de955bb9aca788525a8281ed50973b88ac00000000'
-      expect(subject.sendrawtransaction(raw_tx)).to eq('dfbf28c96d21bb7f2c3fb278c7cfa85a4b68874db29327dd930aeb31efbe70cb')
+      expect(subject.sendrawtransaction(raw_tx)).to eq('3bf1b76036214dbd940603c1499b817e86cc6dc2b1f796642b1833320b00a310')
     end
   end
 
@@ -100,7 +100,7 @@ describe Tapyrus::RPC::RequestHandler do
       # for legacy tx
       tx = subject.decoderawtransaction('01000000017179acc39e281989c62f1ed77940977a8562d2a03c902c20e1888ecca10e75eb00000000715347304402206945124b3126753fa83e7d4b03c419b6ceb90109cb68386ce81052fafe421fbf022023b0a4fabfea8286cb2102fb44623093abb170c127eeb51049f60a2e45d7abea012721022d4549c2f5aca5697dc232390770a99d6ee6ee139fda0fa0412e77a7bcd4b3eead55935887ffffffff010865f2040000000017a91454080827c0212bce22f827d1728d8480975de9338700000000')
       expect(tx).to include(
-                        txid: '6af5fb5448b27f396ad00848e284dc7fe029efa519742fe113ffe63ec429fc32',
+                        txid: '417bb3c8c2c54d6f833308bd2c31800bff543cb5d67f772f566915b1d2e3beb9',
                         hash: '6af5fb5448b27f396ad00848e284dc7fe029efa519742fe113ffe63ec429fc32',
                         version: 1, size: 196, vsize: 196, locktime: 0,
                         vin:[{
@@ -123,7 +123,7 @@ describe Tapyrus::RPC::RequestHandler do
       # for segwit tx
       tx = subject.decoderawtransaction('01000000000101cdf9ce825aba7f777899cc76243946a62d9ecb6c9805d30faa5a690d862344d70000000000ffffffff0253a2800200000000160014e3324f11cd2d4715c9d09186d0677d3f18fc0cc8e8c61100000000001976a91498cba7ee7618b76d19b4952a4240b954609b75cb88ac0247304402204ed43722821e458b98295824079ad4a04f5a55df8aa3339e89ebc7138d45e1ca022076b925a51996eb2797a0f870855d73220950e7a91d5d8f0cc11bc9e2c68551ba012103e67c2c0435bd1b6478ae327e4746d788a01e2f6e669506cb1a0515b9a708c74b00000000')
       expect(tx).to include(
-                        txid: 'e603a71f500a6db03e5ce89160332c1fabb9adb6f76bae2b983d5257cd3d4421',
+                        txid: 'f15bfcea69bd54a970e1bb967bdc4874c5f68fe29bbdca1ed9099879455e2c6c',
                         hash: '56c968fcee7145c47b63f5407acc8e4a337d4b95df79767054e66502078d6d0c',
                         vin:[{
                             txid: 'd74423860d695aaa0fd305986ccb9e2da646392476cc9978777fba5a82cef9cd',
