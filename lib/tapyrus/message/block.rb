@@ -11,10 +11,10 @@ module Tapyrus
 
       COMMAND = 'block'
 
-      def initialize(header, transactions = [], use_segwit = false)
+      def initialize(header, transactions = [])
         @header = header
         @transactions = transactions
-        @use_segwit = use_segwit
+        @use_segwit = false
       end
 
       def self.parse_from_payload(payload)
@@ -32,7 +32,7 @@ module Tapyrus
 
       def to_payload
         header.to_payload << Tapyrus.pack_var_int(transactions.size) <<
-          transactions.map{|t|use_segwit ? t.to_payload : t.serialize_old_format}.join
+          transactions.map(&:to_payload).join
       end
 
       # generate Tapyrus::Block object.

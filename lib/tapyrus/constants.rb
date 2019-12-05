@@ -38,11 +38,8 @@ module Tapyrus
   SCRIPT_VERIFY_CLEANSTACK = (1 << 8)
   SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1 << 9) # Verify CHECKLOCKTIMEVERIFY (BIP-65)
   SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1 << 10) # support CHECKSEQUENCEVERIFY opcode (BIP-112)
-  SCRIPT_VERIFY_WITNESS = (1 << 11) # Support segregated witness
-  SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = (1 << 12) # Making v1-v16 witness program non-standard
   SCRIPT_VERIFY_MINIMALIF = (1 << 13) # Segwit script only: Require the argument of OP_IF/NOTIF to be exactly 0x01 or empty vector
   SCRIPT_VERIFY_NULLFAIL = (1 << 14) # Signature(s) must be empty vector if an CHECK(MULTI)SIG operation failed
-  SCRIPT_VERIFY_WITNESS_PUBKEYTYPE = (1 << 15) # Public keys in segregated witness scripts must be compressed
   SCRIPT_VERIFY_CONST_SCRIPTCODE = (1 << 16) # Making OP_CODESEPARATOR and FindAndDelete fail any non-segwit scripts
 
   MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_P2SH
@@ -60,15 +57,9 @@ module Tapyrus
                                   SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY,
                                   SCRIPT_VERIFY_CHECKSEQUENCEVERIFY,
                                   SCRIPT_VERIFY_LOW_S,
-                                  SCRIPT_VERIFY_WITNESS,
-                                  SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
-                                  SCRIPT_VERIFY_WITNESS_PUBKEYTYPE,
                                   SCRIPT_VERIFY_CONST_SCRIPTCODE].inject(SCRIPT_VERIFY_NONE){|flags, f| flags |= f}
 
   # for script
-
-  # witness version
-  WITNESS_VERSION = 0x00
 
   # Maximum script length in bytes
   MAX_SCRIPT_SIZE = 10000
@@ -104,7 +95,7 @@ module Tapyrus
   # 80 bytes of data, +1 for OP_RETURN, +2 for the pushdata opcodes.
   MAX_OP_RETURN_RELAY = 83
 
-  SIG_VERSION = [:base, :witness_v0]
+  SIG_VERSION = [:base]
 
   # for script error
   SCRIPT_ERR_OK = 0
@@ -152,16 +143,6 @@ module Tapyrus
 
   # softfork safeness
   SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS = 60
-  SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = 61
-
-  # segregated witness
-  SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH = 70
-  SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY = 71
-  SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH = 72
-  SCRIPT_ERR_WITNESS_MALLEATED = 73
-  SCRIPT_ERR_WITNESS_MALLEATED_P2SH = 74
-  SCRIPT_ERR_WITNESS_UNEXPECTED = 75
-  SCRIPT_ERR_WITNESS_PUBKEYTYPE = 76
 
   # Constant scriptCode
   SCRIPT_ERR_OP_CODESEPARATOR = 77
@@ -171,9 +152,6 @@ module Tapyrus
 
   ERRCODES_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [const_get(c), c.to_s] }.flatten]
   NAME_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [c.to_s, const_get(c)] }.flatten]
-
-  # witness commitment
-  WITNESS_COMMITMENT_HEADER = 'aa21a9ed'
 
   COINBASE_WTXID = '00'* 32
 

@@ -56,8 +56,6 @@ describe Tapyrus::Script do
         expect(subject.to_s).to eq('OP_DUP OP_HASH160 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0 OP_EQUALVERIFY OP_CHECKSIG')
         expect(subject.p2pkh?).to be true
         expect(subject.p2sh?).to be false
-        expect(subject.p2wpkh?).to be false
-        expect(subject.p2wsh?).to be false
         expect(subject.multisig?).to be false
         expect(subject.op_return?).to be false
         expect(subject.standard?).to be true
@@ -73,34 +71,6 @@ describe Tapyrus::Script do
     end
   end
 
-  describe 'p2wpkh script' do
-    subject { Tapyrus::Script.to_p2wpkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
-
-    context 'mainnet', network: :mainnet do
-      it 'should be generate P2WPKH script' do
-        expect(subject.to_payload.bytesize).to eq(22)
-        expect(subject.to_payload).to eq('001446c2fbfbecc99a63148fa076de58cf29b0bcf0b0'.htb)
-        expect(subject.to_s).to eq('0 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
-        expect(subject.p2pkh?).to be false
-        expect(subject.p2sh?).to be false
-        expect(subject.p2wpkh?).to be true
-        expect(subject.p2wsh?).to be false
-        expect(subject.multisig?).to be false
-        expect(subject.op_return?).to be false
-        expect(subject.standard?).to be true
-        expect(subject.addresses.first).to eq('bc1qgmp0h7lvexdxx9y05pmdukx09xcteu9svvvxlw')
-        expect(subject.get_pubkeys).to eq([])
-      end
-    end
-
-    context 'testnet' do
-      it 'should be generate P2WPKH script' do
-        expect(subject.addresses.first).to eq('tb1qgmp0h7lvexdxx9y05pmdukx09xcteu9sx2h4ya')
-      end
-    end
-
-  end
-
   describe 'p2sh script' do
     subject {
       k1 = '021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9'
@@ -114,8 +84,6 @@ describe Tapyrus::Script do
         expect(subject[0].to_s).to eq('OP_HASH160 7620a79e8657d066cff10e21228bf983cf546ac6 OP_EQUAL')
         expect(subject[0].p2pkh?).to be false
         expect(subject[0].p2sh?).to be true
-        expect(subject[0].p2wpkh?).to be false
-        expect(subject[0].p2wsh?).to be false
         expect(subject[0].multisig?).to be false
         expect(subject[0].op_return?).to be false
         expect(subject[0].standard?).to be true
@@ -135,37 +103,6 @@ describe Tapyrus::Script do
     end
   end
 
-  describe 'p2wsh script' do
-    subject {
-      k1 = '021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9'
-      k2 = '032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35'
-      redeem_script = Tapyrus::Script.to_multisig_script(1, [k1, k2])
-      Tapyrus::Script.to_p2wsh(redeem_script)
-    }
-
-    context 'mainnet', network: :mainnet do
-      it 'should be generate P2WSH script' do
-        expect(subject.to_hex).to eq('00203ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd')
-        expect(subject.to_s).to eq('0 3ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd')
-        expect(subject.p2pkh?).to be false
-        expect(subject.p2sh?).to be false
-        expect(subject.p2wpkh?).to be false
-        expect(subject.p2wsh?).to be true
-        expect(subject.multisig?).to be false
-        expect(subject.op_return?).to be false
-        expect(subject.standard?).to be true
-        expect(subject.addresses.first).to eq('bc1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607s264w7g')
-        expect(subject.get_pubkeys).to eq([])
-      end
-    end
-
-    context 'testnet' do
-      it 'should be generate P2WSH script' do
-        expect(subject.addresses.first).to eq('tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy8')
-      end
-    end
-  end
-
   describe 'multisig script' do
     subject {
       k1 = '021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9'
@@ -175,8 +112,6 @@ describe Tapyrus::Script do
     it 'should treat as multisig' do
       expect(subject.p2pkh?).to be false
       expect(subject.p2sh?).to be false
-      expect(subject.p2wpkh?).to be false
-      expect(subject.p2wsh?).to be false
       expect(subject.multisig?).to be true
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be true
@@ -193,8 +128,6 @@ describe Tapyrus::Script do
       it 'should treat as multisig' do
         expect(subject.p2pkh?).to be false
         expect(subject.p2sh?).to be false
-        expect(subject.p2wpkh?).to be false
-        expect(subject.p2wsh?).to be false
         expect(subject.multisig?).to be false
         expect(subject.op_return?).to be true
         expect(subject.standard?).to be true
@@ -253,10 +186,6 @@ describe Tapyrus::Script do
       expect(p2sh.to_s).to eq('1 021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9 032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35 2 OP_CHECKMULTISIG')
       expect(p2sh.to_payload).to eq('5121021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e921032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e3552ae'.htb)
 
-      p2wpkh = Tapyrus::Script.from_string('0 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
-      expect(p2wpkh.to_s).to eq('0 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
-      expect(p2wpkh.to_payload).to eq('001446c2fbfbecc99a63148fa076de58cf29b0bcf0b0'.htb)
-
       pushdata = Tapyrus::Script.from_string('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
       expect(pushdata.to_s).to eq('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
       expect(pushdata.to_payload).to eq('1446c2fbfbecc99a63148fa076de58cf29b0bcf0b0'.htb)
@@ -314,28 +243,6 @@ describe Tapyrus::Script do
     it 'should be split' do
       expect(subject.subscript(0..-1)).to eq(subject)
       expect(subject.subscript(3..-1)).to eq(Tapyrus::Script.new << OP_EQUALVERIFY << OP_CHECKSIG)
-    end
-  end
-
-  describe '#witness_program?' do
-    it 'should be judge' do
-      expect(Tapyrus::Script.from_string('0 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d').witness_program?).to be true
-      expect(Tapyrus::Script.from_string('0 62').witness_program?).to be false
-      expect(Tapyrus::Script.from_string('0 6234').witness_program?).to be true
-      expect(Tapyrus::Script.from_string('0 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d0000000000000000').witness_program?).to be true
-      expect(Tapyrus::Script.from_string('0 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d000000000000000000').witness_program?).to be false
-      expect(Tapyrus::Script.from_string('1 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d').witness_program?).to be true
-      expect(Tapyrus::Script.from_string('0000 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d').witness_program?).to be true
-    end
-  end
-
-  describe '#witness_data' do
-    it 'should be return version and program' do
-      script = Tapyrus::Script.from_string('0 6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d')
-      data = script.witness_data
-      expect(data.size).to eq(2)
-      expect(data[0]).to eq(0)
-      expect(data[1].bth).to eq('6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d')
     end
   end
 
@@ -416,29 +323,6 @@ describe Tapyrus::Script do
     end
   end
 
-  describe '#witness_commitment' do
-    context 'has commitment' do
-      subject {Tapyrus::Script.parse_from_payload('6a24aa21a9ed670436c55de638c8100326d72998157a61aab2af1a8d4c5785f9093134b78e33'.htb)}
-      it 'should be return commitment hash' do
-        expect(subject.witness_commitment).to eq('670436c55de638c8100326d72998157a61aab2af1a8d4c5785f9093134b78e33')
-      end
-    end
-
-    context 'invalid commitment' do
-      it 'should be return nil' do
-        # push data only
-        script = Tapyrus::Script.parse_from_payload('24aa21a9ed670436c55de638c8100326d72998157a61aab2af1a8d4c5785f9093134b78e33'.htb)
-        expect(script.witness_commitment).to be nil
-        # invalid commitment header
-        script = Tapyrus::Script.parse_from_payload('6a24aa21a9ee670436c55de638c8100326d72998157a61aab2af1a8d4c5785f9093134b78e33'.htb)
-        expect(script.witness_commitment).to be nil
-        # invalid commitment hash length
-        script = Tapyrus::Script.parse_from_payload('6a24aa21a9ed670436c55de638c8100326d72998157a61aab2af1a8d4c5785f9093134b78e'.htb)
-        expect(script.witness_commitment).to be nil
-      end
-    end
-  end
-
   describe '#parse_from_addr' do
     context 'mainnet', network: :mainnet do
       it 'should generate script' do
@@ -446,10 +330,6 @@ describe Tapyrus::Script do
         expect(Tapyrus::Script.parse_from_addr('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to eq(Tapyrus::Script.parse_from_payload('76a91457dd450aed53d4e35d3555a24ae7dbf3e08a78ec88ac'.htb))
         # P2SH
         expect(Tapyrus::Script.parse_from_addr('3HG15Tn6hEd1WVR1ySQtWRstTbvyy6B5V8')).to eq(Tapyrus::Script.parse_from_payload('a914aac6e837af9eba6951552e83862740b069cf59f587'.htb))
-        # P2WPKH
-        expect(Tapyrus::Script.parse_from_addr('bc1q2lw52zhd202wxhf42k3y4e7m70sg578ver73dn')).to eq(Tapyrus::Script.from_string('0 57dd450aed53d4e35d3555a24ae7dbf3e08a78ec'))
-        # P2WSH
-        expect(Tapyrus::Script.parse_from_addr('bc1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607s264w7g')).to eq(Tapyrus::Script.from_string('0 3ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd'))
       end
     end
 
@@ -459,10 +339,6 @@ describe Tapyrus::Script do
         expect(Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to eq(Tapyrus::Script.parse_from_payload('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb))
         # P2SH
         expect(Tapyrus::Script.parse_from_addr('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')).to eq(Tapyrus::Script.parse_from_payload('a914755874542a017c665184c356f67c20cf4a0621ca87'.htb))
-        # P2WPKH
-        expect(Tapyrus::Script.parse_from_addr('tb1qgmp0h7lvexdxx9y05pmdukx09xcteu9sx2h4ya')).to eq(Tapyrus::Script.from_string('0 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0'))
-        # P2WSH
-        expect(Tapyrus::Script.parse_from_addr('tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy8')).to eq(Tapyrus::Script.from_string('0 3ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd'))
       end
     end
 

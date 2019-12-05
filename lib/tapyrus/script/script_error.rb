@@ -78,20 +78,6 @@ module Tapyrus
         'Witness version reserved for soft-fork upgrades'
       when SCRIPT_ERR_PUBKEYTYPE
         'Public key is neither compressed or uncompressed'
-      when SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH
-        'Witness program has incorrect length'
-      when SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY
-        'Witness program was passed an empty witness'
-      when SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH
-        'Witness program hash mismatch'
-      when SCRIPT_ERR_WITNESS_MALLEATED
-        'Witness requires empty scriptSig'
-      when SCRIPT_ERR_WITNESS_MALLEATED_P2SH
-        'Witness requires only-redeemscript scriptSig'
-      when SCRIPT_ERR_WITNESS_UNEXPECTED
-        'Witness provided for non-witness script'
-      when SCRIPT_ERR_WITNESS_PUBKEYTYPE
-        'Using non-compressed keys in segwit'
       when SCRIPT_ERR_OP_CODESEPARATOR
         'Using OP_CODESEPARATOR in non-witness scrip'
       when SCRIPT_ERR_SIG_FINDANDDELETE

@@ -9,7 +9,6 @@ module Tapyrus
     attr_accessor :out_point
     attr_accessor :script_sig
     attr_accessor :sequence
-    attr_accessor :script_witness
 
     # Setting nSequence to this value for every input in a transaction disables nLockTime.
     SEQUENCE_FINAL = 0xffffffff
@@ -24,10 +23,9 @@ module Tapyrus
     # If TxIn#sequence encodes a relative lock-time, this mask is applied to extract that lock-time from the sequence field.
     SEQUENCE_LOCKTIME_MASK = 0x0000ffff
 
-    def initialize(out_point: nil, script_sig: Tapyrus::Script.new, script_witness: ScriptWitness.new, sequence: SEQUENCE_FINAL)
+    def initialize(out_point: nil, script_sig: Tapyrus::Script.new, sequence: SEQUENCE_FINAL)
       @out_point = out_point
       @script_sig = script_sig
-      @script_witness = script_witness
       @sequence = sequence
     end
 
@@ -61,15 +59,11 @@ module Tapyrus
       p
     end
 
-    def has_witness?
-      !script_witness.empty?
-    end
 
     def to_h
       sig = script_sig.to_h
       sig.delete(:type)
       h = {txid: out_point.txid, vout: out_point.index,  script_sig: sig }
-      h[:txinwitness] = script_witness.stack.map(&:bth) if has_witness?
       h[:sequence] = sequence
       h
     end

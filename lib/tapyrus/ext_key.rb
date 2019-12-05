@@ -214,14 +214,7 @@ module Tapyrus
 
     # get address
     def addr
-      case version
-        when Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version
-          key.to_nested_p2wpkh
-        when Tapyrus.chain_params.bip84_pubkey_p2wpkh_version
-          key.to_p2wpkh
-        else
-          key.to_p2pkh
-      end
+      key.to_p2pkh
     end
 
     # get key object

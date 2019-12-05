@@ -19,62 +19,6 @@ describe Tapyrus::Network::Peer do
   }
   after { chain.db.close }
 
-  describe '#support_witness?' do
-    context 'before handshake' do
-      it 'should be false' do
-        expect(subject.support_witness?).to be false
-        expect(subject.local_version.relay).to be false # spv set relay flag to false.
-      end
-    end
-
-    context 'non segwit peer' do
-      before {
-        subject.conn.version = Tapyrus::Message::Version.new(services: Tapyrus::Message::SERVICE_FLAGS[:none])
-      }
-      it 'should be false' do
-        expect(subject.support_witness?).to be false
-      end
-    end
-
-    context 'segwit peer' do
-      before {
-        subject.conn.version = Tapyrus::Message::Version.new
-      }
-      it 'should be true' do
-        expect(subject.support_witness?).to be true
-      end
-    end
-  end
-
-  describe '#support_cmpct?' do
-    context 'remote peer dose not support' do
-      it 'should be false' do
-        # not support version
-        subject.conn.version = Tapyrus::Message::Version.new(version: 70013)
-        expect(subject.support_cmpct?).to be false
-        # local support segwit, but remote dose not support segwit
-        subject.conn.version = Tapyrus::Message::Version.new(version: 70015, services: Tapyrus::Message::SERVICE_FLAGS[:network])
-        expect(subject.support_cmpct?).to be false
-        # remote's version dose not support witness block
-        subject.conn.version = Tapyrus::Message::Version.new(version: 70014, services: Tapyrus::Message::SERVICE_FLAGS[:witness])
-        expect(subject.support_cmpct?).to be false
-      end
-    end
-
-    context 'remote peer support' do
-      it 'should be true' do
-        # local dose not supports segwit, and remote too.
-        subject.local_version = Tapyrus::Message::Version.new(version: 70014, services: Tapyrus::Message::SERVICE_FLAGS[:network])
-        subject.conn.version = Tapyrus::Message::Version.new(version: 70014, services: Tapyrus::Message::SERVICE_FLAGS[:network])
-        expect(subject.support_cmpct?).to be true
-        # local and remote supports compact witness.
-        subject.local_version = Tapyrus::Message::Version.new
-        subject.conn.version = Tapyrus::Message::Version.new(version: 70015, services: Tapyrus::Message::SERVICE_FLAGS[:witness])
-        expect(subject.support_cmpct?).to be true
-      end
-    end
-  end
-
   describe '#to_network_addr' do
     before {
       opts = {version:70015, services: 13, timestamp: 1507879363, local_addr: "0.0.0.0:0", remote_addr: "94.130.106.254:63446", nonce: 1561841459448609851, user_agent: "/Satoshi:0.14.2/", start_height: 1210117, relay: true}

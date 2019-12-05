@@ -47,7 +47,7 @@ describe Tapyrus::BlockHeader do
 
   describe '#valid_pow?' do
     subject {
-      payload = load_block('0000000000343e7e31a6233667fd6ed5288d60ed7e894ae5d53beb0dffc89170').htb
+      payload = load_block('0000000001be84d00475b5cf0148c3dfb9b7c2a770f788f22b0d96085b0f0e84').htb
       Tapyrus::Message::Block.parse_from_payload(payload).header
     }
     it 'evaluate pow' do

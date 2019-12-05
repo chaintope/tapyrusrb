@@ -6,16 +6,14 @@ describe Tapyrus::Tx do
   describe 'parse from payload' do
     context 'coinbase tx' do
       subject {
-        Tapyrus::Tx.parse_from_payload('010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff2a038c7f110411bd48592f244d696e65642062792037706f6f6c2e636f6d2f0100000bd807000000000000ffffffff0340597307000000001976a91489893957178347e87e2bb3850e6f6937de7372b288ac50d6dc01000000001976a914ca560088c0fb5e6f028faa11085e643e343a8f5c88ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000'.htb)
+        Tapyrus::Tx.parse_from_payload('01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2a038c7f110411bd48592f244d696e65642062792037706f6f6c2e636f6d2f0100000bd807000000000000ffffffff0340597307000000001976a91489893957178347e87e2bb3850e6f6937de7372b288ac50d6dc01000000001976a914ca560088c0fb5e6f028faa11085e643e343a8f5c88ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000'.htb)
       }
       it 'should be parsed' do
         expect(subject.inputs.length).to eq(1)
         expect(subject.coinbase_tx?).to be true
-        expect(subject.to_hex).to eq('010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff2a038c7f110411bd48592f244d696e65642062792037706f6f6c2e636f6d2f0100000bd807000000000000ffffffff0340597307000000001976a91489893957178347e87e2bb3850e6f6937de7372b288ac50d6dc01000000001976a914ca560088c0fb5e6f028faa11085e643e343a8f5c88ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000')
+        expect(subject.to_hex).to eq('01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2a038c7f110411bd48592f244d696e65642062792037706f6f6c2e636f6d2f0100000bd807000000000000ffffffff0340597307000000001976a91489893957178347e87e2bb3850e6f6937de7372b288ac50d6dc01000000001976a914ca560088c0fb5e6f028faa11085e643e343a8f5c88ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000')
         expect(subject.tx_hash).to eq('e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d')
         expect(subject.txid).to eq('71d91ef4e7aff57d5f1383f681d36d9bcdfde43b2b6bab44a2221cf33a43e202')
-        expect(subject.witness_hash).to eq('9aec529a48536a94637c41afcb05d29659ec964784afc3e27a5b451b793350f1')
-        expect(subject.wtxid).to eq('f15033791b455b7ae2c3af844796ec5996d205cbaf417c63946a53489a52ec9a')
       end
     end
 
@@ -25,7 +23,6 @@ describe Tapyrus::Tx do
       }
       it 'should be parsed' do
         expect(subject.txid).to eq('d130d8335ca4d79246b69a5033a945b47dfe6f421f94cb9565e9d727110840d5')
-        expect(subject.wtxid).to eq('9ae1fd1572ffe82e2670e2edd1e2431b37bbb0bb6493e64546447ca8827d1375')
         expect(subject.coinbase_tx?).to be false
         expect(subject.version).to eq(1)
         expect(subject.lock_time).to eq(0)
@@ -108,19 +105,18 @@ describe Tapyrus::Tx do
           amount = prevout_script_values[i.out_point.to_payload]
           amount |= 0
           flags = json[2].split(',').map{|s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}")}.inject(Tapyrus::SCRIPT_VERIFY_NONE){|flags, f| flags |= f}
-          witness = i.script_witness
           checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
           script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]
 
           use_ecdsa_gem
           interpreter = Tapyrus::ScriptInterpreter.new(flags: flags, checker: checker)
-          result = interpreter.verify_script(i.script_sig, script_pubkey, witness)
+          result = interpreter.verify_script(i.script_sig, script_pubkey)
           expect(result).to be true
           expect(interpreter.error.code).to eq(Tapyrus::SCRIPT_ERR_OK)
 
           use_secp256k1
           interpreter = Tapyrus::ScriptInterpreter.new(flags: flags, checker: checker)
-          result = interpreter.verify_script(i.script_sig, script_pubkey, witness)
+          result = interpreter.verify_script(i.script_sig, script_pubkey)
           expect(result).to be true
           expect(interpreter.error.code).to eq(Tapyrus::SCRIPT_ERR_OK)
         end
@@ -150,11 +146,10 @@ describe Tapyrus::Tx do
             amount = prevout_script_values[i.out_point.to_payload]
             amount |= 0
             flags = json[2].split(',').map {|s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}")}.inject(Tapyrus::SCRIPT_VERIFY_NONE){|flags, f| flags |= f}
-            witness = i.script_witness
             checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
             interpreter = Tapyrus::ScriptInterpreter.new(flags: flags, checker: checker)
             script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]
-            valid = interpreter.verify_script(i.script_sig, script_pubkey, witness)
+            valid = interpreter.verify_script(i.script_sig, script_pubkey)
             break unless valid
           end
         end
@@ -235,14 +230,8 @@ describe Tapyrus::Tx do
 
   describe 'calculate size' do
     it 'should be calculate' do
-      # P2WPKH
-      tx = Tapyrus::Tx.parse_from_payload('010000000001018015516590902931d31f650f7e0e79a931e01bcb2f73d4ca49195aed2854b5fd0000000000ffffffff0170460d00000000001976a9148911455a265235b2d356a1324af000d4dae0326288ac02473044022009ea34cf915708efa8d0fb8a784d4d9e3108ca8da4b017261dd029246c857ebc02201ae570e2d8a262bd9a2a157f473f4089f7eae5a8f54ff9f114f624557eda7420012102effb2edfcf826d43027feae226143bdac058ad2e87b7cec26f97af2d357ddefa00000000'.htb)
-      expect(tx.vsize).to eq(113)
-      expect(tx.size).to eq(194)
-
       # non-segwit tx
       tx = Tapyrus::Tx.parse_from_payload('010000000201e4a0f1fa83c642b91feafae36a0f8fded4158dfa6fd650e046b4364b805684000000006b483045022045c65646abc12c71352335dbec2824b2dbdef9253366b4b83439b2190ce098d2022100eed0b70371d3892f865b43e2bb713ec9e887a50d38f47e8416220daf826d0ab201210259f6658325c4e3ca6fb38f657ffcbf4b1c45ef4f0c1dd86d5f6c0cebb0e09520ffffffff31137db564a7fad07c9db5b6b862786589977c68d1270819030a9079941ca6c9010000006b48304502204354565632eedd30fb9ca5c22bb70ef848afd74f7bed354d267705a6e71ea885022100e6ea6250d29dc109cb59ac66318f1cb2768c13fb0daca7c3d91a3b8d0991e0cb01210259f6658325c4e3ca6fb38f657ffcbf4b1c45ef4f0c1dd86d5f6c0cebb0e09520ffffffff02801d2c04000000001976a914322653c91d6038e08b6d971e4560842c155c8a8888ac80248706000000001976a9143b9722f91a2e50d913dadc3a6a8a88a58a7b859788ac00000000'.htb)
-      expect(tx.vsize).to eq(374)
       expect(tx.size).to eq(374)
     end
   end
@@ -267,13 +256,6 @@ describe Tapyrus::Tx do
       # dublicate txns
       tx.in << tx.in[0]
       expect(tx.valid?).to be false
-    end
-  end
-
-  describe '#immutable txid' do
-    it 'should be calculate.' do
-      tx = Tapyrus::Tx.parse_from_payload('020000000100000000000000000000000000000000000000000000000000000000000000000c000000035c0101ffffffff0200f2052a010000001976a914169d728df86741490ccf243ad27c89f25af2d41788ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000'.htb)
-      expect(tx.txid).to eq('1c9f9a5485735cddfb34254d11ce699a41dc198903549daa78a6f77fc8384b10')
     end
   end
 

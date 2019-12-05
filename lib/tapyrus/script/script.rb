@@ -18,11 +18,6 @@ module Tapyrus
       new << OP_DUP << OP_HASH160 << pubkey_hash << OP_EQUALVERIFY << OP_CHECKSIG
     end
 
-    # generate P2WPKH script
-    def self.to_p2wpkh(pubkey_hash)
-      new << WITNESS_VERSION << pubkey_hash
-    end
-
     # generate m of n multisig p2sh script
     # @param [String] m the number of signatures required for multisig
     # @param [Array] pubkeys array of public keys that compose multisig
@@ -57,13 +52,6 @@ module Tapyrus
     def self.to_multisig_script(m, pubkeys, sort: false)
       pubkeys = pubkeys.sort if sort
       new << m << pubkeys << pubkeys.size << OP_CHECKMULTISIG
-    end
-
-    # generate p2wsh script for +redeem_script+
-    # @param [Script] redeem_script target redeem script
-    # @param [Script] p2wsh script
-    def self.to_p2wsh(redeem_script)
-      new << WITNESS_VERSION << redeem_script.to_sha256
     end
 
     # generate script from string.
@@ -151,14 +139,13 @@ module Tapyrus
     def addresses
       return [p2pkh_addr] if p2pkh?
       return [p2sh_addr] if p2sh?
-      return [bech32_addr] if witness_program?
       return get_multisig_pubkeys.map{|pubkey| Tapyrus::Key.new(pubkey: pubkey.bth).to_p2pkh} if multisig?
       []
     end
 
     # check whether standard script.
     def standard?
-      p2pkh? | p2sh? | p2wpkh? | p2wsh? | multisig? | standard_op_return?
+      p2pkh? | p2sh? | multisig? | standard_op_return?
     end
 
     # whether this script is a P2PKH format script.
@@ -166,17 +153,6 @@ module Tapyrus
       return false unless chunks.size == 5
       [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] ==
           (chunks[0..1]+ chunks[3..4]).map(&:ord) && chunks[2].bytesize == 21
-    end
-
-    # whether this script is a P2WPKH format script.
-    def p2wpkh?
-      return false unless chunks.size == 2
-      chunks[0].ord == WITNESS_VERSION && chunks[1].bytesize == 21
-    end
-
-    def p2wsh?
-      return false unless chunks.size == 2
-      chunks[0].ord == WITNESS_VERSION && chunks[1].bytesize == 33
     end
 
     def p2sh?
@@ -221,48 +197,13 @@ module Tapyrus
       chunks.select{|c|c.pushdata? && [33, 65].include?(c.pushed_data.bytesize) && [2, 3, 4, 6, 7].include?(c.pushed_data[0].bth.to_i(16))}.map{|c|c.pushed_data.bth}
     end
 
-    # A witness program is any valid Script that consists of a 1-byte push opcode followed by a data push between 2 and 40 bytes.
-    def witness_program?
-      return false if size < 4 || size > 42 || chunks.size < 2
-
-      opcode = chunks[0].opcode
-
-      return false if opcode != OP_0 && (opcode < OP_1 || opcode > OP_16)
-      return false unless chunks[1].pushdata?
-
-      if size == (chunks[1][0].unpack('C').first + 2)
-        program_size = chunks[1].pushed_data.bytesize
-        return program_size >= 2 && program_size <= 40
-      end
-
-      false
-    end
-
-    # get witness commitment
-    def witness_commitment
-      return nil if !op_return? || op_return_data.bytesize < 36
-      buf = StringIO.new(op_return_data)
-      return nil unless buf.read(4).bth == WITNESS_COMMITMENT_HEADER
-      buf.read(32).bth
-    end
-
-    # If this script is witness program, return its script code,
-    # otherwise returns the self payload. ScriptInterpreter does not use this.
+    # returns the self payload. ScriptInterpreter does not use this.
     def to_script_code(skip_separator_index = 0)
       payload = to_payload
-      if p2wpkh?
-        payload = Script.to_p2pkh(chunks[1].pushed_data.bth).to_payload
-      elsif skip_separator_index > 0
+      if skip_separator_index > 0
         payload = subscript_codeseparator(skip_separator_index)
       end
       Tapyrus.pack_var_string(payload)
-    end
-
-    # get witness version and witness program
-    def witness_data
-      version = opcode_to_small_int(chunks[0].opcode)
-      program = chunks[1].pushed_data
-      [version, program]
     end
 
     # append object to payload
@@ -482,8 +423,6 @@ module Tapyrus
       return 'pubkeyhash' if p2pkh?
       return 'scripthash' if p2sh?
       return 'multisig' if multisig?
-      return 'witness_v0_keyhash' if p2wpkh?
-      return 'witness_v0_scripthash' if p2wsh?
       'nonstandard'
     end
 
@@ -520,30 +459,12 @@ module Tapyrus
       Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.address_version)
     end
 
-    # generate p2wpkh address. if script dose not p2wpkh, return nil.
-    def p2wpkh_addr
-      p2wpkh? ? bech32_addr : nil
-    end
-
     # generate p2sh address. if script dose not p2sh, return nil.
     def p2sh_addr
       return nil unless p2sh?
       hash160 = chunks[1].pushed_data.bth
       return nil unless hash160.htb.bytesize == 20
       Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.p2sh_version)
-    end
-
-    # generate p2wsh address. if script dose not p2wsh, return nil.
-    def p2wsh_addr
-      p2wsh? ? bech32_addr : nil
-    end
-
-    # return bech32 address for payload
-    def bech32_addr
-      segwit_addr = Bech32::SegwitAddr.new
-      segwit_addr.hrp = Tapyrus.chain_params.bech32_hrp
-      segwit_addr.script_pubkey = to_payload.bth
-      segwit_addr.addr
     end
 
   end

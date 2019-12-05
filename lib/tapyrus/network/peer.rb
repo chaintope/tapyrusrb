@@ -99,21 +99,7 @@ module Tapyrus
 
       # broadcast tx.
       def broadcast_tx(tx)
-        conn.send_message(Tapyrus::Message::Tx.new(tx, support_witness?))
-      end
-
-      # check the remote peer support witness.
-      def support_witness?
-        return false unless remote_version
-        remote_version.services & Tapyrus::Message::SERVICE_FLAGS[:witness] > 0
-      end
-
-      # check the remote peer supports compact block.
-      def support_cmpct?
-        return false if remote_version.version < Tapyrus::Message::VERSION[:compact]
-        return true unless local_version.services & Tapyrus::Message::SERVICE_FLAGS[:witness] > 0
-        return false unless support_witness?
-        remote_version.version >= Tapyrus::Message::VERSION[:compact_witness]
+        conn.send_message(Tapyrus::Message::Tx.new(tx))
       end
 
       # get peer's block type.

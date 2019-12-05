@@ -13,11 +13,6 @@ module Tapyrus
         return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-empty')
       end
 
-      # Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
-      if tx.serialize_old_format.bytesize * Tapyrus::WITNESS_SCALE_FACTOR > Tapyrus::MAX_BLOCK_WEIGHT
-        return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-oversize')
-      end
-
       # Check for negative or overflow output values
       amount = 0
       tx.outputs.each do |o|

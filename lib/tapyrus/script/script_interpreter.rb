@@ -32,14 +32,12 @@ module Tapyrus
     # eval script
     # @param [Tapyrus::Script] script_sig a signature script (unlock script which data push only)
     # @param [Tapyrus::Script] script_pubkey a script pubkey (locking script)
-    # @param [Tapyrus::ScriptWitness] witness a witness script
     # @return [Boolean] result
-    def verify_script(script_sig, script_pubkey, witness = ScriptWitness.new)
+    def verify_script(script_sig, script_pubkey)
 
       return set_error(SCRIPT_ERR_SIG_PUSHONLY) if flag?(SCRIPT_VERIFY_SIGPUSHONLY) && !script_sig.push_only?
 
       stack_copy = nil
-      had_witness = false
 
       return false unless eval_script(script_sig, :base)
 
@@ -48,15 +46,6 @@ module Tapyrus
       return false unless eval_script(script_pubkey, :base)
 
       return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last.htb)
-
-      # Bare witness programs
-      if flag?(SCRIPT_VERIFY_WITNESS) && script_pubkey.witness_program?
-        had_witness = true
-        return set_error(SCRIPT_ERR_WITNESS_MALLEATED) unless script_sig.size == 0
-        version, program = script_pubkey.witness_data
-        stack_copy = stack.dup
-        return false unless verify_witness_program(witness, version, program)
-      end
 
       # Additional validation for spend-to-script-hash transactions
       if flag?(SCRIPT_VERIFY_P2SH) && script_pubkey.p2sh?
@@ -71,16 +60,6 @@ module Tapyrus
         end
         return false unless eval_script(redeem_script, :base)
         return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last)
-
-        # P2SH witness program
-        if flag?(SCRIPT_VERIFY_WITNESS) && redeem_script.witness_program?
-          had_witness = true
-          # The scriptSig must be _exactly_ a single push of the redeemScript. Otherwise we reintroduce malleability.
-          return set_error(SCRIPT_ERR_WITNESS_MALLEATED_P2SH) unless script_sig == (Tapyrus::Script.new << redeem_script.to_payload.bth)
-
-          version, program = redeem_script.witness_data
-          return false unless verify_witness_program(witness, version, program)
-        end
       end
 
       # The CLEANSTACK check is only performed after potential P2SH evaluation,
@@ -93,49 +72,12 @@ module Tapyrus
         return set_error(SCRIPT_ERR_CLEANSTACK) unless stack.size == 1
       end
 
-      if flag?(SCRIPT_VERIFY_WITNESS)
-        raise 'assert' unless flag?(SCRIPT_VERIFY_P2SH)
-        return set_error(SCRIPT_ERR_WITNESS_UNEXPECTED) if !had_witness && !witness.empty?
-      end
-
       true
     end
 
     def set_error(err_code, extra_message = nil)
       @error = ScriptError.new(err_code, extra_message)
       false
-    end
-
-    def verify_witness_program(witness, version, program)
-      if version == 0
-        if program.bytesize == 32
-          return set_error(SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY) if witness.stack.size == 0
-          script_pubkey = Tapyrus::Script.parse_from_payload(witness.stack.last)
-          @stack = witness.stack[0..-2].map{|w|w.bth}
-          script_hash = Tapyrus.sha256(script_pubkey.to_payload)
-          return set_error(SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH) unless script_hash == program
-        elsif program.bytesize == 20
-          return set_error(SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH) unless witness.stack.size == 2
-          script_pubkey = Tapyrus::Script.to_p2pkh(program.bth)
-          @stack = witness.stack.map{|w|w.bth}
-        else
-          return set_error(SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH)
-        end
-      elsif flag?(SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM)
-        return set_error(SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM)
-      else
-        return true # Higher version witness scripts return true for future softfork compatibility
-      end
-
-      stack.each do |s| # Disallow stack item size > MAX_SCRIPT_ELEMENT_SIZE in witness stack
-        return set_error(SCRIPT_ERR_PUSH_SIZE) if s.htb.bytesize > MAX_SCRIPT_ELEMENT_SIZE
-      end
-
-      return false unless eval_script(script_pubkey, :witness_v0)
-
-      return set_error(SCRIPT_ERR_EVAL_FALSE) unless stack.size == 1
-      return set_error(SCRIPT_ERR_EVAL_FALSE) unless cast_to_bool(stack.last)
-      true
     end
 
     def eval_script(script, sig_version)
@@ -209,7 +151,7 @@ module Tapyrus
                   if need_exec
                     return set_error(SCRIPT_ERR_UNBALANCED_CONDITIONAL) if stack.size < 1
                     value = pop_string.htb
-                    if sig_version == :witness_v0 && flag?(SCRIPT_VERIFY_MINIMALIF)
+                    if flag?(SCRIPT_VERIFY_MINIMALIF)
                       if value.bytesize > 1 || (value.bytesize == 1 && value[0].unpack('C').first != 1)
                         return set_error(SCRIPT_ERR_MINIMALIF)
                       end
@@ -617,11 +559,6 @@ module Tapyrus
     def check_pubkey_encoding(pubkey, sig_version)
       if flag?(SCRIPT_VERIFY_STRICTENC) && !Key.compress_or_uncompress_pubkey?(pubkey)
         return set_error(SCRIPT_ERR_PUBKEYTYPE)
-      end
-      # Only compressed keys are accepted in segwit
-      if flag?(SCRIPT_VERIFY_WITNESS_PUBKEYTYPE) &&
-          sig_version == :witness_v0 && !Key.compress_pubkey?(pubkey)
-        return set_error(SCRIPT_ERR_WITNESS_PUBKEYTYPE)
       end
       true
     end

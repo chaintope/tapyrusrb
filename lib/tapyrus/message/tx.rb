@@ -17,11 +17,11 @@ module Tapyrus
 
       def self.parse_from_payload(payload)
         tx = Tapyrus::Tx.parse_from_payload(payload)
-        new(tx, tx.witness?)
+        new(tx)
       end
 
       def to_payload
-        use_segwit ? tx.to_payload : tx.serialize_old_format
+        tx.to_payload
       end
 
     end

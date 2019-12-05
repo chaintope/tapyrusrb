@@ -128,18 +128,6 @@ module Tapyrus
       Tapyrus::Script.to_p2pkh(hash160).addresses.first
     end
 
-    # get pay to witness pubkey hash address
-    # @deprecated
-    def to_p2wpkh
-      Tapyrus::Script.to_p2wpkh(hash160).addresses.first
-    end
-
-    # get p2wpkh address nested in p2sh.
-    # @deprecated
-    def to_nested_p2wpkh
-      Tapyrus::Script.to_p2wpkh(hash160).to_p2sh.addresses.first
-    end
-
     def compressed?
       key_type != TYPES[:uncompressed]
     end

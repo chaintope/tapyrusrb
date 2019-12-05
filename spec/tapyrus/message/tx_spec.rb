@@ -15,16 +15,6 @@ describe Tapyrus::Message::Tx do
       end
     end
 
-    context 'use segwit' do # MSG_WITNESS_TX
-      subject {
-        Tapyrus::Message::Tx.parse_from_payload('01000000000101cfef3176137fe4db1ddc8ea1664ab5d6e97a9a9621ad9ccb988551039ac10b8c0000000000ffffffff01107a0700000000001976a91466f2f993a3e661501934f91772eab19a86701fa788ac0247304402206d9fac7b0eb73ebf7eeddb999e7708efffd793e1d6d0edffd34cce5e12e2f62d0220732f8c34f75e84e061253e590bf64cf61f2f35746be541b238683cc301bbb68f0121030f222cb92080f061c177019695e67810e1648718f52d1e8f6871b6122fe5495600000000'.htb)
-      }
-      it 'should be parsed' do
-        expect(subject.tx.txid).to eq('62e75e7815900b7ebd6d39135b43b46e4d7d68a6e99ea4310c86406ed861fa12')
-        expect(subject.tx.wtxid).to eq('c4a8b714e29804c9747a28e28c0ef38b8360968df344426d295f563d08fc0f79')
-      end
-    end
-
   end
 
   describe '#to_payload' do

@@ -1,7 +1,7 @@
 module Tapyrus
   module Message
 
-    # cmpctblock message
+    # cmpctblock message. support only version 1.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class CmpctBlock < Base
 
@@ -15,14 +15,12 @@ module Tapyrus
 
       # generate CmpctBlock from Block data.
       # @param [Tapyrus::Block] block the block to generate CmpctBlock.
-      # @param [Integer] version Compact Block version specified by sendcmpct message.
       # @param [Integer] nonce
       # @return [Tapyrus::Message::CmpctBlock]
-      def self.from_block(block, version, nonce = SecureRandom.hex(8).to_i(16))
-        raise 'Unsupported version.' unless [1, 2].include?(version)
+      def self.from_block(block, nonce = SecureRandom.hex(8).to_i(16))
         h = HeaderAndShortIDs.new(block.header, nonce)
         block.transactions[1..-1].each do |tx|
-          h.short_ids << h.short_id(version == 1 ? tx.txid : tx.wtxid)
+          h.short_ids << h.short_id(tx.txid)
         end
         h.prefilled_txn << PrefilledTx.new(0, block.transactions.first)
         self.new(h)

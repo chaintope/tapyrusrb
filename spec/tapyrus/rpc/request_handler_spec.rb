@@ -101,8 +101,8 @@ describe Tapyrus::RPC::RequestHandler do
       tx = subject.decoderawtransaction('01000000017179acc39e281989c62f1ed77940977a8562d2a03c902c20e1888ecca10e75eb00000000715347304402206945124b3126753fa83e7d4b03c419b6ceb90109cb68386ce81052fafe421fbf022023b0a4fabfea8286cb2102fb44623093abb170c127eeb51049f60a2e45d7abea012721022d4549c2f5aca5697dc232390770a99d6ee6ee139fda0fa0412e77a7bcd4b3eead55935887ffffffff010865f2040000000017a91454080827c0212bce22f827d1728d8480975de9338700000000')
       expect(tx).to include(
                         txid: '417bb3c8c2c54d6f833308bd2c31800bff543cb5d67f772f566915b1d2e3beb9',
-                        hash: '6af5fb5448b27f396ad00848e284dc7fe029efa519742fe113ffe63ec429fc32',
-                        version: 1, size: 196, vsize: 196, locktime: 0,
+                        hash: '32fc29c43ee6ff13e12f7419a5ef29e07fdc84e24808d06a397fb24854fbf56a',
+                        version: 1, size: 196, locktime: 0,
                         vin:[{
                             txid: 'eb750ea1cc8e88e1202c903ca0d262857a974079d71e2fc68919289ec3ac7971', vout: 0,
                             script_sig: {
@@ -119,19 +119,6 @@ describe Tapyrus::RPC::RequestHandler do
                                 req_sigs: 1, type: 'scripthash',
                                 addresses: ['2MzuYNTgfcezpymFsHLGjsNPchnKXwNP7SK']
                             }}]
-                    )
-      # for segwit tx
-      tx = subject.decoderawtransaction('01000000000101cdf9ce825aba7f777899cc76243946a62d9ecb6c9805d30faa5a690d862344d70000000000ffffffff0253a2800200000000160014e3324f11cd2d4715c9d09186d0677d3f18fc0cc8e8c61100000000001976a91498cba7ee7618b76d19b4952a4240b954609b75cb88ac0247304402204ed43722821e458b98295824079ad4a04f5a55df8aa3339e89ebc7138d45e1ca022076b925a51996eb2797a0f870855d73220950e7a91d5d8f0cc11bc9e2c68551ba012103e67c2c0435bd1b6478ae327e4746d788a01e2f6e669506cb1a0515b9a708c74b00000000')
-      expect(tx).to include(
-                        txid: 'f15bfcea69bd54a970e1bb967bdc4874c5f68fe29bbdca1ed9099879455e2c6c',
-                        hash: '56c968fcee7145c47b63f5407acc8e4a337d4b95df79767054e66502078d6d0c',
-                        vin:[{
-                            txid: 'd74423860d695aaa0fd305986ccb9e2da646392476cc9978777fba5a82cef9cd',
-                            vout: 0, script_sig: {asm: '', hex: ''}, sequence: 4294967295,
-                            txinwitness: [
-                                '304402204ed43722821e458b98295824079ad4a04f5a55df8aa3339e89ebc7138d45e1ca022076b925a51996eb2797a0f870855d73220950e7a91d5d8f0cc11bc9e2c68551ba01',
-                                '03e67c2c0435bd1b6478ae327e4746d788a01e2f6e669506cb1a0515b9a708c74b'
-                            ]}]
                     )
       # for invalid tx
       expect{subject.decoderawtransaction('hoge')}.to raise_error(ArgumentError)
@@ -154,25 +141,6 @@ describe Tapyrus::RPC::RequestHandler do
         expect(h).to include(asm: 'OP_HASH160 7620a79e8657d066cff10e21228bf983cf546ac6 OP_EQUAL',
                              type: 'scripthash', req_sigs: 1,
                              addresses: ['2N41pqp5vuafHQf39KraznDLEqsSKaKmrij'])
-      end
-    end
-    context 'p2wpkh' do
-      it 'should return p2wpkh script and addr.' do
-        h = subject.decodescript('001446c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
-        expect(h).to include(asm: '0 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0',
-                             type: 'witness_v0_keyhash',
-                             p2sh: '2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm',
-                             req_sigs: 1,
-                             addresses: ['tb1qgmp0h7lvexdxx9y05pmdukx09xcteu9sx2h4ya'])
-      end
-    end
-    context 'p2wsh' do
-      it 'should return p2wsh script and addr.' do
-        h = subject.decodescript('00203ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd')
-        expect(h).to include(asm: '0 3ce1c71303e564430e0c5721727739290046302a9674f1d67a249cfd2ce7d3fd',
-                             type: 'witness_v0_scripthash', req_sigs: 1,
-                             p2sh: '2MtdzMmaUTSjL72ziauNhZygLNuNc8LNSxg',
-                             addresses: ['tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy8'])
       end
     end
     context 'multisig' do
@@ -247,8 +215,8 @@ describe Tapyrus::RPC::RequestHandler do
         expect(accounts[0][:look_ahead]).to eq(10)
         expect(accounts[0][:account_key]).to eq('vpub5Y6cjg78GGuNLsaPhmYsiw4gYX3HoQiRBiSwDaBXKUafCt9bNwWQiitDk5VZ5BVxYnQdwoTyXSs2JHRPAgjAvtbBrf8ZhDYe2jWAqvZVnsc')
         expect(accounts[0][:watch_only]).to be false
-        expect(accounts[0][:receive_address]).to eq('tb1q6rz28mcfaxtmd6v789l9rrlrusdprr9pqcpvkl')
-        expect(accounts[0][:change_address]).to eq('tb1q9u62588spffmq4dzjxsr5l297znf3z6j5p2688')
+        expect(accounts[0][:receive_address]).to eq('mzYpQmSAGYWWyTLiLGbGaG8T3rHdjNcV11')
+        expect(accounts[0][:change_address]).to eq('mjpZ9GG9z6eWeN9dUdRmxss9ajYcK47A4p')
 
         master = result[:master]
         expect(master[:encrypted]).to be false
