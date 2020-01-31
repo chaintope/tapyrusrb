@@ -11,6 +11,10 @@ module Tapyrus
 
       # generate temporary key k to be used when ECDSA sign.
       # https://tools.ietf.org/html/rfc6979#section-3.2
+      # @param [String] data a data to be signed with binary format.
+      # @param [String] privkey a private key using sign with binary format.
+      # @param [String] extra_entropy extra entropy with binary format.
+      # @return [Integer] a nonce.
       def generate_rfc6979_nonce(data, privkey, extra_entropy)
         v = INITIAL_V # 3.2.b
         k = INITIAL_K # 3.2.c
