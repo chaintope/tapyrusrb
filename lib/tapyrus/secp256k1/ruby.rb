@@ -35,7 +35,7 @@ module Tapyrus
         privkey = privkey.htb
         private_key = ECDSA::Format::IntegerOctetString.decode(privkey)
         extra_entropy ||= ''
-        nonce = RFC6979.generate_rfc6979_nonce(data, privkey, extra_entropy)
+        nonce = RFC6979.generate_rfc6979_nonce(privkey + data, extra_entropy)
 
         # port form ecdsa gem.
         r_point = GROUP.new_point(nonce)
