@@ -35,7 +35,7 @@ module Tapyrus
         privkey = privkey.htb
         private_key = ECDSA::Format::IntegerOctetString.decode(privkey)
         extra_entropy ||= ''
-        nonce = generate_rfc6979_nonce(data, privkey, extra_entropy)
+        nonce = RFC6979.generate_rfc6979_nonce(data, privkey, extra_entropy)
 
         # port form ecdsa gem.
         r_point = GROUP.new_point(nonce)
@@ -87,36 +87,6 @@ module Tapyrus
         end
       end
 
-      INITIAL_V = '0101010101010101010101010101010101010101010101010101010101010101'.htb
-      INITIAL_K = '0000000000000000000000000000000000000000000000000000000000000000'.htb
-      ZERO_B = '00'.htb
-      ONE_B = '01'.htb
-
-      # generate temporary key k to be used when ECDSA sign.
-      # https://tools.ietf.org/html/rfc6979#section-3.2
-      def generate_rfc6979_nonce(data, privkey, extra_entropy)
-        v = INITIAL_V # 3.2.b
-        k = INITIAL_K # 3.2.c
-        # 3.2.d
-        k = Tapyrus.hmac_sha256(k, v + ZERO_B + privkey + data + extra_entropy)
-        # 3.2.e
-        v = Tapyrus.hmac_sha256(k, v)
-        # 3.2.f
-        k = Tapyrus.hmac_sha256(k, v + ONE_B + privkey + data + extra_entropy)
-        # 3.2.g
-        v = Tapyrus.hmac_sha256(k, v)
-        # 3.2.h
-        t = ''
-        10000.times do
-          v = Tapyrus.hmac_sha256(k, v)
-          t = (t + v)
-          t_num = t.bth.to_i(16)
-          return t_num if 1 <= t_num && t_num < GROUP.order
-          k = Tapyrus.hmac_sha256(k, v + '00'.htb)
-          v = Tapyrus.hmac_sha256(k, v)
-        end
-        raise 'A valid nonce was not found.'
-      end
     end
 
   end

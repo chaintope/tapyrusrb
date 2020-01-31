@@ -6,6 +6,7 @@ module Tapyrus
 
     autoload :Ruby, 'tapyrus/secp256k1/ruby'
     autoload :Native, 'tapyrus/secp256k1/native'
+    autoload :RFC6979, 'tapyrus/secp256k1/rfc6979'
 
   end
 
