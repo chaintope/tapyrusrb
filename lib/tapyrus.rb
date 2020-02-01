@@ -10,6 +10,7 @@ require 'ffi'
 require 'observer'
 require 'tmpdir'
 require_relative 'openassets'
+require_relative 'schnorr'
 
 module Tapyrus
 

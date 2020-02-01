@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'schnorr'
+  spec.add_runtime_dependency 'ecdsa'
   spec.add_runtime_dependency 'eventmachine'
   spec.add_runtime_dependency 'murmurhash3'
   spec.add_runtime_dependency 'daemon-spawn'
