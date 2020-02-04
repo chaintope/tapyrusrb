@@ -36,8 +36,8 @@ module Schnorr
   # @param public_key (String) The public key with binary format.
   # @param signature (String) The signature with binary format.
   # @return (Boolean) whether signature is valid.
-  def valid_sig?(message, public_key, signature)
-    check_sig!(message, public_key, signature)
+  def valid_sig?(message, signature, public_key)
+    check_sig!(message, signature, public_key)
   rescue InvalidSignatureError, ECDSA::Format::DecodeError
     false
   end
@@ -47,7 +47,7 @@ module Schnorr
   # @param public_key (String) The public key with binary format.
   # @param signature (String) The signature with binary format.
   # @return (Boolean)
-  def check_sig!(message, public_key, signature)
+  def check_sig!(message, signature, public_key)
     sig = Schnorr::Signature.decode(signature)
     pubkey = ECDSA::Format::PointOctetString.decode(public_key, GROUP)
     field = GROUP.field
