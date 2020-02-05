@@ -111,4 +111,42 @@ describe Schnorr do
     end
   end
 
+  describe 'same deterministic sign with Tapyrus Core', network: :mainnet do
+    it 'should be generated.' do
+      key1 = Tapyrus::Key.from_wif('5HxWvvfubhXpYYpS3tJkw6fq9jE9j18THftkZjHHfmFiWtmAbrj')
+      key2 = Tapyrus::Key.from_wif('5KC4ejrDjv152FGwP386VD1i2NYc5KkfSMyv1nGy1VGDxGHqVY3')
+      msg = 'Very deterministic message'
+      msg_hash = Tapyrus.double_sha256(msg)
+
+      sig1 = Schnorr.sign(msg_hash, key1.priv_key.to_i(16))
+      expect(sig1.encode.bth).to eq('0567cbade8656cff3bb08d00913d59363273c32ea66130cf0c9b1be8e874b8bcb0e62372c22e8ecd34ffeadda493beb221e52bf23413cc6c3abdcdfc03d0ed52')
+
+      sig2 = Schnorr.sign(msg_hash, key2.priv_key.to_i(16))
+      expect(sig2.encode.bth).to eq('064623e23b59e1bd304156fb20c197eee23e6d10e021664aef3878364d9d5e175916f7909c9358192e9c1510ebb466b085e726aab0d71c6ef9f298b53ea179aa')
+    end
+  end
+
+  describe 'ecdsa nonce and schnorr nonce' do
+    it 'should generate different nonce' do
+      msg = '1000000000000000000000000000000000000000000000000000000000000000'.htb
+      key = Tapyrus::Key.generate
+      public_key = key.pubkey.htb
+
+      nonce1 = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(msg + key.priv_key.htb, '')
+      nonce2 = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(msg + key.priv_key.htb, '')
+      expect(nonce1).to eq(nonce2)
+
+      # schnorr sign
+      signature1 = Schnorr.sign(msg, key.priv_key.to_i(16))
+      expect(Schnorr.valid_sig?(msg, signature1.encode, public_key)).to be true
+
+      # ECDSA sign
+      signature2 = ECDSA::Format::SignatureDerString.decode(Tapyrus::Secp256k1::Ruby.sign_data(msg, key.priv_key, ''))
+      expect(Tapyrus::Secp256k1::Ruby.valid_sig?(msg, signature2.to_der, key.pubkey)).to be true
+
+      # R is different
+      expect(signature1.r).not_to eq(signature2.r)
+    end
+  end
+
 end

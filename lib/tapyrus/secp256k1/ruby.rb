@@ -74,6 +74,10 @@ module Tapyrus
         end
       end
 
+      alias :valid_sig? :verify_sig
+
+      module_function :valid_sig?
+
       # if +pubkey+ is hybrid public key format, it convert uncompressed format.
       # https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2012-June/001578.html
       def repack_pubkey(pubkey)
