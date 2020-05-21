@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Bitcoin::RPC::BitcoinCoreClient do
+describe Tapyrus::RPC::TapyrusCoreClient do
 
   let!(:client) { 
-    # for Bitcoin::RPC::BitcoinCoreClient#initialize
+    # for Tapyrus::RPC::TapyrusCoreClient#initialize
     stub_request(:post, server_url).to_return(body: JSON.generate({ 'result': 'rpc_command' }))
-    Bitcoin::RPC::BitcoinCoreClient.new(config)
+    Tapyrus::RPC::TapyrusCoreClient.new(config)
   }
   let(:config) { {
     schema: 'http',
