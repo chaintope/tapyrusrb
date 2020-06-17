@@ -8,7 +8,7 @@ describe Tapyrus::Network::MessageHandler do
     def initialize
       @message = ''
       @logger = Logger.new(STDOUT)
-      configuration = Tapyrus::Node::Configuration.new(network: :testnet)
+      configuration = Tapyrus::Node::Configuration.new(network: :dev)
       @chain = create_test_chain
       @peer = Tapyrus::Network::Peer.new('127.0.0.1', 18332,
                                          Tapyrus::Network::Pool.new(nil, @chain, configuration), configuration)
@@ -30,7 +30,7 @@ describe Tapyrus::Network::MessageHandler do
 
   describe 'handle message' do
     context 'invalid header magic' do
-      it 'raise message error' do # mainnet magic
+      it 'raise message error' do # prod magic
         expect(subject).not_to receive(:defer_handle_command)
         expect(subject).to receive(:close).once
         subject.handle('f9beb4d976657261636b000000000000000000005df6e0e2'.htb)

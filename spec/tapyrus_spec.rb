@@ -9,12 +9,10 @@ describe Tapyrus do
 
   describe '#chain_params' do
     it 'should be change tapyrus network' do
-      Tapyrus.chain_params = :mainnet
-      expect(Tapyrus.chain_params.network).to eq('mainnet')
-      Tapyrus.chain_params = :testnet
-      expect(Tapyrus.chain_params.network).to eq('testnet')
-      Tapyrus.chain_params = :regtest
-      expect(Tapyrus.chain_params.network).to eq('regtest')
+      Tapyrus.chain_params = :prod
+      expect(Tapyrus.chain_params.network).to eq('prod')
+      Tapyrus.chain_params = :dev
+      expect(Tapyrus.chain_params.network).to eq('dev')
       expect { Tapyrus.chain_params = :hoge }.to raise_error(RuntimeError)
     end
   end

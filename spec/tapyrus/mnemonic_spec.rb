@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Tapyrus::Mnemonic, network: :mainnet do
+describe Tapyrus::Mnemonic, network: :prod do
 
   subject { Tapyrus::Mnemonic.new('english') }
 

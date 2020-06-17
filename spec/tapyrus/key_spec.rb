@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Tapyrus::Key do
 
   describe '#from_wif' do
-    context 'mainnet', network: :mainnet do
+    context 'mainnet', network: :prod do
       subject { Tapyrus::Key.from_wif('KxJkzWsRQmr2bdU9TdWDFhXxg9nsELSEQojEQFZMFqJsHTBSXpP9') }
       it 'should be parse' do
         expect(subject.priv_key).to eq('206f3acb5b7ac66dacf87910bb0b04bed78284b9b50c0d061705a44447a947ff')
@@ -12,7 +12,7 @@ describe Tapyrus::Key do
       end
     end
 
-    context 'testnet', network: :testnet do
+    context 'testnet', network: :dev do
       subject { Tapyrus::Key.from_wif('cPaJYBMDLjQp5gSUHnBfhX4Rgj95ekBS6oBttwQLw3qfsKKcDfuB') }
       it 'should be parse' do
         expect(subject.compressed?).to be true
@@ -24,7 +24,7 @@ describe Tapyrus::Key do
   end
 
   describe '#to_wif' do
-    context 'mainnet', network: :mainnet do
+    context 'mainnet', network: :prod do
       subject { Tapyrus::Key.new(priv_key: '206f3acb5b7ac66dacf87910bb0b04bed78284b9b50c0d061705a44447a947ff').to_wif }
       it 'should be export' do
         expect(subject).to eq('KxJkzWsRQmr2bdU9TdWDFhXxg9nsELSEQojEQFZMFqJsHTBSXpP9')
@@ -112,7 +112,7 @@ describe Tapyrus::Key do
     end
   end
 
-  describe 'low/high R signature', network: :mainnet do
+  describe 'low/high R signature', network: :prod do
 
     context 'same sig output as Tapyrus Core' do
       it 'should be generate' do

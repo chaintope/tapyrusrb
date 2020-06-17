@@ -551,7 +551,6 @@ module Tapyrus
       return false if sig.empty?
       s = sig.unpack('C*')
       hash_type = s[-1] & (~(SIGHASH_TYPE[:anyonecanpay]))
-      hash_type &= (~(Tapyrus::SIGHASH_FORK_ID)) if Tapyrus.chain_params.fork_chain? # for fork coin.
       return false if hash_type < SIGHASH_TYPE[:all] || hash_type > SIGHASH_TYPE[:single]
       true
     end

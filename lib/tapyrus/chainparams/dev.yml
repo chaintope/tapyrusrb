@@ -1,5 +1,5 @@
 --- !ruby/object:Tapyrus::ChainParams
-network: "testnet"
+network: "dev"
 magic_head: "0b110907"
 message_magic: "Bitcoin Signed Message:\n"
 address_version: "6f"

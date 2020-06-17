@@ -10,7 +10,7 @@ describe Tapyrus::Network::Peer do
   subject {
     chain_mock = double('chain mock')
     node_mock = double('node mock')
-    configuration = Tapyrus::Node::Configuration.new(network: :testnet)
+    configuration = Tapyrus::Node::Configuration.new(network: :dev)
     peer = Tapyrus::Network::Peer.new('210.196.254.100', 18333,
                                       Tapyrus::Network::Pool.new(node_mock, chain, configuration), configuration)
     peer.conn = ConnectionMock.new

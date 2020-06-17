@@ -18,10 +18,8 @@ module OpenAssets
       end
 
       def oa_version_byte
-        case Tapyrus.chain_params.network
-        when 'mainnet' then OA_VERSION_BYTE
-        when 'testnet', 'regtest' then OA_VERSION_BYTE_TESTNET
-        end
+        return OA_VERSION_BYTE if Tapyrus.chain_params.prod?
+        return OA_VERSION_BYTE_TESTNET if Tapyrus.chain_params.dev?
       end
     end
   end

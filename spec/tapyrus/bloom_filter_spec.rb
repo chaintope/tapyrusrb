@@ -28,7 +28,7 @@ describe Tapyrus::BloomFilter do
       end
     end
 
-    context "add key", network: :mainnet do
+    context "add key", network: :prod do
       subject{ Tapyrus::BloomFilter.create_filter(2, 0.001) }
       it do
         key = Tapyrus::Key.from_wif("5Kg1gnAjaLfKiwhhPpGS3QfRg2m6awQvaj98JCZBZQ5SuS2F15C")

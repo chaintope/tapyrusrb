@@ -49,7 +49,7 @@ describe Tapyrus::Script do
   describe 'p2pkh script' do
     subject { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
 
-    context 'mainnet', network: :mainnet do
+    context 'prod', network: :prod do
       it 'should be generate P2PKH script' do
         expect(subject.to_payload.bytesize).to eq(25)
         expect(subject.to_payload).to eq('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb)
@@ -64,7 +64,7 @@ describe Tapyrus::Script do
       end
     end
 
-    context 'testnet' do
+    context 'dev' do
       it 'should be generate P2PKH script' do
         expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
       end
@@ -77,7 +77,7 @@ describe Tapyrus::Script do
       k2 = '032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35'
       Tapyrus::Script.to_p2sh_multisig_script(1, [k1, k2])
     }
-    context 'mainnet', network: :mainnet do
+    context 'prod', network: :prod do
       it 'should be generate P2SH script' do
         expect(subject.length).to eq(2)
         expect(subject[0].to_hex).to eq('a9147620a79e8657d066cff10e21228bf983cf546ac687')
@@ -95,7 +95,7 @@ describe Tapyrus::Script do
       end
     end
 
-    context 'testnet' do
+    context 'dev' do
       it 'should be generate P2SH script' do
         expect(subject[0].addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
         expect(subject[1].addresses).to eq(['n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 'mvqSumyieKezeESrga7dGBmgm7cfuATBvf'])
@@ -324,7 +324,7 @@ describe Tapyrus::Script do
   end
 
   describe '#parse_from_addr' do
-    context 'mainnet', network: :mainnet do
+    context 'prod', network: :prod do
       it 'should generate script' do
         # P2PKH
         expect(Tapyrus::Script.parse_from_addr('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to eq(Tapyrus::Script.parse_from_payload('76a91457dd450aed53d4e35d3555a24ae7dbf3e08a78ec88ac'.htb))
@@ -333,7 +333,7 @@ describe Tapyrus::Script do
       end
     end
 
-    context 'testnet' do
+    context 'dev' do
       it 'should generate script' do
         # P2PKH
         expect(Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to eq(Tapyrus::Script.parse_from_payload('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb))

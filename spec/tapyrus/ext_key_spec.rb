@@ -2,7 +2,7 @@ require 'spec_helper'
 
 # BIP-32 test
 # https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Test_Vectors
-describe Tapyrus::ExtKey, network: :mainnet do
+describe Tapyrus::ExtKey, network: :prod do
 
   describe 'Test Vector 1' do
 

@@ -8,7 +8,7 @@ module Tapyrus
 
       def initialize(opts = {})
         # TODO apply configuration file.
-        opts[:network] = :mainnet unless opts[:network]
+        opts[:network] = :prod unless opts[:network]
         opts[:relay] = false unless opts[:relay]
         Tapyrus.chain_params = opts[:network]
 

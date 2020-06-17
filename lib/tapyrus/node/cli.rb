@@ -7,7 +7,7 @@ module Tapyrus
 
     class CLI < Thor
 
-      class_option :network, aliases: '-n', default: :mainnet
+      class_option :network, aliases: '-n', default: :prod
 
       desc 'getblockchaininfo', 'Returns an object containing various state info regarding blockchain processing.'
       def getblockchaininfo

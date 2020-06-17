@@ -29,7 +29,7 @@ describe Tapyrus::RPC::RequestHandler do
   describe '#getblockchaininfo' do
     it 'should return chain info' do
       result = subject.getblockchaininfo
-      expect(result[:chain]).to eq('testnet')
+      expect(result[:chain]).to eq('dev')
       expect(result[:headers]).to eq(1210339)
       expect(result[:bestblockhash]).to eq('00000000ecae98e551fde86596f9e258d28edefd956f1e6919c268332804b668')
       expect(result[:mediantime]).to eq(1508126989)
@@ -294,7 +294,7 @@ describe Tapyrus::RPC::RequestHandler do
     ))
     allow(conn2).to receive(:version).and_return(Tapyrus::Message::Version.new)
 
-    configuration = Tapyrus::Node::Configuration.new(network: :testnet)
+    configuration = Tapyrus::Node::Configuration.new(network: :dev)
     pool = Tapyrus::Network::Pool.new(node_mock, chain, configuration)
 
     peer1 =Tapyrus::Network::Peer.new('192.168.0.1', 18333, pool, configuration)

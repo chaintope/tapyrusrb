@@ -36,34 +36,23 @@ module Tapyrus
 
     attr_accessor :dust_relay_fee
 
-    # fork coin id.
-    attr_accessor :fork_id
 
-    # mainnet genesis
-    def self.mainnet
-      init('mainnet')
+    # production genesis
+    def self.prod
+      init('prod')
     end
 
-    # testnet genesis
-    def self.testnet
-      init('testnet')
+    # development genesis
+    def self.dev
+      init('dev')
     end
 
-    # regtest genesis
-    def self.regtest
-      init('regtest')
+    def prod?
+      network == 'prod'
     end
 
-    def mainnet?
-      network == 'mainnet'
-    end
-
-    def testnet?
-      network == 'testnet'
-    end
-
-    def regtest?
-      network == 'regtest'
+    def dev?
+      network == 'dev'
     end
 
     def genesis_block
@@ -73,10 +62,6 @@ module Tapyrus
       Tapyrus::Block.new(header)
     end
 
-    # whether fork coin.
-    def fork_chain?
-      !fork_id.nil?
-    end
 
     def self.init(name)
       i = YAML.load(File.open("#{__dir__}/chainparams/#{name}.yml"))

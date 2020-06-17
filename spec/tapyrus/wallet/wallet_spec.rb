@@ -3,23 +3,17 @@ require 'spec_helper'
 describe Tapyrus::Wallet do
 
   describe '#default_path_prefix' do
-    context 'testnet', network: :testnet do
+    context 'dev', network: :dev do
       subject { Tapyrus::Wallet::Base.default_path_prefix }
 
-      it { is_expected.to eq "#{Dir.home}/.tapyrusrb/testnet/db/wallet/" }
+      it { is_expected.to eq "#{Dir.home}/.tapyrusrb/dev/db/wallet/" }
     end
 
-    context 'regtest', network: :regtest do
-      subject { Tapyrus::Wallet::Base.default_path_prefix }
-
-      it { is_expected.to eq "#{Dir.home}/.tapyrusrb/regtest/db/wallet/" }
-    end
-
-    context 'change network from regtest to testnet', network: :regtest do
+    context 'change network from regtest to testnet', network: :prod do
       it 'should return path with network prefix' do
-        expect(Tapyrus::Wallet::Base.default_path_prefix).to eq "#{Dir.home}/.tapyrusrb/regtest/db/wallet/"
-        Tapyrus.chain_params = :testnet
-        expect(Tapyrus::Wallet::Base.default_path_prefix).to eq "#{Dir.home}/.tapyrusrb/testnet/db/wallet/"
+        expect(Tapyrus::Wallet::Base.default_path_prefix).to eq "#{Dir.home}/.tapyrusrb/prod/db/wallet/"
+        Tapyrus.chain_params = :dev
+        expect(Tapyrus::Wallet::Base.default_path_prefix).to eq "#{Dir.home}/.tapyrusrb/dev/db/wallet/"
       end
     end
 
@@ -77,7 +71,7 @@ describe Tapyrus::Wallet do
     end
   end
 
-  describe '#create_account', network: :mainnet do
+  describe '#create_account', network: :prod do
     subject {
       allow(Tapyrus::Wallet::MasterKey).to receive(:generate).and_return(test_master_key)
       wallet = create_test_wallet(3)

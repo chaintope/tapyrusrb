@@ -87,7 +87,7 @@ describe Tapyrus::Store::SPVChain do
     subject { chain }
 
     it 'should return median time' do
-      Tapyrus.chain_params = :mainnet
+      Tapyrus.chain_params = :prod
       # tapyrus mainnet
       headers = [
         # time = 1231469665
@@ -119,7 +119,7 @@ describe Tapyrus::Store::SPVChain do
 
     context 'block height is less than Tapyrus::MEDIAN_TIME_SPAN(11)' do
       it do
-        Tapyrus.chain_params = :mainnet
+        Tapyrus.chain_params = :prod
         # tapyrus mainnet
         headers = [
           # time = 1231469665

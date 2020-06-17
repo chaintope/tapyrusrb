@@ -9,7 +9,7 @@ RSpec.configure do |config|
     if example.metadata[:network]
       Tapyrus.chain_params = example.metadata[:network]
     else
-      Tapyrus.chain_params = :testnet
+      Tapyrus.chain_params = :dev
     end
     if example.metadata[:use_secp256k1]
       use_secp256k1

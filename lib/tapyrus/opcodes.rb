@@ -141,6 +141,8 @@ module Tapyrus
     OP_PUBKEY = 0xfe
     OP_INVALIDOPCODE = 0xff
 
+    OP_COLOR = 0xbc
+
     DUPLICATE_KEY = [:OP_NOP2, :OP_NOP3]
     OPCODES_MAP = Hash[*(constants.grep(/^OP_/) - [:OP_NOP2, :OP_NOP3, :OP_CHECKLOCKTIMEVERIFY, :OP_CHECKSEQUENCEVERIFY]).map { |c| [const_get(c), c.to_s] }.flatten]
     NAME_MAP = Hash[*constants.grep(/^OP_/).map { |c| [c.to_s, const_get(c)] }.flatten]

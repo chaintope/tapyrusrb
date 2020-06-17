@@ -6,8 +6,8 @@ describe OpenAssets::Util do
   describe  '.script_to_asset_id' do
     before { Tapyrus.chain_params = chain }
 
-    context 'mainnet' do
-      let(:chain) { :mainnet }
+    context 'prod' do
+      let(:chain) { :prod }
 
       it 'script_to_asset_id' do
         # OP_DUP OP_HASH160 010966776006953d5567439e5e39f86a0d273bee OP_EQUALVERIFY OP_CHECKSIG
@@ -15,8 +15,8 @@ describe OpenAssets::Util do
       end
     end
 
-    context 'testnet' do
-      let(:chain) { :testnet }
+    context 'dev' do
+      let(:chain) { :dev }
 
       it 'script_to_asset_id' do
         # OP_HASH160 f9d499817e88ef7b10a88673296c6d6df2f4292d OP_EQUAL
@@ -24,13 +24,5 @@ describe OpenAssets::Util do
       end
     end
 
-    context 'regtest' do
-      let(:chain) { :regtest }
-
-      it 'script_to_asset_id' do
-        # OP_HASH160 f9d499817e88ef7b10a88673296c6d6df2f4292d OP_EQUAL
-        expect(described_class.script_to_asset_id('a914f9d499817e88ef7b10a88673296c6d6df2f4292d87')).to eq('oMb2yzA542yQgwn8XtmGefTzBv5NJ2nDjh')
-      end
-    end
   end
 end

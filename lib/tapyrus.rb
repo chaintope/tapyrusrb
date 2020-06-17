@@ -51,11 +51,11 @@ module Tapyrus
 
   extend Util
 
-  @chain_param = :mainnet
+  @chain_param = :prod
 
   # set tapyrus network chain params
   def self.chain_params=(name)
-    raise "chain params for #{name} is not defined." unless %i(mainnet testnet regtest).include?(name.to_sym)
+    raise "chain params for #{name} is not defined." unless %i(prod dev).include?(name.to_sym)
     @current_chain = nil
     @chain_param = name.to_sym
   end
@@ -64,12 +64,10 @@ module Tapyrus
   def self.chain_params
     return @current_chain if @current_chain
     case @chain_param
-    when :mainnet
-      @current_chain = Tapyrus::ChainParams.mainnet
-    when :testnet
-      @current_chain = Tapyrus::ChainParams.testnet
-    when :regtest
-      @current_chain = Tapyrus::ChainParams.regtest
+    when :prod
+      @current_chain = Tapyrus::ChainParams.prod
+    when :dev
+      @current_chain = Tapyrus::ChainParams.dev
     end
     @current_chain
   end

@@ -65,29 +65,21 @@ And then add to your .rb file:
 
 The parameters of the blockchain are managed by `Tapyrus::ChainParams`. Switch chain parameters as follows:
 
-* mainnet
+* prod
 
 ```ruby
-Tapyrus.chain_params = :mainnet
+Tapyrus.chain_params = :prod
 ```
 
-This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/mainnet.yml.
+This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/prod.yml.
 
-* testnet
+* dev
 
 ```ruby
-Tapyrus.chain_params = :testnet
+Tapyrus.chain_params = :dev
 ```
 
-This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/testnet.yml.
-
-* regtest
-
-```ruby
-Tapyrus.chain_params = :regtest
-```
-
-This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/regtest.yml.
+This parameter is described in https://github.com/chaintope/tapyrusrb/blob/master/lib/tapyrus/chainparams/dev.yml.
 
 ## Contributing
 

@@ -111,7 +111,7 @@ describe Schnorr do
     end
   end
 
-  describe 'same deterministic sign with Tapyrus Core', network: :mainnet do
+  describe 'same deterministic sign with Tapyrus Core', network: :prod do
     it 'should be generated.' do
       key1 = Tapyrus::Key.from_wif('5HxWvvfubhXpYYpS3tJkw6fq9jE9j18THftkZjHHfmFiWtmAbrj')
       key2 = Tapyrus::Key.from_wif('5KC4ejrDjv152FGwP386VD1i2NYc5KkfSMyv1nGy1VGDxGHqVY3')

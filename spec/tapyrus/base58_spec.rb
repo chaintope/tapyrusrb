@@ -17,11 +17,9 @@ describe Tapyrus::Base58 do
     valid_json.each do |base58_str, payload, metadata|
       it "should be valid #{base58_str}, #{payload}, #{metadata}" do
         if metadata['chain'] == 'main'
-          Tapyrus.chain_params = :mainnet
-        elsif metadata['chain'] == 'test'
-          Tapyrus.chain_params = :testnet
+          Tapyrus.chain_params = :prod
         else
-          Tapyrus.chain_params = :regtest
+          Tapyrus.chain_params = :dev
         end
         compressed = metadata['isCompressed'] ? metadata['isCompressed'] : false
         is_privkey = metadata['isPrivkey']
