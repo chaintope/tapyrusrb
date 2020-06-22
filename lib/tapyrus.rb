@@ -46,6 +46,7 @@ module Tapyrus
   autoload :BloomFilter, 'tapyrus/bloom_filter'
   autoload :KeyPath, 'tapyrus/key_path'
   autoload :SLIP39, 'tapyrus/slip39'
+  autoload :Color, 'tapyrus/script/color'
 
   require_relative 'tapyrus/constants'
 

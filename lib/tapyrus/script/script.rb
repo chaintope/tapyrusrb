@@ -40,6 +40,22 @@ module Tapyrus
       Script.to_p2sh(to_hash160)
     end
 
+    # generate cp2pkh script
+    # @param [ColorIdentifier] color identifier
+    # @param [String] hash160 of pubkey
+    # @return [Script] CP2PKH script
+    def self.to_cp2pkh(color_id, pubkey_hash)
+      new << color_id.to_payload << OP_COLOR << OP_DUP << OP_HASH160 << pubkey_hash << OP_EQUALVERIFY << OP_CHECKSIG
+    end
+
+    # generate cp2sh script
+    # @param [ColorIdentifier] color identifier
+    # @param [String] hash160 of script
+    # @return [Script] CP2SH script
+    def self.to_cp2sh(color_id, script_hash)
+      new << color_id.to_payload << OP_COLOR << OP_HASH160 << script_hash << OP_EQUAL
+    end
+
     def get_multisig_pubkeys
       num = Tapyrus::Opcodes.opcode_to_small_int(chunks[-2].bth.to_i(16))
       (1..num).map{ |i| chunks[i].pushed_data }
@@ -175,6 +191,21 @@ module Tapyrus
     def standard_op_return?
       op_return? && size <= MAX_OP_RETURN_RELAY &&
           (chunks.size == 1 || chunks[1].opcode <= OP_16)
+    end
+
+    def cp2pkh?
+      return false unless chunks.size == 7
+      return false unless chunks[0].bytesize == 34
+      return false unless chunks[1].ord == OP_COLOR
+      [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] ==
+          (chunks[2..3]+ chunks[5..6]).map(&:ord) && chunks[4].bytesize == 21
+    end
+
+    def cp2sh?
+      return false unless chunks.size == 5
+      return false unless chunks[0].bytesize == 34
+      return false unless chunks[1].ord == OP_COLOR
+      OP_HASH160 == chunks[2].ord && OP_EQUAL == chunks[4].ord && chunks[3].bytesize == 21
     end
 
     def op_return_data
