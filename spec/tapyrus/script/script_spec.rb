@@ -157,6 +157,48 @@ describe Tapyrus::Script do
     end
   end
 
+  describe 'cp2pkh script' do
+    subject { Tapyrus::Script.to_cp2pkh(color, '46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
+
+    let(:color) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))}
+
+    it 'should be generate CP2PKH script' do
+      expect(subject.to_payload.bytesize).to eq(60)
+      expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac')
+      expect(subject.to_s).to eq('03ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_DUP OP_HASH160 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0 OP_EQUALVERIFY OP_CHECKSIG')
+      expect(subject.p2pkh?).to be false
+      expect(subject.p2sh?).to be false
+      expect(subject.cp2pkh?).to be true
+      expect(subject.cp2sh?).to be false
+      expect(subject.multisig?).to be false
+      expect(subject.op_return?).to be false
+      expect(subject.standard?).to be false
+      # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
+      # expect(subject.get_pubkeys).to eq([])
+    end
+  end
+
+  describe 'cp2sh script' do
+    subject { Tapyrus::Script.to_cp2sh(color, '7620a79e8657d066cff10e21228bf983cf546ac6') }
+
+    let(:color) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))}
+
+    it 'should be generate CP2SH script' do
+      expect(subject.to_payload.bytesize).to eq(58)
+      expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687')
+      expect(subject.to_s).to eq('03ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_HASH160 7620a79e8657d066cff10e21228bf983cf546ac6 OP_EQUAL')
+      expect(subject.p2pkh?).to be false
+      expect(subject.p2sh?).to be false
+      expect(subject.cp2pkh?).to be false
+      expect(subject.cp2sh?).to be true
+      expect(subject.multisig?).to be false
+      expect(subject.op_return?).to be false
+      expect(subject.standard?).to be false
+      # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
+      # expect(subject.get_pubkeys).to eq([])
+    end
+  end
+
   describe 'parse from payload' do
     context 'spendable' do
       subject { Tapyrus::Script.parse_from_payload('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb) }
