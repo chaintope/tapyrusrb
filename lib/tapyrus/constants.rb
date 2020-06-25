@@ -141,7 +141,12 @@ module Tapyrus
   SCRIPT_ERR_OP_CODESEPARATOR = 77
   SCRIPT_ERR_SIG_FINDANDDELETE = 78
 
-  SCRIPT_ERR_ERROR_COUNT = 80
+  SCRIPT_ERR_OP_COLOR_UNEXPECTED = 79
+  SCRIPT_ERR_OP_COLOR_ID_INVALID = 80
+  SCRIPT_ERR_OP_COLOR_MULTIPLE = 81
+  SCRIPT_ERR_OP_COLOR_IN_BRANCH = 82
+
+  SCRIPT_ERR_ERROR_COUNT = 83
 
   ERRCODES_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [const_get(c), c.to_s] }.flatten]
   NAME_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [c.to_s, const_get(c)] }.flatten]
