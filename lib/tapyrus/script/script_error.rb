@@ -82,6 +82,14 @@ module Tapyrus
         'Using OP_CODESEPARATOR in non-witness scrip'
       when SCRIPT_ERR_SIG_FINDANDDELETE
         'Signature is found in scriptCode'
+      when SCRIPT_ERR_OP_COLOR_UNEXPECTED
+        'Unexpected OP_COLOR in script'
+      when SCRIPT_ERR_OP_COLOR_ID_INVALID
+        'Invalid ColorId in script'
+      when SCRIPT_ERR_OP_COLOR_MULTIPLE
+        'Multiple OP_COLOR found in script'
+      when SCRIPT_ERR_OP_COLOR_IN_BRANCH
+        'OP_COLOR is not permitted in a script branch'
       when SCRIPT_ERR_UNKNOWN_ERROR, SCRIPT_ERR_ERROR_COUNT
         'unknown error'
       else

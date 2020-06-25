@@ -39,11 +39,11 @@ module Tapyrus
 
       stack_copy = nil
 
-      return false unless eval_script(script_sig, :base)
+      return false unless eval_script(script_sig, :base, false)
 
       stack_copy = stack.dup if flag?(SCRIPT_VERIFY_P2SH)
 
-      return false unless eval_script(script_pubkey, :base)
+      return false unless eval_script(script_pubkey, :base, false)
 
       return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last.htb)
 
@@ -58,7 +58,7 @@ module Tapyrus
         rescue Exception => e
           return set_error(SCRIPT_ERR_BAD_OPCODE, "Failed to parse serialized redeem script for P2SH. #{e.message}")
         end
-        return false unless eval_script(redeem_script, :base)
+        return false unless eval_script(redeem_script, :base, true)
         return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last)
       end
 
@@ -80,13 +80,14 @@ module Tapyrus
       false
     end
 
-    def eval_script(script, sig_version)
+    def eval_script(script, sig_version, is_redeem_script)
       return set_error(SCRIPT_ERR_SCRIPT_SIZE) if script.size > MAX_SCRIPT_SIZE
       begin
         flow_stack = []
         alt_stack = []
         last_code_separator_index = 0
         op_count = 0
+        color_id = nil
 
         script.chunks.each_with_index do |c, index|
           need_exec = !flow_stack.include?(false)
@@ -445,6 +446,25 @@ module Tapyrus
                   end
                 when OP_RETURN
                   return set_error(SCRIPT_ERR_OP_RETURN)
+                when OP_COLOR
+                  # Color id is not permitted in p2sh redeem script
+                  return set_error(SCRIPT_ERR_OP_COLOR_UNEXPECTED) if is_redeem_script
+
+                  # if Color id is already initialized this must be an extra
+                  return set_error(SCRIPT_ERR_OP_COLOR_MULTIPLE) if color_id && color_id.type != Tapyrus::Color::TokenTypes::NONE
+
+                  # color id is not allowed inside OP_IF
+                  return set_error(SCRIPT_ERR_OP_COLOR_IN_BRANCH) unless flow_stack.empty?
+
+                  # pop one stack element and verify that it exists
+                  return set_error(SCRIPT_ERR_INVALID_STACK_OPERATION) if stack.size() < 1
+
+                  color_id = Tapyrus::Color::ColorIdentifier.parse_from_payload(stack.last.htb)
+
+                  # check ColorIdentifier is valid
+                  return set_error(SCRIPT_ERR_OP_COLOR_ID_INVALID) unless color_id.valid?
+
+                  stack.pop
                 else
                   return set_error(SCRIPT_ERR_BAD_OPCODE)
               end
