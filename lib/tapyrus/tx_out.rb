@@ -7,6 +7,7 @@ module Tapyrus
   class TxOut
 
     include OpenAssets::MarkerOutput
+    include Tapyrus::Color::ColoredOutput
 
     attr_accessor :value
     attr_accessor :script_pubkey
