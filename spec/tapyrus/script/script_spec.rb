@@ -218,6 +218,36 @@ describe Tapyrus::Script do
     end
   end
 
+  describe '#add_color' do
+    subject { script.add_color(color) }
+
+    let(:color) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))}
+
+    context 'for p2pkh' do
+      let(:script) { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
+
+      it { expect(subject.to_hex).to eq '2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac' }
+      it { expect(subject.cp2pkh?).to be_truthy }
+      it { expect(subject.cp2sh?).to be_falsy }
+    end
+    context 'for p2sh' do
+      let(:script) do
+        k1 = '021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9'
+        k2 = '032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35'
+        Tapyrus::Script.to_p2sh_multisig_script(1, [k1, k2])[0]
+      end
+
+      it { expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687') }
+      it { expect(subject.cp2pkh?).to be_falsy }
+      it { expect(subject.cp2sh?).to be_truthy }
+    end
+    context 'for op_return' do
+      let(:script) { Tapyrus::Script.new << OP_RETURN }
+
+      it { expect { subject }.to raise_error }
+    end
+  end
+
   describe '#from_string' do
     it 'should be generate' do
       p2pkh = Tapyrus::Script.from_string('OP_DUP OP_HASH160 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0 OP_EQUALVERIFY OP_CHECKSIG')
