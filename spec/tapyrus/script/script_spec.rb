@@ -173,6 +173,7 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
+      expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
       # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
       # expect(subject.get_pubkeys).to eq([])
     end
@@ -194,6 +195,7 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
+      expect(subject.addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
       # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
       # expect(subject.get_pubkeys).to eq([])
     end

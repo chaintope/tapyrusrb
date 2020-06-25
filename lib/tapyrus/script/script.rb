@@ -166,6 +166,8 @@ module Tapyrus
     def addresses
       return [p2pkh_addr] if p2pkh?
       return [p2sh_addr] if p2sh?
+      return [cp2pkh_addr] if cp2pkh?
+      return [cp2sh_addr] if cp2sh?
       return get_multisig_pubkeys.map{|pubkey| Tapyrus::Key.new(pubkey: pubkey.bth).to_p2pkh} if multisig?
       []
     end
@@ -509,6 +511,21 @@ module Tapyrus
       Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.p2sh_version)
     end
 
+    # generate cp2pkh address. if script dose not cp2pkh, return nil.
+    def cp2pkh_addr
+      return nil unless cp2pkh?
+      hash160 = chunks[4].pushed_data.bth
+      return nil unless hash160.htb.bytesize == 20
+      Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.address_version)
+    end
+
+    # generate cp2sh address. if script dose not cp2sh, return nil.
+    def cp2sh_addr
+      return nil unless cp2sh?
+      hash160 = chunks[3].pushed_data.bth
+      return nil unless hash160.htb.bytesize == 20
+      Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.p2sh_version)
+    end
   end
 
 end
