@@ -62,7 +62,7 @@ describe Tapyrus::ScriptInterpreter do
     tx.version = 1
     tx.lock_time = 0
     tx.inputs << Tapyrus::TxIn.new(
-      out_point: Tapyrus::OutPoint.new(locked_tx.tx_hash, 0),
+      out_point: Tapyrus::OutPoint.from_txid(locked_tx.txid, 0),
       script_sig: script_sig,
     )
     tx.outputs << Tapyrus::TxOut.new(script_pubkey: Tapyrus::Script.new, value: amount)
