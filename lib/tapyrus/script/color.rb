@@ -48,5 +48,30 @@ module Tapyrus
         @payload = payload
       end
     end
+
+    module ColoredOutput
+      def colored?
+        script_pubkey.cp2pkh? || script_pubkey.cp2sh?
+      end
+
+      def color_id
+        @color_id ||= ColorIdentifier.parse_from_payload(script_pubkey.chunks[0].pushed_data)
+      end
+
+      def reissuable?
+        return false unless colored?
+        color_id.type == TokenTypes::REISSUABLE
+      end
+
+      def non_reissuable?
+        return false unless colored?
+        color_id.type == TokenTypes::NON_REISSUABLE
+      end
+
+      def nft?
+        return false unless colored?
+        color_id.type == TokenTypes::NFT
+      end
+    end
   end
 end
