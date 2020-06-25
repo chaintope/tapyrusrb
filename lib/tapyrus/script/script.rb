@@ -56,6 +56,17 @@ module Tapyrus
       new << color_id.to_payload << OP_COLOR << OP_HASH160 << script_hash << OP_EQUAL
     end
 
+    # Add color identifier to existing p2pkh or p2sh
+    # @param [ColorIdentifier] color identifier
+    # @return [Script] CP2PKH or CP2SH script
+    def add_color(color_id)
+      raise RuntimeError, 'Only p2pkh and p2sh can add color' unless p2pkh? or p2sh?
+      Tapyrus::Script.new.tap do |s|
+        s << color_id.to_payload << OP_COLOR
+        s.chunks += self.chunks
+      end
+    end
+
     def get_multisig_pubkeys
       num = Tapyrus::Opcodes.opcode_to_small_int(chunks[-2].bth.to_i(16))
       (1..num).map{ |i| chunks[i].pushed_data }
