@@ -261,10 +261,25 @@ describe Tapyrus::Script do
       it { expect(subject.cp2pkh?).to be_falsy }
       it { expect(subject.cp2sh?).to be_truthy }
     end
+
     context 'for op_return' do
       let(:script) { Tapyrus::Script.new << OP_RETURN }
 
       it { expect { subject }.to raise_error }
+    end
+
+    context 'when color identifier is not specified' do
+      let(:color) { nil }
+      let(:script) { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
+
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
+    end
+
+    context 'when color identifier is invalid' do
+      let(:color) { Tapyrus::Color::ColorIdentifier.parse_from_payload("c4ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46") }
+      let(:script) { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
+
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
     end
   end
 

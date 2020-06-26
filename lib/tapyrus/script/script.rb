@@ -63,7 +63,10 @@ module Tapyrus
     # Add color identifier to existing p2pkh or p2sh
     # @param [ColorIdentifier] color identifier
     # @return [Script] CP2PKH or CP2SH script
+    # @raise [ArgumentError] if color_id is nil or invalid
+    # @raise [RuntimeError] if script is neither p2pkh nor p2sh
     def add_color(color_id)
+      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
       raise RuntimeError, 'Only p2pkh and p2sh can add color' unless p2pkh? or p2sh?
       Tapyrus::Script.new.tap do |s|
         s << color_id.to_payload << OP_COLOR
