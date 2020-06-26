@@ -44,7 +44,9 @@ module Tapyrus
     # @param [ColorIdentifier] color identifier
     # @param [String] hash160 of pubkey
     # @return [Script] CP2PKH script
+    # @raise [ArgumentError] if color_id is nil or invalid
     def self.to_cp2pkh(color_id, pubkey_hash)
+      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
       new << color_id.to_payload << OP_COLOR << OP_DUP << OP_HASH160 << pubkey_hash << OP_EQUALVERIFY << OP_CHECKSIG
     end
 
@@ -52,7 +54,9 @@ module Tapyrus
     # @param [ColorIdentifier] color identifier
     # @param [String] hash160 of script
     # @return [Script] CP2SH script
+    # @raise [ArgumentError] if color_id is nil or invalid
     def self.to_cp2sh(color_id, script_hash)
+      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
       new << color_id.to_payload << OP_COLOR << OP_HASH160 << script_hash << OP_EQUAL
     end
 
