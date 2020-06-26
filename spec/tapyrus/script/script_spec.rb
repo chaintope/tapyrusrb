@@ -164,8 +164,8 @@ describe Tapyrus::Script do
 
     it 'should be generate CP2PKH script' do
       expect(subject.to_payload.bytesize).to eq(60)
-      expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac')
-      expect(subject.to_s).to eq('03ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_DUP OP_HASH160 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0 OP_EQUALVERIFY OP_CHECKSIG')
+      expect(subject.to_hex).to eq('21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac')
+      expect(subject.to_s).to eq('c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_DUP OP_HASH160 46c2fbfbecc99a63148fa076de58cf29b0bcf0b0 OP_EQUALVERIFY OP_CHECKSIG')
       expect(subject.p2pkh?).to be false
       expect(subject.p2sh?).to be false
       expect(subject.cp2pkh?).to be true
@@ -174,8 +174,7 @@ describe Tapyrus::Script do
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
       expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
-      # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
-      # expect(subject.get_pubkeys).to eq([])
+      expect(subject.get_pubkeys).to eq([])
     end
   end
 
@@ -186,8 +185,8 @@ describe Tapyrus::Script do
 
     it 'should be generate CP2SH script' do
       expect(subject.to_payload.bytesize).to eq(58)
-      expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687')
-      expect(subject.to_s).to eq('03ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_HASH160 7620a79e8657d066cff10e21228bf983cf546ac6 OP_EQUAL')
+      expect(subject.to_hex).to eq('21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687')
+      expect(subject.to_s).to eq('c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46 OP_COLOR OP_HASH160 7620a79e8657d066cff10e21228bf983cf546ac6 OP_EQUAL')
       expect(subject.p2pkh?).to be false
       expect(subject.p2sh?).to be false
       expect(subject.cp2pkh?).to be false
@@ -196,8 +195,7 @@ describe Tapyrus::Script do
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
       expect(subject.addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
-      # TODO: get_pubkeys returns ColorIdentifier because it is 33byte-length
-      # expect(subject.get_pubkeys).to eq([])
+      expect(subject.get_pubkeys).to eq([])
     end
   end
 
@@ -228,7 +226,7 @@ describe Tapyrus::Script do
     context 'for p2pkh' do
       let(:script) { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
 
-      it { expect(subject.to_hex).to eq '2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac' }
+      it { expect(subject.to_hex).to eq '21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac' }
       it { expect(subject.cp2pkh?).to be_truthy }
       it { expect(subject.cp2sh?).to be_falsy }
     end
@@ -239,7 +237,7 @@ describe Tapyrus::Script do
         Tapyrus::Script.to_p2sh_multisig_script(1, [k1, k2])[0]
       end
 
-      it { expect(subject.to_hex).to eq('2103ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687') }
+      it { expect(subject.to_hex).to eq('21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687') }
       it { expect(subject.cp2pkh?).to be_falsy }
       it { expect(subject.cp2sh?).to be_truthy }
     end

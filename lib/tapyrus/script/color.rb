@@ -1,10 +1,10 @@
 module Tapyrus
   module Color
     module TokenTypes
-      NONE = 0
-      REISSUABLE = 1
-      NON_REISSUABLE = 2
-      NFT = 3
+      NONE = 0x00
+      REISSUABLE = 0xC1
+      NON_REISSUABLE = 0xC2
+      NFT = 0xC3
     end
 
     class ColorIdentifier
