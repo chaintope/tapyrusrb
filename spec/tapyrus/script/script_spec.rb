@@ -176,6 +176,16 @@ describe Tapyrus::Script do
       expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
       expect(subject.get_pubkeys).to eq([])
     end
+
+    context 'when color identifier is not specified' do
+      let(:color) { nil }
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
+    end
+
+    context 'when color identifier is invalid' do
+      let(:color) { Tapyrus::Color::ColorIdentifier.parse_from_payload("c4ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46") }
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
+    end
   end
 
   describe 'cp2sh script' do
@@ -196,6 +206,16 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
       expect(subject.get_pubkeys).to eq([])
+    end
+
+    context 'when color identifier is not specified' do
+      let(:color) { nil }
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
+    end
+
+    context 'when color identifier is invalid' do
+      let(:color) { Tapyrus::Color::ColorIdentifier.parse_from_payload("c4ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46") }
+      it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
     end
   end
 
