@@ -88,10 +88,17 @@ describe Tapyrus::Key do
 
   describe '#sign and verify' do
     it 'should be success' do
-      message = 'message'.htb
+      message = Tapyrus.sha256('message'.htb)
       key = Tapyrus::Key.generate
+      # ecdsa
       sig = key.sign(message)
       expect(key.verify(sig, message)).to be true
+      expect(key.verify(sig, message, algo: :schnorr)).to be false
+
+      # schnorr
+      sig = key.sign(message, algo: :schnorr)
+      expect(key.verify(sig, message)).to be false
+      expect(key.verify(sig, message, algo: :schnorr)).to be true
     end
   end
 

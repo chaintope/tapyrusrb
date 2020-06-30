@@ -11,6 +11,8 @@ module Tapyrus
     SIGNATURE_SIZE = 72
     COMPACT_SIGNATURE_SIZE = 65
 
+    SIG_ALGO = [:ecdsa, :schnorr]
+
     attr_accessor :priv_key
     attr_accessor :pubkey
     attr_accessor :key_type
@@ -89,29 +91,31 @@ module Tapyrus
     # @param [String] data a data to be signed with binary format
     # @param [Boolean] low_r flag to apply low-R.
     # @param [String] extra_entropy the extra entropy for rfc6979.
+    # @param [Symbol] algo Algorithms used for verification. Either :ecdsa or :schnorr is supported. default value is :ecdsa.
     # @return [String] signature data with binary format
-    def sign(data, low_r = true, extra_entropy = nil)
-      sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
-      if low_r && !sig_has_low_r?(sig)
-        counter = 1
-        until sig_has_low_r?(sig)
-          extra_entropy = [counter].pack('I*').bth.ljust(64, '0').htb
-          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
-          counter += 1
-        end
+    def sign(data, low_r = true, extra_entropy = nil, algo: :ecdsa)
+      raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
+      if algo == :ecdsa
+        sign_ecdsa(data, low_r, extra_entropy)
+      else
+        sign_schnorr(data)
       end
-      sig
     end
 
     # verify signature using public key
     # @param [String] sig signature data with binary format
     # @param [String] origin original message
+    # @param [Symbol] algo Algorithms used for verification. Either :ecdsa or :schnorr is supported. default value is :ecdsa.
     # @return [Boolean] verify result
-    def verify(sig, origin)
+    def verify(sig, origin, algo: :ecdsa)
       return false unless valid_pubkey?
       begin
-        sig = ecdsa_signature_parse_der_lax(sig)
-        secp256k1_module.verify_sig(origin, sig, pubkey)
+        raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
+        if algo == :ecdsa
+          verify_ecdsa_sig(sig, origin)
+        else
+          verify_schnorr_sig(sig, origin)
+        end
       rescue Exception
         false
       end
@@ -179,18 +183,24 @@ module Tapyrus
 
     # check +sig+ is correct der encoding.
     # This function is consensus-critical since BIP66.
-    def self.valid_signature_encoding?(sig)
-      return false if sig.bytesize < 9 || sig.bytesize > 73 # Minimum and maximum size check
+    # @param [String] sig a signature data with binary format.
+    # @param [Boolean] data_sig whether data signature or not.
+    # @return [Boolean] result
+    def self.valid_signature_encoding?(sig, data_sig = false)
+      num_parts = data_sig ? 8 : 9
+      size = data_sig ? 72 : 73
+
+      return false if sig.bytesize < num_parts || sig.bytesize > size # Minimum and maximum size check
 
       s = sig.unpack('C*')
 
-      return false if s[0] != 0x30 || s[1] != s.size - 3 # A signature is of type 0x30 (compound). Make sure the length covers the entire signature.
+      return false if s[0] != 0x30 || s[1] != s.size - (data_sig ? 2 : 3) # A signature is of type 0x30 (compound). Make sure the length covers the entire signature.
 
       len_r = s[3]
       return false if 5 + len_r >= s.size # Make sure the length of the S element is still inside the signature.
 
       len_s = s[5 + len_r]
-      return false unless len_r + len_s + 7 == s.size #Verify that the length of the signature matches the sum of the length of the elements.
+      return false unless len_r + len_s + (data_sig ? 6 : 7) == s.size #Verify that the length of the signature matches the sum of the length of the elements.
 
       return false unless s[2] == 0x02 # Check whether the R element is an integer.
 
@@ -277,6 +287,36 @@ module Tapyrus
     # @return [Boolean] result
     def sig_has_low_r?(sig)
       sig[3].bth.to_i(16) == 0x20 && sig[4].bth.to_i(16) < 0x80
+    end
+
+    # generate ecdsa signature
+    def sign_ecdsa(data, low_r, extra_entropy)
+      sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
+      if low_r && !sig_has_low_r?(sig)
+        counter = 1
+        until sig_has_low_r?(sig)
+          extra_entropy = [counter].pack('I*').bth.ljust(64, '0').htb
+          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
+          counter += 1
+        end
+      end
+      sig
+    end
+
+    # generate schnorr signature
+    def sign_schnorr(msg)
+      Schnorr.sign(msg, priv_key.to_i(16)).encode
+    end
+
+    # verify ecdsa signature
+    def verify_ecdsa_sig(sig, message)
+      sig = ecdsa_signature_parse_der_lax(sig)
+      secp256k1_module.verify_sig(message, sig, pubkey)
+    end
+
+    # verify schnorr signature
+    def verify_schnorr_sig(sig, message)
+      Schnorr.valid_sig?(message, sig, pubkey.htb)
     end
 
   end
