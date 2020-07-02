@@ -177,6 +177,10 @@ describe Tapyrus::Script do
       expect(subject.get_pubkeys).to eq([])
     end
 
+    context 'prod', network: :prod do
+      it { expect(subject.addresses.first).to eq('w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC') }
+    end
+
     context 'when color identifier is not specified' do
       let(:color) { nil }
       it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
@@ -206,6 +210,10 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.addresses.first).to eq('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
       expect(subject.get_pubkeys).to eq([])
+    end
+
+    context 'prod', network: :prod do
+      it { expect(subject.addresses.first).to eq('4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB') }
     end
 
     context 'when color identifier is not specified' do
