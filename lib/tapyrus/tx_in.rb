@@ -35,11 +35,10 @@ module Tapyrus
       hash, index = buf.read(36).unpack('a32V')
       i.out_point = OutPoint.new(hash.bth, index)
       sig_length = Tapyrus.unpack_var_int_from_io(buf)
-      sig = buf.read(sig_length)
-      if i.coinbase?
-        i.script_sig.chunks[0] = sig
+      if sig_length == 0
+        i.script_sig = Script.new
       else
-        i.script_sig = Script.parse_from_payload(sig)
+        i.script_sig = Script.parse_from_payload(buf.read(sig_length))
       end
       i.sequence = buf.read(4).unpack('V').first
       i

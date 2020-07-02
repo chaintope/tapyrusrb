@@ -29,7 +29,7 @@ module Tapyrus
       end
 
       if tx.coinbase_tx?
-        if tx.inputs[0].script_sig.size < 2 || tx.inputs[0].script_sig.size > 100
+        if tx.inputs[0].out_point.index == 0xffffffff || tx.inputs[0].script_sig.size > 100
           return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-cb-length')
         end
       else

@@ -3,6 +3,9 @@ require 'spec_helper'
 describe Tapyrus::ScriptInterpreter do
 
   describe 'check script_test.json' do
+    script_json = [
+        ["0", "0x21 0x02865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac0 CHECKSIG NOT", "", "OK"]
+    ]
     script_json = fixture_file('script_tests.json').select{ |j|j.size > 3}
     script_json.each do| r |
       it "should validate script #{r.inspect}" do

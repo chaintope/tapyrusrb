@@ -24,9 +24,7 @@ module Tapyrus
       sig = script_sig[0..-2]
       sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type,
                                      amount: amount, sig_version: sig_version)
-      key_type = pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
-      key = Key.new(pubkey: pubkey, key_type: key_type)
-      key.verify(sig, sighash)
+      verify_sig(sig.bth, pubkey, sighash)
     end
 
     # Check data signature.
@@ -35,9 +33,10 @@ module Tapyrus
     # @param [String] digest a message digest with binary format to be verified.
     # @return [Boolean] if check is passed return true, otherwise false.
     def verify_sig(sig, pubkey, digest)
+      key_type = pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
       sig = sig.htb
       algo = sig.bytesize == 64 ? :schnorr : :ecdsa
-      key = Key.new(pubkey: pubkey)
+      key = Key.new(pubkey: pubkey, key_type: key_type)
       key.verify(sig, digest, algo: algo)
     end
 

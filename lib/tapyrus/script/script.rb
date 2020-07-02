@@ -313,6 +313,7 @@ module Tapyrus
         when Integer
           opcode_to_name(c)
         when String
+          return c if c.empty?
           if c.pushdata?
             v = Opcodes.opcode_to_small_int(c.ord)
             if v

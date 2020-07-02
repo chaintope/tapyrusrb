@@ -19,7 +19,7 @@ module Tapyrus
     end
 
     def coinbase?
-      tx_hash == COINBASE_HASH && index == COINBASE_INDEX
+      tx_hash == COINBASE_HASH
     end
 
     def to_payload
