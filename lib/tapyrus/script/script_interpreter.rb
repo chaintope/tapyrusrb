@@ -353,7 +353,7 @@ module Tapyrus
                     subscript = tmp
                   end
 
-                  return false if !check_pubkey_encoding(pubkey, sig_version) || !check_signature_encoding(sig) # error already set.
+                  return false if !check_pubkey_encoding(pubkey, sig_version) || !check_ecdsa_signature_encoding(sig) # error already set.
 
                   success = checker.check_sig(sig, pubkey, subscript, sig_version)
 
@@ -370,6 +370,19 @@ module Tapyrus
                     else
                       return set_error(SCRIPT_ERR_CHECKSIGVERIFY)
                     end
+                  end
+                when OP_CHECKDATASIG, OP_CHECKDATASIGVERIFY
+                  return set_error(SCRIPT_ERR_INVALID_STACK_OPERATION)  if stack.size < 3
+                  sig, msg, pubkey = pop_string(3)
+                  # check signature encoding without hashtype byte
+                  return false if (sig.htb.bytesize != (Tapyrus::Key::COMPACT_SIGNATURE_SIZE - 1) && !check_ecdsa_signature_encoding(sig, true)) || !check_pubkey_encoding(pubkey, sig_version)
+                  digest = Tapyrus.sha256(msg)
+                  success = checker.verify_sig(sig, pubkey, digest)
+                  return set_error(SCRIPT_ERR_SIG_NULLFAIL) if !success && flag?(SCRIPT_VERIFY_NULLFAIL) && sig.bytesize > 0
+                  push_int(success ? 1 : 0)
+                  if opcode == OP_CHECKDATASIGVERIFY
+                    stack.pop if success
+                    return set_error(SCRIPT_ERR_CHECKDATASIGVERIFY) unless success
                   end
                 when OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY
                   return set_error(SCRIPT_ERR_INVALID_STACK_OPERATION)  if stack.size < 1
@@ -409,7 +422,7 @@ module Tapyrus
                   while success && sig_count > 0
                     sig = sigs.pop
                     pubkey = pubkeys.pop
-                    return false if !check_pubkey_encoding(pubkey, sig_version) || !check_signature_encoding(sig) # error already set.
+                    return false if !check_pubkey_encoding(pubkey, sig_version) || !check_ecdsa_signature_encoding(sig) # error already set.
                     ok = checker.check_sig(sig, pubkey, subscript, sig_version)
                     if ok
                       sig_count -= 1
@@ -548,20 +561,20 @@ module Tapyrus
       end
     end
 
-    def check_signature_encoding(sig)
+    def check_ecdsa_signature_encoding(sig, data_sig = false)
       return true if sig.size.zero?
-      if (flag?(SCRIPT_VERIFY_DERSIG) || flag?(SCRIPT_VERIFY_LOW_S) || flag?(SCRIPT_VERIFY_STRICTENC)) && !Key.valid_signature_encoding?(sig.htb)
+      if (flag?(SCRIPT_VERIFY_DERSIG) || flag?(SCRIPT_VERIFY_LOW_S) || flag?(SCRIPT_VERIFY_STRICTENC)) && !Key.valid_signature_encoding?(sig.htb, data_sig)
         return set_error(SCRIPT_ERR_SIG_DER)
-      elsif flag?(SCRIPT_VERIFY_LOW_S) && !low_der_signature?(sig)
+      elsif flag?(SCRIPT_VERIFY_LOW_S) && !low_der_signature?(sig, data_sig)
         return false
-      elsif flag?(SCRIPT_VERIFY_STRICTENC) && !defined_hashtype_signature?(sig)
+      elsif flag?(SCRIPT_VERIFY_STRICTENC) && !data_sig && !defined_hashtype_signature?(sig)
         return set_error(SCRIPT_ERR_SIG_HASHTYPE)
       end
       true
     end
 
-    def low_der_signature?(sig)
-      return set_error(SCRIPT_ERR_SIG_DER) unless Key.valid_signature_encoding?(sig.htb)
+    def low_der_signature?(sig, data_sig = false)
+      return set_error(SCRIPT_ERR_SIG_DER) unless Key.valid_signature_encoding?(sig.htb, data_sig)
       return set_error(SCRIPT_ERR_SIG_HIGH_S) unless Key.low_signature?(sig.htb)
       true
     end

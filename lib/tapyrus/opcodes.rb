@@ -141,6 +141,9 @@ module Tapyrus
     OP_PUBKEY = 0xfe
     OP_INVALIDOPCODE = 0xff
 
+    # tapyrus extension
+    OP_CHECKDATASIG = 0xba
+    OP_CHECKDATASIGVERIFY = 0xbb
     OP_COLOR = 0xbc
 
     DUPLICATE_KEY = [:OP_NOP2, :OP_NOP3]

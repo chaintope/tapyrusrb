@@ -12,10 +12,11 @@ module Tapyrus
     end
 
     # check signature
-    # @param [String] script_sig
-    # @param [String] pubkey
+    # @param [String] script_sig a signature with hex format.
+    # @param [String] pubkey a public key with hex format.
     # @param [Tapyrus::Script] script_code
     # @param [Integer] sig_version
+    # @return [Boolean] if check is passed return true, otherwise false.
     def check_sig(script_sig, pubkey, script_code, sig_version)
       return false if script_sig.empty?
       script_sig = script_sig.htb
@@ -26,6 +27,18 @@ module Tapyrus
       key_type = pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
       key = Key.new(pubkey: pubkey, key_type: key_type)
       key.verify(sig, sighash)
+    end
+
+    # Check data signature.
+    # @param [String] sig a signature with hex format.
+    # @param [String] pubkey a public key with hex format.
+    # @param [String] digest a message digest with binary format to be verified.
+    # @return [Boolean] if check is passed return true, otherwise false.
+    def verify_sig(sig, pubkey, digest)
+      sig = sig.htb
+      algo = sig.bytesize == 64 ? :schnorr : :ecdsa
+      key = Key.new(pubkey: pubkey)
+      key.verify(sig, digest, algo: algo)
     end
 
     def check_locktime(locktime)

@@ -60,7 +60,7 @@ describe Tapyrus::Opcodes do
       it 'should be false' do
         expect(Tapyrus::Opcodes.defined?(0xc1.chr.opcode)).to be false
         expect(Tapyrus::Opcodes.defined?(0xfff)).to be false
-        expect(Tapyrus::Opcodes.defined?(0xba.chr.opcode)).to be false
+        expect(Tapyrus::Opcodes.defined?(0xbd.chr.opcode)).to be false
       end
     end
   end
