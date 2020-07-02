@@ -522,17 +522,27 @@ module Tapyrus
     # generate cp2pkh address. if script dose not cp2pkh, return nil.
     def cp2pkh_addr
       return nil unless cp2pkh?
+
+      color_id = chunks[0].pushed_data.bth
+      return nil unless Tapyrus::Color::ColorIdentifier.parse_from_payload(color_id.htb)&.valid?
+
       hash160 = chunks[4].pushed_data.bth
       return nil unless hash160.htb.bytesize == 20
-      Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.address_version)
+
+      Tapyrus.encode_base58_address(color_id + hash160, Tapyrus.chain_params.cp2pkh_version)
     end
 
     # generate cp2sh address. if script dose not cp2sh, return nil.
     def cp2sh_addr
       return nil unless cp2sh?
+
+      color_id = chunks[0].pushed_data.bth
+      return nil unless Tapyrus::Color::ColorIdentifier.parse_from_payload(color_id.htb)&.valid?
+
       hash160 = chunks[3].pushed_data.bth
       return nil unless hash160.htb.bytesize == 20
-      Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.p2sh_version)
+
+      Tapyrus.encode_base58_address(color_id + hash160, Tapyrus.chain_params.cp2sh_version)
     end
   end
 
