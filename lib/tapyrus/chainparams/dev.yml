@@ -4,6 +4,8 @@ magic_head: "0b110907"
 message_magic: "Bitcoin Signed Message:\n"
 address_version: "6f"
 p2sh_version: "c4"
+cp2pkh_version: "70"
+cp2sh_version: "c5"
 bech32_hrp: 'tb'
 privkey_version: "ef"
 extended_privkey_version: "04358394"

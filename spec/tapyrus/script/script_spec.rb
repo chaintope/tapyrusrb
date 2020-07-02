@@ -173,7 +173,7 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
-      expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
+      expect(subject.addresses.first).to eq('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')
       expect(subject.get_pubkeys).to eq([])
     end
 
@@ -204,7 +204,7 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
-      expect(subject.addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
+      expect(subject.addresses.first).to eq('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
       expect(subject.get_pubkeys).to eq([])
     end
 
