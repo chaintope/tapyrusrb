@@ -157,6 +157,34 @@ describe Tapyrus::Script do
     end
   end
 
+  describe '#cp2pkh?' do
+    subject { Tapyrus::Script.parse_from_payload(payload) }
+
+    let(:payload) { '21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb }
+
+    it { expect(subject.cp2pkh?).to be_truthy }
+
+    context 'invalid type' do
+      let(:payload) { '21c4ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb }
+
+      it { expect(subject.cp2pkh?).to be_falsy }
+    end
+  end
+
+  describe '#cp2sh?' do
+    subject { Tapyrus::Script.parse_from_payload(payload) }
+
+    let(:payload) { '21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687'.htb }
+
+    it { expect(subject.cp2sh?).to be_truthy }
+
+    context 'invalid type' do
+      let(:payload) { '21c4ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687'.htb }
+
+      it { expect(subject.cp2sh?).to be_falsy }
+    end
+  end
+
   describe 'cp2pkh script' do
     subject { Tapyrus::Script.to_cp2pkh(color, '46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
 
