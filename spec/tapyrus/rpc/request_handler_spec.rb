@@ -42,8 +42,8 @@ describe Tapyrus::RPC::RequestHandler do
         result = subject.getblockheader('00000000fb0350a72d7316a2006de44e74c16b56843a29bd85e0535d71edbc5b', true)
         expect(result[:hash]).to eq('00000000fb0350a72d7316a2006de44e74c16b56843a29bd85e0535d71edbc5b')
         expect(result[:height]).to eq(1210337)
-        expect(result[:version]).to eq(536870912)
-        expect(result[:versionHex]).to eq('20000000')
+        expect(result[:features]).to eq(536870912)
+        expect(result[:featuresHex]).to eq('20000000')
         expect(result[:merkleroot]).to eq('ac92cbb5ccd160f9b474f27a1ed50aa9f503b4d39c5acd7f24ef0a6a0287c7c6')
         expect(result[:time]).to eq(1508130596)
         expect(result[:mediantime]).to eq(1508125317)
@@ -102,7 +102,7 @@ describe Tapyrus::RPC::RequestHandler do
       expect(tx).to include(
                         txid: '417bb3c8c2c54d6f833308bd2c31800bff543cb5d67f772f566915b1d2e3beb9',
                         hash: '32fc29c43ee6ff13e12f7419a5ef29e07fdc84e24808d06a397fb24854fbf56a',
-                        version: 1, size: 196, locktime: 0,
+                        features: 1, size: 196, locktime: 0,
                         vin:[{
                             txid: 'eb750ea1cc8e88e1202c903ca0d262857a974079d71e2fc68919289ec3ac7971', vout: 0,
                             script_sig: {

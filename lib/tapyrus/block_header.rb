@@ -3,15 +3,15 @@ module Tapyrus
   # Block Header
   class BlockHeader
 
-    attr_accessor :version
+    attr_accessor :features
     attr_accessor :prev_hash
     attr_accessor :merkle_root
     attr_accessor :time # unix timestamp
     attr_accessor :bits
     attr_accessor :nonce
 
-    def initialize(version, prev_hash, merkle_root, time, bits, nonce)
-      @version = version
+    def initialize(features, prev_hash, merkle_root, time, bits, nonce)
+      @features = features
       @prev_hash = prev_hash
       @merkle_root = merkle_root
       @time = time
@@ -20,12 +20,12 @@ module Tapyrus
     end
 
     def self.parse_from_payload(payload)
-      version, prev_hash, merkle_root, time, bits, nonce = payload.unpack('Va32a32VVV')
-      new(version, prev_hash.bth, merkle_root.bth, time, bits, nonce)
+      features, prev_hash, merkle_root, time, bits, nonce = payload.unpack('Va32a32VVV')
+      new(features, prev_hash.bth, merkle_root.bth, time, bits, nonce)
     end
 
     def to_payload
-      [version, prev_hash.htb, merkle_root.htb, time, bits, nonce].pack('Va32a32VVV')
+      [features, prev_hash.htb, merkle_root.htb, time, bits, nonce].pack('Va32a32VVV')
     end
 
     # compute difficulty target from bits.

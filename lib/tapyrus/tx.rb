@@ -11,7 +11,7 @@ module Tapyrus
     # The maximum weight for transactions we're willing to relay/mine
     MAX_STANDARD_TX_WEIGHT = 400000
 
-    attr_accessor :version
+    attr_accessor :features
     attr_reader :inputs
     attr_reader :outputs
     attr_accessor :lock_time
@@ -19,7 +19,7 @@ module Tapyrus
     def initialize
       @inputs = []
       @outputs = []
-      @version = 1
+      @features = 1
       @lock_time = 0
     end
 
@@ -29,7 +29,7 @@ module Tapyrus
     def self.parse_from_payload(payload)
       buf = payload.is_a?(String) ? StringIO.new(payload) : payload
       tx = new
-      tx.version = buf.read(4).unpack('V').first
+      tx.features = buf.read(4).unpack('V').first
 
       in_count = Tapyrus.unpack_var_int_from_io(buf)
 
@@ -56,7 +56,7 @@ module Tapyrus
     end
 
     def txid
-      buf = [version].pack('V')
+      buf = [features].pack('V')
       buf << Tapyrus.pack_var_int(inputs.length) << inputs.map{|i|i.to_payload(use_malfix: true)}.join
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
       buf << [lock_time].pack('V')
@@ -64,7 +64,7 @@ module Tapyrus
     end
 
     def to_payload
-      buf = [version].pack('V')
+      buf = [features].pack('V')
       buf << Tapyrus.pack_var_int(inputs.length) << inputs.map(&:to_payload).join
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
       buf << [lock_time].pack('V')
@@ -87,7 +87,7 @@ module Tapyrus
 
     # check this tx is standard.
     def standard?
-      return false if version > MAX_STANDARD_VERSION
+      return false if features > MAX_STANDARD_VERSION
       inputs.each do |i|
         # Biggest 'standard' txin is a 15-of-15 P2SH multisig with compressed keys (remember the 520 byte limit on redeemScript size).
         # That works out to a (15*(33+1))+3=513 byte redeemScript, 513+1+15*(73+1)+3=1627
@@ -142,7 +142,7 @@ module Tapyrus
 
     def to_h
       {
-          txid: txid, hash: tx_hash, version: version, size: size, locktime: lock_time,
+          txid: txid, hash: tx_hash, features: features, size: size, locktime: lock_time,
           vin: inputs.map(&:to_h), vout: outputs.map.with_index{|tx_out, index| tx_out.to_h.merge({n: index})}
       }
     end
@@ -189,7 +189,7 @@ module Tapyrus
         ins = [ins[index]]
       end
 
-      buf = [[version].pack('V'), Tapyrus.pack_var_int(ins.size),
+      buf = [[features].pack('V'), Tapyrus.pack_var_int(ins.size),
           ins, out_size, outs, [lock_time, hash_type].pack('VV')].join
 
       Tapyrus.double_sha256(buf)

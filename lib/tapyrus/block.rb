@@ -34,7 +34,7 @@ module Tapyrus
     # return this block height. block height is included in coinbase.
     # if block version under 1, height does not include in coinbase, so return nil.
     def height
-      return nil if header.version < 2
+      return nil if header.features < 2
       coinbase_tx = transactions[0]
       return nil unless coinbase_tx.coinbase_tx?
       buf = StringIO.new(coinbase_tx.inputs[0].script_sig.to_payload)

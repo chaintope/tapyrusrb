@@ -52,7 +52,7 @@ describe Tapyrus::ScriptInterpreter do
 
   def build_credit_tx(script_pubkey, amount)
     tx = Tapyrus::Tx.new
-    tx.version = 1
+    tx.features = 1
     tx.lock_time = 0
     coinbase = Tapyrus::Script.new << 0 << 0
     tx.inputs << Tapyrus::TxIn.new(out_point: Tapyrus::OutPoint.create_coinbase_outpoint, script_sig: coinbase)
@@ -62,7 +62,7 @@ describe Tapyrus::ScriptInterpreter do
 
   def build_spending_tx(script_sig, locked_tx, amount)
     tx = Tapyrus::Tx.new
-    tx.version = 1
+    tx.features = 1
     tx.lock_time = 0
     tx.inputs << Tapyrus::TxIn.new(
       out_point: Tapyrus::OutPoint.from_txid(locked_tx.txid, 0),

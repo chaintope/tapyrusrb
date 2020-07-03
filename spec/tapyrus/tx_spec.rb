@@ -24,7 +24,7 @@ describe Tapyrus::Tx do
       it 'should be parsed' do
         expect(subject.txid).to eq('d130d8335ca4d79246b69a5033a945b47dfe6f421f94cb9565e9d727110840d5')
         expect(subject.coinbase_tx?).to be false
-        expect(subject.version).to eq(1)
+        expect(subject.features).to eq(1)
         expect(subject.lock_time).to eq(0)
         expect(subject.inputs.length).to eq(5)
         expect(subject.outputs.length).to eq(2)
@@ -36,7 +36,7 @@ describe Tapyrus::Tx do
         Tapyrus::Tx.parse_from_payload('01000000000000000000'.htb)
       }
       it 'should generate empty payload and parse it.' do
-        expect(subject.version).to eq(1)
+        expect(subject.features).to eq(1)
         expect(subject.inputs.size).to eq(0)
         expect(subject.outputs.size).to eq(0)
         expect(subject.lock_time).to eq(0)

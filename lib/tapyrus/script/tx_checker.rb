@@ -65,7 +65,7 @@ module Tapyrus
     def check_sequence(sequence)
       tx_sequence = tx.inputs[input_index].sequence
       # Fail if the transaction's version number is not set high enough to trigger BIP 68 rules.
-      return false if tx.version < 2
+      return false if tx.features < 2
 
       # Sequence numbers with their most significant bit set are not consensus constrained.
       # Testing that the transaction's sequence number do not have this bit set prevents using this property to get around a CHECKSEQUENCEVERIFY check.

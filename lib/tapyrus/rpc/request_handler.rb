@@ -31,8 +31,8 @@ module Tapyrus
           {
               hash: block_id,
               height: entry.height,
-              version: entry.header.version,
-              versionHex: entry.header.version.to_even_length_hex,
+              features: entry.header.features,
+              featuresHex: entry.header.features.to_even_length_hex,
               merkleroot: entry.header.merkle_root.rhex,
               time: entry.header.time,
               mediantime: node.chain.mtp(block_hash),
