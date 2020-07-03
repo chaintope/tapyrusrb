@@ -509,7 +509,6 @@ module Tapyrus
     def p2pkh_addr
       return nil unless p2pkh?
       hash160 = chunks[2].pushed_data.bth
-      return nil unless hash160.htb.bytesize == 20
       Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.address_version)
     end
 
@@ -517,7 +516,6 @@ module Tapyrus
     def p2sh_addr
       return nil unless p2sh?
       hash160 = chunks[1].pushed_data.bth
-      return nil unless hash160.htb.bytesize == 20
       Tapyrus.encode_base58_address(hash160, Tapyrus.chain_params.p2sh_version)
     end
 
@@ -527,8 +525,6 @@ module Tapyrus
 
       color_id = chunks[0].pushed_data.bth
       hash160 = chunks[4].pushed_data.bth
-      return nil unless hash160.htb.bytesize == 20
-
       Tapyrus.encode_base58_address(color_id + hash160, Tapyrus.chain_params.cp2pkh_version)
     end
 
@@ -538,8 +534,6 @@ module Tapyrus
 
       color_id = chunks[0].pushed_data.bth
       hash160 = chunks[3].pushed_data.bth
-      return nil unless hash160.htb.bytesize == 20
-
       Tapyrus.encode_base58_address(color_id + hash160, Tapyrus.chain_params.cp2sh_version)
     end
   end

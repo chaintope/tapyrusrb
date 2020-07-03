@@ -69,6 +69,15 @@ describe Tapyrus::Script do
         expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
       end
     end
+
+    context 'invalid hash(too long)' do
+      subject { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b000') }
+
+      it 'should not be treated as P2PKH' do
+        expect(subject.p2pkh?).to be false
+        expect(subject.addresses).to be_empty
+      end
+    end
   end
 
   describe 'p2sh script' do
@@ -99,6 +108,15 @@ describe Tapyrus::Script do
       it 'should be generate P2SH script' do
         expect(subject[0].addresses.first).to eq('2N41pqp5vuafHQf39KraznDLEqsSKaKmrij')
         expect(subject[1].addresses).to eq(['n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 'mvqSumyieKezeESrga7dGBmgm7cfuATBvf'])
+      end
+    end
+
+    context 'invalid hash(too long)' do
+      subject { Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac600') }
+
+      it 'should not be treated as P2SH' do
+        expect(subject.p2sh?).to be_falsy
+        expect(subject.addresses).to be_empty
       end
     end
   end
