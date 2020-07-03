@@ -216,6 +216,7 @@ module Tapyrus
     def cp2pkh?
       return false unless chunks.size == 7
       return false unless chunks[0].bytesize == 34
+      return false unless Tapyrus::Color::ColorIdentifier.parse_from_payload(chunks[0].pushed_data)&.valid?
       return false unless chunks[1].ord == OP_COLOR
       [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] ==
           (chunks[2..3]+ chunks[5..6]).map(&:ord) && chunks[4].bytesize == 21
@@ -224,6 +225,7 @@ module Tapyrus
     def cp2sh?
       return false unless chunks.size == 5
       return false unless chunks[0].bytesize == 34
+      return false unless Tapyrus::Color::ColorIdentifier.parse_from_payload(chunks[0].pushed_data)&.valid?
       return false unless chunks[1].ord == OP_COLOR
       OP_HASH160 == chunks[2].ord && OP_EQUAL == chunks[4].ord && chunks[3].bytesize == 21
     end
@@ -524,8 +526,6 @@ module Tapyrus
       return nil unless cp2pkh?
 
       color_id = chunks[0].pushed_data.bth
-      return nil unless Tapyrus::Color::ColorIdentifier.parse_from_payload(color_id.htb)&.valid?
-
       hash160 = chunks[4].pushed_data.bth
       return nil unless hash160.htb.bytesize == 20
 
@@ -537,8 +537,6 @@ module Tapyrus
       return nil unless cp2sh?
 
       color_id = chunks[0].pushed_data.bth
-      return nil unless Tapyrus::Color::ColorIdentifier.parse_from_payload(color_id.htb)&.valid?
-
       hash160 = chunks[3].pushed_data.bth
       return nil unless hash160.htb.bytesize == 20
 
