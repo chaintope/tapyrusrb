@@ -5,6 +5,7 @@ module Tapyrus
 
   # Transaction class
   class Tx
+    include Tapyrus::HexConverter
 
     MAX_STANDARD_VERSION = 2
 
@@ -48,7 +49,7 @@ module Tapyrus
     end
 
     def hash
-      to_payload.bth.to_i(16)
+      to_hex.to_i(16)
     end
 
     def tx_hash
@@ -69,12 +70,6 @@ module Tapyrus
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
       buf << [lock_time].pack('V')
       buf
-    end
-
-    # convert tx to hex format.
-    # @return [String] tx with hex format.
-    def to_hex
-      to_payload.bth
     end
 
     def coinbase_tx?

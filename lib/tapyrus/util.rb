@@ -130,4 +130,12 @@ module Tapyrus
 
   end
 
+  module HexConverter
+
+    def to_hex
+      to_payload.bth
+    end
+
+  end
+
 end

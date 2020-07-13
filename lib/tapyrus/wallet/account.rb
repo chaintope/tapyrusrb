@@ -3,6 +3,7 @@ module Tapyrus
 
     # the account in BIP-44
     class Account
+      include Tapyrus::HexConverter
 
       PURPOSE_TYPE = {legacy: 44, nested_witness: 49, native_segwit: 84}
 

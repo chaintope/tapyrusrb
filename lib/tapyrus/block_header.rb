@@ -2,6 +2,7 @@ module Tapyrus
 
   # Block Header
   class BlockHeader
+    include Tapyrus::HexConverter
 
     attr_accessor :features
     attr_accessor :prev_hash

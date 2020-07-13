@@ -5,6 +5,7 @@ module Tapyrus
 
   # BIP32 Extended private key
   class ExtKey
+    include Tapyrus::HexConverter
 
     attr_accessor :ver
     attr_accessor :depth
@@ -47,7 +48,7 @@ module Tapyrus
 
     # Base58 encoded extended private key
     def to_base58
-      h = to_payload.bth
+      h = to_hex
       hex = h + Tapyrus.calc_checksum(h)
       Base58.encode(hex)
     end
@@ -190,6 +191,7 @@ module Tapyrus
 
   # BIP-32 Extended public key
   class ExtPubkey
+    include Tapyrus::HexConverter
 
     attr_accessor :ver
     attr_accessor :depth
@@ -235,7 +237,7 @@ module Tapyrus
 
     # Base58 encoded extended pubkey
     def to_base58
-      h = to_payload.bth
+      h = to_hex
       hex = h + Tapyrus.calc_checksum(h)
       Base58.encode(hex)
     end

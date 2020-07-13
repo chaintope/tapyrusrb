@@ -5,6 +5,7 @@ module Tapyrus
 
   # tapyrus script
   class Script
+    include Tapyrus::HexConverter
     include Tapyrus::Opcodes
 
     attr_accessor :chunks
@@ -346,7 +347,7 @@ module Tapyrus
 
     # generate hash160 hash for payload
     def to_hash160
-      Tapyrus.hash160(to_payload.bth)
+      Tapyrus.hash160(to_hex)
     end
 
     # script size
@@ -481,7 +482,7 @@ module Tapyrus
     end
 
     def to_h
-      h = {asm: to_s, hex: to_payload.bth, type: type}
+      h = {asm: to_s, hex: to_hex, type: type}
       addrs = addresses
       unless addrs.empty?
         h[:req_sigs] = multisig? ? Tapyrus::Opcodes.opcode_to_small_int(chunks[0].bth.to_i(16)) :addrs.size
@@ -495,12 +496,6 @@ module Tapyrus
     # @return [Boolean] whether the script is guaranteed to fail at execution
     def unspendable?
       (size > 0 && op_return?) || size > Tapyrus::MAX_SCRIPT_SIZE
-    end
-
-    # convert payload to hex data.
-    # @return [String] script with hex format.
-    def to_hex
-      to_payload.bth
     end
 
     private

@@ -3,6 +3,7 @@ module Tapyrus
 
     # Base message class
     class Base
+      include Tapyrus::HexConverter
       include Tapyrus::Util
       extend Tapyrus::Util
 

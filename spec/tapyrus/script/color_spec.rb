@@ -1,9 +1,9 @@
 require 'spec_helper'
 include Tapyrus::Opcodes
 
-describe 'Tapyrus::Color::ColorIdentifier' do
+describe Tapyrus::Color::ColorIdentifier do
   describe '#to_paylaod' do
-    subject { color.to_payload.bth }
+    subject { color.to_hex }
 
     let(:color) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
 

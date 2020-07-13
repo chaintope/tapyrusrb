@@ -8,6 +8,8 @@ module Tapyrus
     end
 
     class ColorIdentifier
+      include Tapyrus::HexConverter
+
       attr_reader :type, :payload
 
       def self.reissuable(script_pubkey)

@@ -3,6 +3,7 @@ module Tapyrus
 
     # HD Wallet master seed
     class MasterKey
+      include Tapyrus::HexConverter
       extend Tapyrus::Util
       include Tapyrus::Util
       include Tapyrus::KeyPath

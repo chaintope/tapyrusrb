@@ -3,6 +3,7 @@ module Tapyrus
 
     # wrap a block header object with extra data.
     class ChainEntry
+      include Tapyrus::HexConverter
 
       attr_reader :header
       attr_reader :height
