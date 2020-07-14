@@ -12,7 +12,6 @@ module Tapyrus
     attr_reader :p2sh_version
     attr_reader :cp2pkh_version
     attr_reader :cp2sh_version
-    attr_reader :bech32_hrp
     attr_reader :privkey_version
     attr_reader :extended_privkey_version
     attr_reader :extended_pubkey_version
@@ -25,6 +24,7 @@ module Tapyrus
     attr_reader :bip84_pubkey_p2wsh_version
     attr_reader :bip84_privkey_p2wsh_version
     attr_reader :default_port
+    attr_reader :rpc_port
     attr_reader :protocol_version
     attr_reader :retarget_interval
     attr_reader :retarget_time
