@@ -57,7 +57,7 @@ module Tapyrus
         uri = URI.parse(server_url)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = uri.scheme === "https"
-        request = Net::HTTP::Post.new('/')
+        request = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.path)
         request.basic_auth(uri.user, uri.password)
         request.content_type = 'application/json'
         request.body = data.to_json
