@@ -14,6 +14,7 @@ require_relative 'schnorr'
 
 module Tapyrus
 
+  autoload :Ext, 'tapyrus/ext'
   autoload :Util, 'tapyrus/util'
   autoload :ChainParams, 'tapyrus/chain_params'
   autoload :Message, 'tapyrus/message'

@@ -1,15 +1,16 @@
 require 'net/http'
+require 'json/pure'
 
 module Tapyrus
   module RPC
 
-    # Client implementation for RPC to Bitcoin Core.
+    # Client implementation for RPC to Tapyrus Core.
     #
     # [Usage]
     # config = {schema: 'http', host: 'localhost', port: 18332, user: 'xxx', password: 'yyy'}
-    # client = Tapyrus::RPC::BitcoinCoreClient.new(config)
+    # client = Tapyrus::RPC::TapyrusCoreClient.new(config)
     #
-    # You can execute the CLI command supported by Bitcoin Core as follows:
+    # You can execute the CLI command supported by Tapyrus Core as follows:
     #
     # client.listunspent
     # client.getblockchaininfo
@@ -62,7 +63,7 @@ module Tapyrus
         request.body = data.to_json
         response = http.request(request)
         body = response.body
-        response = JSON.parse(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') })
+        response = Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
         raise response['error'].to_s if response['error']
         response['result']
       end
