@@ -47,7 +47,7 @@ describe Tapyrus::RPC::TapyrusCoreClient do
       end
     end
 
-    context 'If the wallet is specified in config' do
+    context 'wallet is specified in config' do
       let(:config) { super().merge({ wallet: 'mywallet' }) }
       let(:server_url) { "#{config[:schema]}://#{config[:host]}:#{config[:port]}/wallet/#{config[:wallet]}" }
       it 'should have wallet name in the path like "/wallet/[wallet_name]"' do
