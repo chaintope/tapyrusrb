@@ -33,11 +33,9 @@ module Tapyrus
     attr_reader :bip34_height
     attr_reader :proof_of_work_limit
     attr_reader :dns_seeds
-    attr_reader :genesis
     attr_reader :bip44_coin_type
 
     attr_accessor :dust_relay_fee
-
 
     # production genesis
     def self.prod
@@ -56,14 +54,6 @@ module Tapyrus
     def dev?
       network == 'dev'
     end
-
-    def genesis_block
-      header = Tapyrus::BlockHeader.new(
-          genesis['version'], genesis['prev_hash'].rhex, genesis['merkle_root'].rhex,
-          genesis['time'], genesis['bits'], genesis['nonce'])
-      Tapyrus::Block.new(header)
-    end
-
 
     def self.init(name)
       i = YAML.load(File.open("#{__dir__}/chainparams/#{name}.yml"))
