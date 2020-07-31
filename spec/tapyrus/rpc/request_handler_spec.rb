@@ -30,29 +30,30 @@ describe Tapyrus::RPC::RequestHandler do
     it 'should return chain info' do
       result = subject.getblockchaininfo
       expect(result[:chain]).to eq('dev')
-      expect(result[:headers]).to eq(1210339)
-      expect(result[:bestblockhash]).to eq('00000000ecae98e551fde86596f9e258d28edefd956f1e6919c268332804b668')
-      expect(result[:mediantime]).to eq(1508126989)
+      expect(result[:headers]).to eq(15071)
+      expect(result[:bestblockhash]).to eq('75be7b3b19e07f2c3644523016132db7e7e67063b3f5abbaa420cafc8a44557f')
+      expect(result[:mediantime]).to eq(1594879787,)
     end
   end
 
   describe '#getblockheader' do
     context 'has block header' do
       it 'should return header info' do
-        result = subject.getblockheader('00000000fb0350a72d7316a2006de44e74c16b56843a29bd85e0535d71edbc5b', true)
-        expect(result[:hash]).to eq('00000000fb0350a72d7316a2006de44e74c16b56843a29bd85e0535d71edbc5b')
-        expect(result[:height]).to eq(1210337)
-        expect(result[:features]).to eq(536870912)
-        expect(result[:featuresHex]).to eq('20000000')
-        expect(result[:merkleroot]).to eq('ac92cbb5ccd160f9b474f27a1ed50aa9f503b4d39c5acd7f24ef0a6a0287c7c6')
-        expect(result[:time]).to eq(1508130596)
-        expect(result[:mediantime]).to eq(1508125317)
-        expect(result[:nonce]).to eq(1647419287)
-        expect(result[:bits]).to eq('1d00ffff')
-        expect(result[:previousblockhash]).to eq('00000000cd01007346f9a3d384a507f97afb164c057bcd1694ca20bb3302bb8d')
-        expect(result[:nextblockhash]).to eq('000000008f71fb3f76a19075987a5d5653efce9bab90474497c9e1151ac94b69')
-        header = subject.getblockheader('00000000fb0350a72d7316a2006de44e74c16b56843a29bd85e0535d71edbc5b', false)
-        expect(header).to eq('000000208dbb0233bb20ca9416cd7b054c16fb7af907a584d3a3f946730001cd00000000c6c787026a0aef247fcd5a9cd3b403f5a90ad51e7af274b4f960d1ccb5cb92ac243fe459ffff001d979f3162')
+        result = subject.getblockheader('a296873d850b332564e25061e8b8c9c57abb6d4fad56626780f70d5b53082df6', true)
+        expect(result[:hash]).to eq('a296873d850b332564e25061e8b8c9c57abb6d4fad56626780f70d5b53082df6')
+        expect(result[:height]).to eq(15070)
+        expect(result[:features]).to eq(1)
+        expect(result[:featuresHex]).to eq('01000000')
+        expect(result[:merkleroot]).to eq('94b5dae46c6d0e7d3c6043b374ab64ddbfee371463fbbc4ee080a463a2a45b7f')
+        expect(result[:time]).to eq(1594880968)
+        expect(result[:mediantime]).to eq(1594879492)
+        expect(result[:xfield_type]).to eq(0)
+        expect(result[:xfield]).to be nil
+        expect(result[:proof]).to eq('5b9f92404e15f411d07df45b15c1db8e2235d9f4357081014bda7b6820a2ec411a55421ceb7e228bc80bf89dde50dcda3c26c9770ab52d43b6aebea3b127f20a')
+        expect(result[:previousblockhash]).to eq('2c5eeffc7d82ab1df248bd95b76c6a3c4a3692219c4135cbcb0c752a3bdd35ff')
+        expect(result[:nextblockhash]).to eq('75be7b3b19e07f2c3644523016132db7e7e67063b3f5abbaa420cafc8a44557f')
+        header = subject.getblockheader('a296873d850b332564e25061e8b8c9c57abb6d4fad56626780f70d5b53082df6', false)
+        expect(header).to eq('01000000ff35dd3b2a750ccbcb35419c2192364a3c6a6cb795bd48f21dab827dfcef5e2c7f5ba4a263a480e04ebcfb631437eebfdd64ab74b343603c7d0e6d6ce4dab5945ec6e4adaa36156849708d7cc1c41b69afd0ed608c8bdc2221f8e5d0e609d537c8f30f5f00405b9f92404e15f411d07df45b15c1db8e2235d9f4357081014bda7b6820a2ec411a55421ceb7e228bc80bf89dde50dcda3c26c9770ab52d43b6aebea3b127f20a')
       end
     end
 
@@ -260,27 +261,27 @@ describe Tapyrus::RPC::RequestHandler do
 
   def load_chain_mock
     chain_mock = create_test_chain
-    latest_entry = load_entry('00000020694bc91a15e1c997444790ab9bceef53565d7a987590a1763ffb718f0000000024fe00f0aa7507e54a4a586be1ea7c7d9e077e049e08a8e397da4a4c1a02d14b8d48e459ffff001dc735461c', 1210339)
+    latest_entry = load_entry('01000000f62d08535b0df780676256ad4f6dbb7ac5c9b8e86150e26425330b853d8796a2abd52ce318e5c5d6c3aeb3aea278ebf7fc8b8fe8cb5535543a76d4fd903589742ecee1ba9a3d25123dada6041c6bafff1423b3dd4f561816adcf245736004698f1f40f5f00403b9b731cb77c87078c0bdc8f1f2dc91406b42f082f9d8f095be16b5b0dd68f549b5ad1dda9e01ff87d022404b1f80dd40d40e0d3accc69fb9180fd8db30b5064', 15071)
     allow(chain_mock).to receive(:latest_block).and_return(latest_entry)
     # recent 11 block
-    allow(chain_mock).to receive(:find_entry_by_hash).with('68b604283368c219691e6f95fdde8ed258e2f99665e8fd51e598aeec00000000').and_return(latest_entry)
-    allow(chain_mock).to receive(:find_entry_by_hash).with('694bc91a15e1c997444790ab9bceef53565d7a987590a1763ffb718f00000000').and_return(load_entry('000000205bbced715d53e085bd293a84566bc1744ee46d00a216732da75003fb00000000a0f199af05f22972246d9a380130e498f03df945f482718ee0787ca6dad24808d843e459ffff001d983d2926', 1210338))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('5bbced715d53e085bd293a84566bc1744ee46d00a216732da75003fb00000000').and_return(load_entry('000000208dbb0233bb20ca9416cd7b054c16fb7af907a584d3a3f946730001cd00000000c6c787026a0aef247fcd5a9cd3b403f5a90ad51e7af274b4f960d1ccb5cb92ac243fe459ffff001d979f3162', 1210337))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('8dbb0233bb20ca9416cd7b054c16fb7af907a584d3a3f946730001cd00000000').and_return(load_entry('0000002080244a62f307b3b885a253a3614a3fe6e78de3895512d6e8d44d65aa00000000d1574450981c63e36214035a38aeb1d9fa582bac452ac178c75e9dd8efdf9fd9733ae459ffff001d051759a0', 1210336))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('80244a62f307b3b885a253a3614a3fe6e78de3895512d6e8d44d65aa00000000').and_return(load_entry('00000020426410aa5fcdca74b3598160417f9e2c986edc8fb8633b7f6000000000000000c928ae0f8ed48979bfbdf851ca8a49198731b8e8830139217043e004ce76881bc235e459ffff001d6496f136', 1210335))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('426410aa5fcdca74b3598160417f9e2c986edc8fb8633b7f6000000000000000').and_return(load_entry('00000020f91653ebd7535d498a3cd62db46e939b676a04ae6a35e33f418c0e1800000000b47bfeae2b2201b7b86f34e948099788cfd5ae7fdf1b8fe51bb2651a85946a510d31e45980e17319eee6f292', 1210334))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('f91653ebd7535d498a3cd62db46e939b676a04ae6a35e33f418c0e1800000000').and_return(load_entry('00000020cd931c47b454b2d67a99e380cd051f33d316263548748bdee5a6b3ec0000000035c824c91f310d2b19b772fba5f0fcd9e9e8d0f189e47f5064fc7770ef0957bc362fe459ffff001d13beb4a8', 1210333))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('cd931c47b454b2d67a99e380cd051f33d316263548748bdee5a6b3ec00000000').and_return(load_entry('00000020949c2f5f9083dd4ec45b2c26c28ca701c0f640d62e52551b4b000000000000009305fca54fae340d5b2c9dceb8a559443d5cfb44504bc939820984cbb26b1e2d852ae459ffff001d6babc9be', 1210332))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('949c2f5f9083dd4ec45b2c26c28ca701c0f640d62e52551b4b00000000000000').and_return(load_entry('0000002046194705aa7b0aca636c5a45a3c8857640cddaaab27e44cbc43f5d7f00000000439414cce8f17b94cf2ef654cc96f85e87b5f0a5c615ae474151e02b8ea9f3cdd125e45980e17319eb2ea570', 1210331))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('46194705aa7b0aca636c5a45a3c8857640cddaaab27e44cbc43f5d7f00000000').and_return(load_entry('000000206984d6f872f6499432f66d5bb8eec0f30248e79483382af621000000000000007246d107520e77f6b08c8d74ac0b06f4a8e229070ff95dc07b1fc477a68a0b0b7421e459ffff001d0e7bcc94', 1210330))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('6984d6f872f6499432f66d5bb8eec0f30248e79483382af62100000000000000').and_return(load_entry('00000020f1bd62cf4502b7f88eeae4bb8cf2caa3615caac0dde9bf064994e4350000000067f8d203143e834fd6572aef4bc961b4f9ef4d18b63d6a73ed6342403406e815bf1ce45980e173198907b9ad', 1210329))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('f1bd62cf4502b7f88eeae4bb8cf2caa3615caac0dde9bf064994e43500000000').and_return(load_entry('04000000587b7ec2f7b00aecadc816f74c4734f5d3b57744fa98061b2452245300000000acf407f07491f3c7e326702c84c2319b98989b1d287e612385b35f01bb49a29e7518e459ffff001d40cce489', 1210328))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('587b7ec2f7b00aecadc816f74c4734f5d3b57744fa98061b2452245300000000').and_return(load_entry('00000020b5b07293524eece44221a180a6c67538b5685b474015993ea9422e7600000000ae01949e6bac5a828216d89ea91fc7dfe0bee5488644c7f228e15e0b87b3322fc113e459ffff001d5ef80539', 1210327))
-    allow(chain_mock).to receive(:find_entry_by_hash).with('b5b07293524eece44221a180a6c67538b5685b474015993ea9422e7600000000').and_return(load_entry('00000020fbf65774599e7bf53452a61f0784f30159ffa98e4bfa7091624bb3760000000012e5e283f096b9c14669c38049f4012462f48adb7d7d5e6dc32f3576688ef5480c0fe459ffff001dabe97de2', 1210326))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('7f55448afcca20a4baabf5b36370e6e7b72d1316305244362c7fe0193b7bbe75').and_return(latest_entry)
+    allow(chain_mock).to receive(:find_entry_by_hash).with('f62d08535b0df780676256ad4f6dbb7ac5c9b8e86150e26425330b853d8796a2').and_return(load_entry('01000000ff35dd3b2a750ccbcb35419c2192364a3c6a6cb795bd48f21dab827dfcef5e2c7f5ba4a263a480e04ebcfb631437eebfdd64ab74b343603c7d0e6d6ce4dab5945ec6e4adaa36156849708d7cc1c41b69afd0ed608c8bdc2221f8e5d0e609d537c8f30f5f00405b9f92404e15f411d07df45b15c1db8e2235d9f4357081014bda7b6820a2ec411a55421ceb7e228bc80bf89dde50dcda3c26c9770ab52d43b6aebea3b127f20a', 15070))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('ff35dd3b2a750ccbcb35419c2192364a3c6a6cb795bd48f21dab827dfcef5e2c').and_return(load_entry('0100000056e536e635464af4c5f29c70053aca5c6bf85cd74be4b13767585b8fb584e0d65c1ff2dc325153b244d698b26a2c6da39ad44f0ea1b2da15ec627abf3f8e07719b0db5e2556a79f5e82c00fa26bf67c07ac34706a2230e8733b8bf4c16f224f0a1f20f5f0040237714442c7e200f4541a04d376d8f8c5ec33b0e6612ee8dac6b170238de91ea43d23f3bc693bfbe1b14796abbf4f88506d115674ae41629a257ec521dc06a6c', 15069))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('56e536e635464af4c5f29c70053aca5c6bf85cd74be4b13767585b8fb584e0d6').and_return(load_entry('010000003eade24ce628c75aed820f0b0f8b9769470d3647a9ddf127eebb6ddbd4c8dc5822e42334cf5ea6b72706fb1d689be6b513ef0ffca00eadcd7201c21e5c33578e4037456245438089b06eb1282eded40209e5d0431a29ecc5fe66eb4305946b0e7af10f5f0040f01861a03b1c318e20e96de612b73bc01b00f2add5e134ed504181fd858d7448229b70b59b97cecd2aba5134e4aee5850d401298ff8ae7c51b4e0a5995dd70f4', 15068))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('3eade24ce628c75aed820f0b0f8b9769470d3647a9ddf127eebb6ddbd4c8dc58').and_return(load_entry('0100000050a70429e51f769bc10c3854d70687a96bb9d862d32be90a21fb649614187d4c3f59451a84e0d1c78a8bcc9ce47fcb5a8b77180f1ae0f55ae0346154e75a3ad24ddaf3935cd775aea9bbe3fda1ba96901d56b5d7ab95281ee62fb3d50023415852f00f5f0040eafd2fa6943f047f47553ab1e9b142d57373539e0dd7c100efc4ae536b9b253a7946103abd7f1b6afcedd3152a772ce8216b7812dcb69a0cacf232d90513c604', 15067))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('50a70429e51f769bc10c3854d70687a96bb9d862d32be90a21fb649614187d4c').and_return(load_entry('01000000025a0c77434286176b86beb58c93c6592331f1da951c68efa40a3a7cbcd7810119452ec46124a8b95535fcaa7aef293e0f3883096cddab4cae9bebfbb1161bcf82c0b5b492ea36e497c839cf3ee086d2341e69f9e5ebe07155c8171129254ebc2bef0f5f00403829ee0a5b37c611543845cc3a74ce6afdedf2e1a8f5f349e17ece7aa2893920dde038b7bc1863070517d5fc858b8ebcc7bbbe9a1491b9f160b63e1134ebe212', 15066))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('025a0c77434286176b86beb58c93c6592331f1da951c68efa40a3a7cbcd78101').and_return(load_entry('01000000d2e3ed7b79adee43a9595036183ae538b0a821f307c620062a902c1f405ea6090c7033dd06b6fcec471f8b3c0613bcd05c159f7a2c0ac856b494c9ac0da072f42c7aa291680a9b74e36a448c4ac2f6ae2d14f94c4a46e1fa66edac19a959133604ee0f5f0040e4e14d63a7fe4ed0dbc1007d54f0de4d1f120068e2c1a8f44df4a2d0c22703d995f072424f1d8083f67ff199d59342824bfb625b4885c8a47dce9df31188d2ae', 15065))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('d2e3ed7b79adee43a9595036183ae538b0a821f307c620062a902c1f405ea609').and_return(load_entry('010000007aa97a4c214285cd26826adc3d9a3b99e3c96cffa26d8eb55ff7c0ee577d7f92d80458cc460014907151c69253569247580a22f58114a6016d92333add7e7fd3d358517ba15fe191ca24fb9991212e0c8bd46c6501cdec7759040849e456b5c9dbec0f5f004052ffabaae041db7edc1de0ad586cecafb53d175f8c6bbc1521ce61d3e3f99dcff43284d37647371f971591955796e3080e4e9e11837ba37f93a32493b5b05474', 15064))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('7aa97a4c214285cd26826adc3d9a3b99e3c96cffa26d8eb55ff7c0ee577d7f92').and_return(load_entry('01000000b72da02b82357a9e84a092504ccfb86413dfd9fc53dcf61de0d142faa016b0558c725cb245799bacfa4508dcec97f4a1cbcc17c40d1c4f05ea038b52d247b5a88fd20ad2da8866d8876d1a9b859488c1262910b5b531d5aa2aa0910ea608068fb5eb0f5f0040b454083156453df857490d26823451b3f94058cf7a657499fa78e9b20fb6c34734f9a46788f9fd4d160043de9641f41dc32753065c220b80b69e68727be5bc5e', 15063))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('b72da02b82357a9e84a092504ccfb86413dfd9fc53dcf61de0d142faa016b055').and_return(load_entry('01000000de6c62b258491f8661990ce5dc455e8ee6fd432ee4bf910bf9e80763f4b7fab5eb47ed1177b845aafb114f1d07c268d62d22d6a5e474f74da221d6f3628d66013f1d2f691416e6ce210bf35f066980c967de88b77df9ea006814bda2bac4dfb88eea0f5f00406e5b011d40d7ec21621980459b5c194ce47a161c6581675861483531e978272b92061e561a201053cc4377a64152d28d47ce89f8353e03a86d7907b494f166f3', 15062))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('de6c62b258491f8661990ce5dc455e8ee6fd432ee4bf910bf9e80763f4b7fab5').and_return(load_entry('010000003bd37ec180d002b4a64281c99b5c9e1df4d1a0c87f2d21ffe6fdb885621bf3a18889f838ace351dd40a770f0542002b8fc7c93872b89de1c390b2476a4399f378fd46f3a5d94d58083d64e61d279ced7b9837c6a0fae3161043f0c2441e8af2d65e90f5f00404fc9913444c2b66996bd1e40d4dac89e0051973fa30e3c199a8d74d180dbca2ba40903a62ad03b281a781d9cef36605cfd781146a4ebb1f96bba591b43dca34c', 15061))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('3bd37ec180d002b4a64281c99b5c9e1df4d1a0c87f2d21ffe6fdb885621bf3a1').and_return(load_entry('01000000dfcbcca983e4d98e6851eae1c99ec0d20e22f6c8bc8b74313ef467d24965eaec1d7cc530f03348c1c95341ed3e66401eebcfe5328b8e01fdcdc5ecc939d23ff09ebfa3ef5a2d80bd1d12471a9b5cb52d7d31d6d33c8a8be3df828b0bacdb45323fe80f5f00405b8a6df5176bdfad01e7f52632c7c6d5d3b8fc9a483026788a314cc114813a4b04754e1a1d78adee64d76099c5701fe8d0c55843b0cd9ff9c6ce27181ecda1e7', 15060))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('dfcbcca983e4d98e6851eae1c99ec0d20e22f6c8bc8b74313ef467d24965eaec').and_return(load_entry('010000002ff154348994d2a5df33048c2867e5a0ee39f474cfa141ae424adf090a94736829183926c8f031aaa6b2dd15fe69c59bf1f4f9178aa711443c40c2375afdd865e3422b0d83a8233c54c53afbb5ad0df2d7f7db3c7842ad1f5ab483b9a98d744818e70f5f004050b721ee95b08c15f3ecb079e608cfa5a4817d7ac25aed7278f5526c98dc7a48f7d1f81c372c5b6dc38ac74336e9a31e6a811ba0194a03f7aeae12fe9ad5c8e2', 15059))
+    allow(chain_mock).to receive(:find_entry_by_hash).with('2ff154348994d2a5df33048c2867e5a0ee39f474cfa141ae424adf090a947368').and_return(load_entry('01000000066329ae3211d65c398dffc0e315e0fe4cd1af4bca9edd1310888b8dfc3d93465a14b7331905abb1faa54b8074095874673aabce735a8476d0345ebdfe188b0f8e532f29914c366034ff015debb35a5e7881e021437a5b96994831b5b17c8f0befe50f5f00403abc769ee9b2656d35044ec777809c5da76517736308b626408a1b47b1e89f4978944132730667a7d4f0bb609027bfc85cab276af6af62d9f2337c47bf6c809f', 15058))
     allow(chain_mock).to receive(:find_entry_by_hash).with('00').and_return(nil)
 
     # previous block
-    allow(chain_mock).to receive(:next_hash).with('5bbced715d53e085bd293a84566bc1744ee46d00a216732da75003fb00000000').and_return('694bc91a15e1c997444790ab9bceef53565d7a987590a1763ffb718f00000000')
+    allow(chain_mock).to receive(:next_hash).with('f62d08535b0df780676256ad4f6dbb7ac5c9b8e86150e26425330b853d8796a2').and_return('7f55448afcca20a4baabf5b36370e6e7b72d1316305244362c7fe0193b7bbe75')
     chain_mock
   end
 

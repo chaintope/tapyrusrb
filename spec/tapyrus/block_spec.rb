@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Tapyrus::Block do
 
   subject {
-    payload = load_block('0000000001be84d00475b5cf0148c3dfb9b7c2a770f788f22b0d96085b0f0e84').htb
+    payload = load_block('896574bee055370c047e911212f8472e7e77a1337d666e2a83da739d04f8de2a').htb
     Tapyrus::Message::Block.parse_from_payload(payload).to_block
   }
 
@@ -14,9 +14,9 @@ describe Tapyrus::Block do
       end
     end
 
-    context 'when block has coinbase tx only(genesis block)' do
+    context 'block has two transactions.' do
       subject {
-        payload = load_block('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f').htb
+        payload = load_block('75be7b3b19e07f2c3644523016132db7e7e67063b3f5abbaa420cafc8a44557f').htb
         Tapyrus::Message::Block.parse_from_payload(payload).to_block
       }
       it 'should be true' do
@@ -35,25 +35,7 @@ describe Tapyrus::Block do
   end
 
   describe '#height' do
-    context 'block version 2' do
-      subject { # height is 21106. testnet first version 2 block.
-        payload = load_block('0000000070b701a5b6a1b965f6a38e0472e70b2bb31b973e4638dec400877581').htb
-        Tapyrus::Message::Block.parse_from_payload(payload).to_block
-      }
-      it 'return block height' do
-        expect(subject.height).to eq(21106)
-      end
-    end
 
-    context 'block versoin 1' do
-      subject { # height is 21105. testnet last version 1 block.
-        payload = load_block('000000009020a075cc7af813d46a1ef24eb2b0035e131937153146cc3711542a').htb
-        Tapyrus::Message::Block.parse_from_payload(payload).to_block
-      }
-      it 'return nil' do
-        expect(subject.height).to be nil
-      end
-    end
   end
 
 end

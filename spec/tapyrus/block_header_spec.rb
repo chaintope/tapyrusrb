@@ -3,63 +3,24 @@ require 'spec_helper'
 describe Tapyrus::BlockHeader do
 
   describe 'parse from payload' do
-    subject {Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)}
+    subject {Tapyrus::BlockHeader.parse_from_payload('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c'.htb)}
     it 'should be parsed' do
-      expect(subject.block_hash).to eq('1df1ced8582ca556592c2133d6ccd6e409c50078d932205ac2a7000000000000')
-      expect(subject.time).to eq(1497939217)
-      expect(subject.nonce).to eq(3414637773)
-      expect(subject.prev_hash).to eq('f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000')
-      expect(subject.merkle_root).to eq('e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d')
-      expect(subject.bits).to eq(453039627)
-    end
-  end
-
-  describe 'to_payload' do
-    subject {
-      Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
-    }
-    it 'should be generate payload' do
-      expect(subject.to_hex).to eq('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb')
-    end
-  end
-
-  describe '#bits_to_target' do
-    it 'return difficulty target' do
-      header = Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
-      expect(header.difficulty_target).to eq(0x000000000000d60b000000000000000000000000000000000000000000000000)
-
-      header.bits = 0x1d00ffff
-      expect(header.difficulty_target).to eq(0x00000000ffff0000000000000000000000000000000000000000000000000000)
-
-      header.bits = 0x1b0ffff0
-      expect(header.difficulty_target).to eq(0x00000000000ffff0000000000000000000000000000000000000000000000000)
-
-      header.bits = 0x03000000
-      expect(header.difficulty_target).to eq(0x00)
-
-      header.bits = 0x1b00b5ac
-      expect(header.difficulty_target).to eq(0x000000000000b5ac000000000000000000000000000000000000000000000000)
-
-      header.bits = 0x1c654657
-      expect(header.difficulty_target).to eq(0x0000000065465700000000000000000000000000000000000000000000000000)
-    end
-  end
-
-  describe '#valid_pow?' do
-    subject {
-      payload = load_block('0000000001be84d00475b5cf0148c3dfb9b7c2a770f788f22b0d96085b0f0e84').htb
-      Tapyrus::Message::Block.parse_from_payload(payload).header
-    }
-    it 'evaluate pow' do
-      expect(subject.valid_pow?).to be true
-      subject.bits = 496604799
-      expect(subject.valid_pow?).to be false
+      expect(subject.features).to eq(1)
+      expect(subject.prev_hash).to eq('8dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce')
+      expect(subject.merkle_root).to eq('8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf8')
+      expect(subject.im_merkle_root).to eq('6f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510ec')
+      expect(subject.x_field_type).to eq(0)
+      expect(subject.x_field).to be nil
+      expect(subject.block_hash).to eq('2adef8049d73da832a6e667d33a1777e2e47f81212917e040c3755e0be746589')
+      expect(subject.hash_for_sign).to eq('12dae4b61b7429f084752ebe6dbd0d51c8ea206b9df8d45f5f9c07223f1463c4')
+      expect(subject.proof).to eq('742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c')
+      expect(subject.to_hex).to eq('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c')
     end
   end
 
   describe '#valid_timestamp?' do
     subject {
-      Tapyrus::BlockHeader.parse_from_payload('00000020f29ae31fe472fea5a9812cd8bd9d73c7e4491ee62fbaf9b1be20000000000000e4e24580186a17432dee5ada29678f3f5e6b51a451f3b8d09917a2de11dba12d11bd48590bd6001bcd3c87cb'.htb)
+      Tapyrus::BlockHeader.parse_from_payload('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c'.htb)
     }
 
     before {
@@ -83,15 +44,6 @@ describe Tapyrus::BlockHeader do
     after {
       Timecop.return
     }
-  end
-
-  describe '#work' do
-    subject {
-      Tapyrus::BlockHeader.parse_from_payload('000000207d7a225081665d83116ce0f1c3eaf10d26ee917d03fbd7aad6895f9800000000b5c7027f92cbca51da5b758af41b7cc23d43a456d7abd4f54357b492c233347294dccd59ffff001d00ff2046'.htb)
-    }
-    it 'should be calculate' do
-      expect(subject.work).to eq(4295032833)
-    end
   end
 
 end

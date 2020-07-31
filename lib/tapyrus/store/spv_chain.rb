@@ -14,10 +14,14 @@ module Tapyrus
       attr_reader :db
       attr_reader :logger
 
-      def initialize(db = Tapyrus::Store::DB::LevelDB.new)
+      # initialize spv chain
+      # @param[Tapyrus::Store::DB::LevelDB] db
+      # @param[Tapyrus::Block] genesis genesis block
+      def initialize(db = Tapyrus::Store::DB::LevelDB.new, genesis: nil)
+        raise ArgumentError, 'genesis block should be specified.' unless genesis
         @db = db # TODO multiple db switch
         @logger = Tapyrus::Logger.create(:debug)
-        initialize_block
+        initialize_block(genesis)
       end
 
       # get latest block in the store.
@@ -86,12 +90,9 @@ module Tapyrus
       private
 
       # if database is empty, put genesis block.
-      def initialize_block
-        unless latest_block
-          block = Tapyrus.chain_params.genesis_block
-          genesis = ChainEntry.new(block.header, 0)
-          db.save_entry(genesis)
-        end
+      # @param [Tapyrus::Block] genesis genesis block
+      def initialize_block(genesis)
+        db.save_entry(ChainEntry.new(genesis.header, 0)) unless latest_block
       end
 
     end

@@ -11,7 +11,6 @@ module Tapyrus
         best_block = node.chain.latest_block
         h[:headers] = best_block.height
         h[:bestblockhash] = best_block.header.block_id
-        h[:chainwork] = best_block.header.work
         h[:mediantime] = node.chain.mtp(best_block.block_hash)
         h
       end
@@ -32,12 +31,14 @@ module Tapyrus
               hash: block_id,
               height: entry.height,
               features: entry.header.features,
-              featuresHex: entry.header.features.to_even_length_hex,
+              featuresHex: entry.header.features.to_even_length_hex.ljust(8, '0'),
               merkleroot: entry.header.merkle_root.rhex,
+              immutablemerkleroot: entry.header.im_merkle_root.rhex,
               time: entry.header.time,
               mediantime: node.chain.mtp(block_hash),
-              nonce: entry.header.nonce,
-              bits: entry.header.bits.to_even_length_hex,
+              xfield_type: entry.header.x_field_type,
+              xfield: entry.header.x_field,
+              proof: entry.header.proof,
               previousblockhash: entry.prev_hash.rhex,
               nextblockhash: node.chain.next_hash(block_hash).rhex
           }

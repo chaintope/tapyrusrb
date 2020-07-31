@@ -36,7 +36,7 @@ module Tapyrus
 
       # whether genesis block
       def genesis?
-        Tapyrus.chain_params.genesis_block.header == header
+        height == 0
       end
 
       # @param [String] payload a payload with binary format.
@@ -44,7 +44,7 @@ module Tapyrus
         buf = StringIO.new(payload)
         len = Tapyrus.unpack_var_int_from_io(buf)
         height = buf.read(len).reverse.bth.to_i(16)
-        new(Tapyrus::BlockHeader.parse_from_payload(buf.read(80)), height)
+        new(Tapyrus::BlockHeader.parse_from_payload(buf), height)
       end
 
       # build next block +StoredBlock+ instance.

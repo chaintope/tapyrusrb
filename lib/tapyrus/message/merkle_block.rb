@@ -19,7 +19,7 @@ module Tapyrus
       def self.parse_from_payload(payload)
         m = new
         buf = StringIO.new(payload)
-        m.header = Tapyrus::BlockHeader.parse_from_payload(buf.read(80))
+        m.header = Tapyrus::BlockHeader.parse_from_payload(buf)
         m.tx_count = buf.read(4).unpack('V').first
         hash_count = Tapyrus.unpack_var_int_from_io(buf)
         hash_count.times do

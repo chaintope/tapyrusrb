@@ -21,7 +21,7 @@ module Tapyrus
 
       def self.parse_from_payload(payload)
         buf = StringIO.new(payload)
-        header = Tapyrus::BlockHeader.parse_from_payload(buf.read(80))
+        header = Tapyrus::BlockHeader.parse_from_payload(buf)
         nonce = buf.read(8).unpack('q*').first
         short_ids_len = Tapyrus.unpack_var_int_from_io(buf)
         short_ids = short_ids_len.times.map do

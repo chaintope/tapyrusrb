@@ -19,7 +19,7 @@ module Tapyrus
 
       def self.parse_from_payload(payload)
         buf = StringIO.new(payload)
-        header = Tapyrus::BlockHeader.parse_from_payload(buf.read(80))
+        header = Tapyrus::BlockHeader.parse_from_payload(buf)
         transactions = []
         unless buf.eof?
           tx_count = Tapyrus.unpack_var_int_from_io(buf)

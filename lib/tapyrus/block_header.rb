@@ -3,46 +3,56 @@ module Tapyrus
   # Block Header
   class BlockHeader
     include Tapyrus::HexConverter
+    extend Tapyrus::Util
+    include Tapyrus::Util
+
+    X_FILED_TYPES = {none: 0, aggregate_pubkey: 1}
 
     attr_accessor :features
     attr_accessor :prev_hash
     attr_accessor :merkle_root
-    attr_accessor :time # unix timestamp
-    attr_accessor :bits
-    attr_accessor :nonce
+    attr_accessor :im_merkle_root # merkel root of immulable merkle tree which consist of immutable txid.
+    attr_accessor :time           # unix timestamp
+    attr_accessor :x_field_type
+    attr_accessor :x_field
+    attr_accessor :proof
 
-    def initialize(features, prev_hash, merkle_root, time, bits, nonce)
+    def initialize(features, prev_hash, merkle_root, im_merkle_root, time, x_field_type, x_field, proof = nil)
       @features = features
       @prev_hash = prev_hash
       @merkle_root = merkle_root
+      @im_merkle_root = im_merkle_root
       @time = time
-      @bits = bits
-      @nonce = nonce
+      @x_field_type = x_field_type
+      @x_field = x_field
+      @proof = proof
     end
 
     def self.parse_from_payload(payload)
-      features, prev_hash, merkle_root, time, bits, nonce = payload.unpack('Va32a32VVV')
-      new(features, prev_hash.bth, merkle_root.bth, time, bits, nonce)
+      buf = payload.is_a?(String) ? StringIO.new(payload) : payload
+      features, prev_hash, merkle_root, im_merkle_root, time, x_filed_type = buf.read(105).unpack('Va32a32a32Vc')
+      x_field = buf.read(unpack_var_int_from_io(buf)) unless x_filed_type == X_FILED_TYPES[:none]
+      proof = buf.read(unpack_var_int_from_io(buf))
+      new(features, prev_hash.bth, merkle_root.bth, im_merkle_root.bth, time, x_filed_type, x_field ? x_field.bth : x_field, proof.bth)
     end
 
-    def to_payload
-      [features, prev_hash.htb, merkle_root.htb, time, bits, nonce].pack('Va32a32VVV')
+    def to_payload(skip_proof = false)
+      payload = [features, prev_hash.htb, merkle_root.htb, im_merkle_root.htb, time, x_field_type].pack('Va32a32a32Vc')
+      payload << pack_var_string(x_field.htb) unless x_field_type == X_FILED_TYPES[:none]
+      payload << pack_var_string(proof.htb) if proof && !skip_proof
+      payload
     end
 
-    # compute difficulty target from bits.
-    def difficulty_target
-      exponent = ((bits >> 24) & 0xff)
-      mantissa = bits & 0x7fffff
-      mantissa *= -1 if (bits & 0x800000) > 0
-      (mantissa * 2 ** (8 * (exponent - 3)))
+    # Calculate hash using sign which does not contains proof.
+    # @return [String] hash of block without proof.
+    def hash_for_sign
+      Tapyrus.double_sha256(to_payload(true)).bth
     end
 
-    def hash
-      calc_hash.to_i(16)
-    end
-
+    # Calculate block hash
+    # @return [String] hash of block
     def block_hash
-      calc_hash
+      Tapyrus.double_sha256(to_payload).bth
     end
 
     # block hash(big endian)
@@ -52,12 +62,7 @@ module Tapyrus
 
     # evaluate block header
     def valid?
-      valid_pow? && valid_timestamp?
-    end
-
-    # evaluate valid proof of work.
-    def valid_pow?
-      block_id.hex < difficulty_target
+      valid_timestamp?
     end
 
     # evaluate valid timestamp.
@@ -66,22 +71,14 @@ module Tapyrus
       time <= Time.now.to_i + Tapyrus::MAX_FUTURE_BLOCK_TIME
     end
 
-    # compute chain work of this block.
-    # @return [Integer] a chain work.
-    def work
-      target = difficulty_target
-      return 0 if target < 1
-      115792089237316195423570985008687907853269984665640564039457584007913129639936.div(target + 1) # 115792089237316195423570985008687907853269984665640564039457584007913129639936 is 2**256
-    end
-
     def ==(other)
       other && other.to_payload == to_payload
     end
 
-    private
-
-    def calc_hash
-      Tapyrus.double_sha256(to_payload).bth
+    # get bytesize.
+    # @return [Integer] bytesize.
+    def size
+      to_payload.bytesize
     end
 
   end

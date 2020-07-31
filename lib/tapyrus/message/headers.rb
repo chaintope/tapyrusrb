@@ -19,7 +19,7 @@ module Tapyrus
         header_count = Tapyrus.unpack_var_int_from_io(buf)
         h = new
         header_count.times do
-          h.headers << Tapyrus::BlockHeader.parse_from_payload(buf.read(80))
+          h.headers << Tapyrus::BlockHeader.parse_from_payload(buf)
           buf.read(1) # read tx count 0x00 (headers message doesn't include any tx.)
         end
         h
