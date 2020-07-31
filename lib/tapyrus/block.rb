@@ -1,5 +1,6 @@
 module Tapyrus
   class Block
+    include Tapyrus::Util
 
     attr_accessor :header
     attr_accessor :transactions
@@ -32,14 +33,9 @@ module Tapyrus
     end
 
     # return this block height. block height is included in coinbase.
-    # if block version under 1, height does not include in coinbase, so return nil.
+    # @return [Integer] block height.
     def height
-      return nil if header.features < 2
-      coinbase_tx = transactions[0]
-      return nil unless coinbase_tx.coinbase_tx?
-      buf = StringIO.new(coinbase_tx.inputs[0].script_sig.to_payload)
-      len = Tapyrus.unpack_var_int_from_io(buf)
-      buf.read(len).reverse.bth.to_i(16)
+      transactions.first.in.first.out_point.index
     end
 
   end

@@ -35,7 +35,9 @@ describe Tapyrus::Block do
   end
 
   describe '#height' do
-
+    it 'stored in coinbase tx.' do
+      expect(subject.height).to eq(18870)
+    end
   end
 
 end
