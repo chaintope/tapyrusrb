@@ -50,25 +50,37 @@ module Tapyrus
     end
 
     # Calculate block hash
-    # @return [String] hash of block
+    # @return [String] hash of block with hex format.
     def block_hash
       Tapyrus.double_sha256(to_payload).bth
     end
 
     # block hash(big endian)
+    # @return [String] block id which is reversed version of block hash.
     def block_id
       block_hash.rhex
     end
 
     # evaluate block header
-    def valid?
-      valid_timestamp?
+    # @param [String] agg_pubkey aggregated public key for signers with hex format.
+    # @return [Boolean] result.
+    def valid?(agg_pubkey)
+      valid_timestamp? && valid_proof?(agg_pubkey)
     end
 
     # evaluate valid timestamp.
     # https://en.bitcoin.it/wiki/Block_timestamp
     def valid_timestamp?
       time <= Time.now.to_i + Tapyrus::MAX_FUTURE_BLOCK_TIME
+    end
+
+    # Check whether proof is valid.
+    # @param [String] agg_pubkey aggregated public key for signers with hex format.
+    # @return [Boolean] Return true if proof is valid, otherwise return false.
+    def valid_proof?(agg_pubkey)
+      pubkey = Tapyrus::Key.new(pubkey: agg_pubkey)
+      msg = hash_for_sign.htb
+      pubkey.verify(proof.htb, msg, algo: :schnorr)
     end
 
     def ==(other)

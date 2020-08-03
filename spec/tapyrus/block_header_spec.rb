@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Tapyrus::BlockHeader do
 
+  subject {Tapyrus::BlockHeader.parse_from_payload('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c'.htb)}
+
   describe 'parse from payload' do
-    subject {Tapyrus::BlockHeader.parse_from_payload('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c'.htb)}
     it 'should be parsed' do
       expect(subject.features).to eq(1)
       expect(subject.prev_hash).to eq('8dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce')
@@ -19,10 +20,6 @@ describe Tapyrus::BlockHeader do
   end
 
   describe '#valid_timestamp?' do
-    subject {
-      Tapyrus::BlockHeader.parse_from_payload('010000008dd071313dd2674dc098996805b917f79111359026adde510ac7f5447d0cb3ce8a081b8fbd5159e96d4744a4e1d883d6b9474bb204d14c09bf00b67f3ffdfdf86f5b597044f70e892887af9ee1d7a1288267c684e8afc6670949fefe946510eca314215f0040742dd09cab068bd26fd83d1c1a066405026ccc86bfc5c562350832f78fcd837f6b2ba890c7af950aa1adb40f75834da3c3c4075697c9c938dae1e745114e559c'.htb)
-    }
-
     before {
       Timecop.freeze(Time.utc(2017, 9, 22, 15, 13, 25))
     }
@@ -44,6 +41,14 @@ describe Tapyrus::BlockHeader do
     after {
       Timecop.return
     }
+  end
+
+  describe '#valid_proof?' do
+    it 'check whether proof is valid.' do
+      expect(subject.valid_proof?('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')).to be true
+      # another public key
+      expect(subject.valid_proof?('037f4192c630f399d9271e26c575269b1d15be553ea1a7217f0cb8513cef41cb')).to be false
+    end
   end
 
 end

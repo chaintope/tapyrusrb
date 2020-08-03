@@ -118,4 +118,5 @@ describe Tapyrus::Store::SPVChain do
       end
     end
   end
+
 end

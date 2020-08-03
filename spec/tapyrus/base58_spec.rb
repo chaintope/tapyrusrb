@@ -39,7 +39,6 @@ describe Tapyrus::Base58 do
     invalid_json = fixture_file('key_io_invalid.json')
     invalid_json.each do |json|
       it "should be invalid. #{json}" do
-        puts json
         base58_str = json[0]
         expect{Tapyrus::Key.from_wif(base58_str)}.to raise_error(ArgumentError)
       end

@@ -3,10 +3,12 @@ module Tapyrus
   module Store
 
     KEY_PREFIX = {
-        entry: 'e',   # key: block hash, value: Tapyrus::Store::ChainEntry payload
-        height: 'h',  # key: block height, value: block hash.
-        best: 'B',    # value: best block hash.
-        next: 'n'     # key: block hash, value: A hash of the next block of the specified hash
+        entry: 'e',             # key: block hash, value: Tapyrus::Store::ChainEntry payload
+        height: 'h',            # key: block height, value: block hash.
+        best: 'B',              # value: best block hash.
+        next: 'n',              # key: block hash, value: A hash of the next block of the specified hash
+        agg_pubkey: 'a',        # key: index, value: Activated block height | aggregated public key.
+        latest_agg_pubkey: 'g'  # value: latest agg pubkey index.
     }
 
     class SPVChain
@@ -49,9 +51,9 @@ module Tapyrus
       # @return [Tapyrus::Store::ChainEntry] appended block header entry.
       def append_header(header)
         logger.info("append header #{header.block_id}")
-        raise "this header is invalid. #{header.block_hash}" unless header.valid?
         best_block = latest_block
         current_height = best_block.height
+        raise "this header is invalid. #{header.block_hash}" unless header.valid?(db.agg_pubkey_with_height(current_height + 1))
         if best_block.block_hash == header.prev_hash
           entry = Tapyrus::Store::ChainEntry.new(header, current_height + 1)
           db.save_entry(entry)
@@ -87,12 +89,28 @@ module Tapyrus
         time[time.size / 2]
       end
 
+      # Add aggregated public key.
+      # @param [Integer] active_height
+      # @param [String] agg_pubkey aggregated public key with hex format.
+      def add_agg_pubkey(active_height, agg_pubkey)
+        db.add_agg_pubkey(active_height, agg_pubkey)
+      end
+
+      # get aggregated public key keys.
+      # @return [Array[Array(height, agg_pubkey)]] the list of public keys.
+      def agg_pubkeys
+        db.agg_pubkeys
+      end
+
       private
 
       # if database is empty, put genesis block.
       # @param [Tapyrus::Block] genesis genesis block
       def initialize_block(genesis)
-        db.save_entry(ChainEntry.new(genesis.header, 0)) unless latest_block
+        unless latest_block
+          db.save_entry(ChainEntry.new(genesis.header, 0))
+          db.add_agg_pubkey(0, genesis.header.x_field)
+        end
       end
 
     end

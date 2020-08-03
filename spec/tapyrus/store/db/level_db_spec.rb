@@ -41,4 +41,39 @@ describe Tapyrus::Store::DB::LevelDB do
       expect(subject.get_hash_from_height(16)).to eq 'ebfd42418e2460a42d98a20d5344c305d511bce93c2a4745399c83c86ce21050'
     end
   end
+
+  describe '#agg_pubkeys' do
+    it 'should return aggregated public key list.' do
+      expect(subject.agg_pubkeys.size).to eq(1)
+      expect(subject.agg_pubkeys.first[0]).to eq(0)
+      expect(subject.agg_pubkeys.first[1]).to eq('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+
+      subject.add_agg_pubkey(300, '02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+      expect(subject.agg_pubkeys.size).to eq(2)
+      expect(subject.agg_pubkeys[1][0]).to eq(300)
+      expect(subject.agg_pubkeys[1][1]).to eq('02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+    end
+  end
+
+  describe '#latest_agg_pubkey' do
+    it 'should return latest one.' do
+      expect(subject.latest_agg_pubkey).to eq('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      subject.add_agg_pubkey(300, '02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+      subject.add_agg_pubkey(301, '0266262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      expect(subject.latest_agg_pubkey).to eq('0266262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+    end
+  end
+
+  describe '#agg_pubkey_with_height' do
+    it 'should return target aggregated public key.' do
+      expect(subject.agg_pubkey_with_height(0)).to eq('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      subject.add_agg_pubkey(150, '02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+      subject.add_agg_pubkey(301, '0266262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      expect(subject.agg_pubkey_with_height(149)).to eq('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      expect(subject.agg_pubkey_with_height(150)).to eq('02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+      expect(subject.agg_pubkey_with_height(300)).to eq('02157bc6dc9dc7a25d537f36d4714c0cfc11c882f017a989e16956cc1aa8cce20a')
+      expect(subject.agg_pubkey_with_height(301)).to eq('0266262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+      expect(subject.agg_pubkey_with_height(1050)).to eq('0266262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+    end
+  end
 end
