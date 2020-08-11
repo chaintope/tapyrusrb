@@ -58,10 +58,13 @@ module Tapyrus
           db.get(KEY_PREFIX[:entry] + hash)
         end
 
+        # Save entry.
+        # @param [Tapyrus::Store::ChainEntry]
         def save_entry(entry)
           db.batch do
             db.put(entry.key ,entry.to_payload)
             db.put(height_key(entry.height), entry.block_hash)
+            add_agg_pubkey(entry.height == 0 ? 0 : entry.height + 1, entry.header.x_field) if entry.header.upgrade_agg_pubkey?
             connect_entry(entry)
           end
         end

@@ -65,7 +65,7 @@ module Tapyrus
     # @param [String] agg_pubkey aggregated public key for signers with hex format.
     # @return [Boolean] result.
     def valid?(agg_pubkey)
-      valid_timestamp? && valid_proof?(agg_pubkey)
+      valid_timestamp? && valid_proof?(agg_pubkey) && valid_x_field?
     end
 
     # evaluate valid timestamp.
@@ -81,6 +81,25 @@ module Tapyrus
       pubkey = Tapyrus::Key.new(pubkey: agg_pubkey)
       msg = hash_for_sign.htb
       pubkey.verify(proof.htb, msg, algo: :schnorr)
+    end
+
+    # Check whether x_field is valid.
+    # @return [Boolean] if valid return true, otherwise false
+    def valid_x_field?
+      case x_field_type
+      when X_FILED_TYPES[:none] then
+        x_field.nil?
+      when X_FILED_TYPES[:aggregate_pubkey] then
+        Tapyrus::Key.new(pubkey: x_field).fully_valid_pubkey?
+      else
+        false
+      end
+    end
+
+    # Check this header contains upgrade aggregated publiec key.
+    # @return [Boolean] if contains return true, otherwise false.
+    def upgrade_agg_pubkey?
+      x_field_type == X_FILED_TYPES[:aggregate_pubkey]
     end
 
     def ==(other)

@@ -73,6 +73,25 @@ describe Tapyrus::Store::SPVChain do
         expect(subject.latest_block.header).to eq(header2)
       end
     end
+
+    context 'has x_field type 01' do
+      it 'should register new aggregated public key.' do
+        # add block 1, 2
+        header1 = Tapyrus::BlockHeader.parse_from_payload('010000008add6b1d1547e5793d9ae2e6ae5fea385f909a54d8d72f5a8ff7c27548118b03478f5da5750223cc8f1119b5d49111564533f319d15b6cf523299c0aa48ccc46b17df463553646417f6d18c686a8321edbdd5805e13682951289acd2a41a80e49dbdbc5e0040fa1dcab3ffdb5667ae476e7afa9e1cc15961e8501457c18565b964a1ca411996b90e97fab5e715ae716bcff7fee5a28834af87c97445cb58612a550242aa3e37'.htb)
+        header2 = Tapyrus::BlockHeader.parse_from_payload('0100000081038c7b08c511efccf21d451d1075ecf3e41c464b4c5c2a6729581e342cfd536aa2519c8204db78da162e7ef415a3471a94c398bc98f83c1bea6cc23e26635ce2555325ace27d47ad06b2d8ebc3746445d31d35b0e52a3238294fea5e4cfd6ce4c0bc5e0040ade37f48b67bd8d336e0b724dc29d3f8186a63e94c6741849637f0fa181ad6dd8a66214ec0613bb3fe865f1eef213aab865307d027c5e8779af73c1f7d18da68'.htb)
+        subject.append_header(header1)
+        subject.append_header(header2)
+
+        header3 = Tapyrus::BlockHeader.parse_from_payload('010000006c281f247858b3a15a883883f3b6c088a0e933d97bc47688e504f5be9f2cee77e476dba79e75fc0263c917d2ab40a34c1ab7510aba4020d79fa9ad3cfb3ae834c716cff6adf31e2846e905d391f89b3ca81273db405ad1ca0945b79f2c795e023cc3bc5e012103e5f59afec6ce5cfa1042c93c402a559dd9e4d29fc1c1567a7424ec8643ec609140fbd6752c1a8ba685adc2d9b837be1310aa0f3ae0a8ca551e78472ee179e3f07ead69cf8bcfb5b715ddb128ffcf8f76e83334d810542f387ffab001d48974d4a5'.htb)
+        expect(header3.x_field_type).to eq(Tapyrus::BlockHeader::X_FILED_TYPES[:aggregate_pubkey])
+        expect(header3.x_field).to eq('03e5f59afec6ce5cfa1042c93c402a559dd9e4d29fc1c1567a7424ec8643ec6091')
+        subject.append_header(header3)
+
+        # add block 3 which has new aggregated public key.
+        expect(subject.db.agg_pubkey_with_height(3)).to eq('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')
+        expect(subject.db.agg_pubkey_with_height(4)).to eq('03e5f59afec6ce5cfa1042c93c402a559dd9e4d29fc1c1567a7424ec8643ec6091')
+      end
+    end
   end
 
   describe '#mtp' do

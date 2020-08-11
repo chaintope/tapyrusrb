@@ -109,7 +109,6 @@ module Tapyrus
       def initialize_block(genesis)
         unless latest_block
           db.save_entry(ChainEntry.new(genesis.header, 0))
-          db.add_agg_pubkey(0, genesis.header.x_field)
         end
       end
 
