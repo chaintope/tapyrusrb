@@ -7,6 +7,9 @@ module Tapyrus
   class ExtKey
     include Tapyrus::HexConverter
 
+    MAX_DEPTH = 255
+    MASTER_FINGERPRINT = '00000000'
+
     attr_accessor :ver
     attr_accessor :depth
     attr_accessor :number
@@ -48,9 +51,7 @@ module Tapyrus
 
     # Base58 encoded extended private key
     def to_base58
-      h = to_hex
-      hex = h + Tapyrus.calc_checksum(h)
-      Base58.encode(hex)
+      ExtPubkey.encode_base58(to_hex)
     end
 
     # get private key(hex)
@@ -141,19 +142,25 @@ module Tapyrus
       buf = StringIO.new(payload)
       ext_key = ExtKey.new
       ext_key.ver = buf.read(4).bth # version
-      raise 'An unsupported version byte was specified.' unless ExtKey.support_version?(ext_key.ver)
+      puts ext_key.ver
+      raise ArgumentError, Errors::Messages::INVALID_BIP32_VERSION unless ExtKey.support_version?(ext_key.ver)
       ext_key.depth = buf.read(1).unpack('C').first
       ext_key.parent_fingerprint = buf.read(4).bth
       ext_key.number = buf.read(4).unpack('N').first
+      if ext_key.depth == 0
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT unless ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_INDEX if ext_key.number > 0
+      end
+      raise ArgumentError, Errors::Messages:: INVALID_BIP32_ZERO_DEPTH if ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_key.depth > 0
       ext_key.chain_code = buf.read(32)
-      buf.read(1) # 0x00
+      raise ArgumentError, Errors::Messages::INVALID_BIP32_PRIV_PREFIX unless buf.read(1).bth == '00' # 0x00
       ext_key.key = Tapyrus::Key.new(priv_key: buf.read(32).bth, key_type: Tapyrus::Key::TYPES[:compressed])
       ext_key
     end
 
     # import private key from Base58 private key address
     def self.from_base58(address)
-      ExtKey.parse_from_payload(Base58.decode(address).htb)
+      ExtKey.parse_from_payload(ExtPubkey.validate_checksum(address))
     end
 
     # get version bytes from purpose' value.
@@ -172,6 +179,7 @@ module Tapyrus
     # check whether +version+ is supported version bytes.
     def self.support_version?(version)
       p = Tapyrus.chain_params
+      puts p.extended_privkey_version
       [p.bip49_privkey_p2wpkh_p2sh_version, p.bip84_privkey_p2wpkh_version, p.extended_privkey_version].include?(version)
     end
 
@@ -237,9 +245,14 @@ module Tapyrus
 
     # Base58 encoded extended pubkey
     def to_base58
-      h = to_hex
-      hex = h + Tapyrus.calc_checksum(h)
-      Base58.encode(hex)
+      ExtPubkey.encode_base58(to_hex)
+    end
+
+    # Generate Base58 encoded key from BIP32 payload with hex format.
+    # @param [String] hex BIP32 payload with hex format.
+    # @return [String] Base58 encoded extended key.
+    def self.encode_base58(hex)
+      Base58.encode(hex + Tapyrus.calc_checksum(hex))
     end
 
     # whether hardened key.
@@ -293,19 +306,32 @@ module Tapyrus
       buf = StringIO.new(payload)
       ext_pubkey = ExtPubkey.new
       ext_pubkey.ver = buf.read(4).bth # version
-      raise 'An unsupported version byte was specified.' unless ExtPubkey.support_version?(ext_pubkey.ver)
+      raise ArgumentError, Errors::Messages::INVALID_BIP32_VERSION unless ExtPubkey.support_version?(ext_pubkey.ver)
       ext_pubkey.depth = buf.read(1).unpack('C').first
       ext_pubkey.parent_fingerprint = buf.read(4).bth
       ext_pubkey.number = buf.read(4).unpack('N').first
+      if ext_pubkey.depth == 0
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT unless ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_INDEX if ext_pubkey.number > 0
+      end
+      raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_DEPTH if ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_pubkey.depth > 0
       ext_pubkey.chain_code = buf.read(32)
-      ext_pubkey.pubkey = buf.read(33).bth
+      ext_pubkey.pubkey = Tapyrus::Key.new(pubkey: buf.read(33).bth).pubkey
       ext_pubkey
     end
 
-
     # import pub key from Base58 private key address
     def self.from_base58(address)
-      ExtPubkey.parse_from_payload(Base58.decode(address).htb)
+      ExtPubkey.parse_from_payload(ExtPubkey.validate_checksum(address))
+    end
+
+    # Validate address checksum and return payload.
+    # @param [String] BIP32 Base58 address
+    # @return [String] BIP32 payload with binary format
+    def self.validate_checksum(base58)
+      raw = Base58.decode(base58)
+      raise ArgumentError, Errors::Messages::INVALID_CHECKSUM unless Tapyrus.calc_checksum(raw[0...-8]) == raw[-8..-1]
+      raw[0...-8].htb
     end
 
     # get version bytes from purpose' value.

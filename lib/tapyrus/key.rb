@@ -30,7 +30,7 @@ module Tapyrus
     # @param [Integer] key_type a key type which determine address type.
     # @param [Boolean] compressed [Deprecated] whether public key is compressed.
     # @return [Tapyrus::Key] a key object.
-    def initialize(priv_key: nil, pubkey: nil, key_type: nil, compressed: true)
+    def initialize(priv_key: nil, pubkey: nil, key_type: nil, compressed: true, allow_hybrid: false)
       puts "[Warning] Use key_type parameter instead of compressed. compressed parameter removed in the future." if key_type.nil? && !compressed.nil? && pubkey.nil?
       if key_type
         @key_type = key_type
@@ -41,13 +41,14 @@ module Tapyrus
       @secp256k1_module =  Tapyrus.secp_impl
       @priv_key = priv_key
       if @priv_key
-        raise ArgumentError, 'private key is not on curve' unless validate_private_key_range(@priv_key)
+        raise ArgumentError, Errors::Messages::INVALID_PRIV_KEY unless validate_private_key_range(@priv_key)
       end
       if pubkey
         @pubkey = pubkey
       else
         @pubkey = generate_pubkey(priv_key, compressed: compressed) if priv_key
       end
+      raise ArgumentError, Errors::Messages::INVALID_PUBLIC_KEY unless fully_valid_pubkey?(allow_hybrid)
     end
 
     # generate key pair
@@ -65,7 +66,7 @@ module Tapyrus
       data = hex[2...-8].htb
       checksum = hex[-8..-1]
       raise ArgumentError, 'invalid version' unless version == Tapyrus.chain_params.privkey_version
-      raise ArgumentError, 'invalid checksum' unless Tapyrus.calc_checksum(version + data.bth) == checksum
+      raise ArgumentError, Errors::Messages::INVALID_CHECKSUM unless Tapyrus.calc_checksum(version + data.bth) == checksum
       key_len = data.bytesize
       if key_len == COMPRESSED_PUBLIC_KEY_SIZE && data[-1].unpack('C').first == 1
         key_type = TYPES[:compressed]
@@ -223,10 +224,10 @@ module Tapyrus
     end
 
     # fully validate whether this is a valid public key (more expensive than IsValid())
-    def fully_valid_pubkey?
+    def fully_valid_pubkey?(allow_hybrid = false)
       return false unless valid_pubkey?
       begin
-        point = ECDSA::Format::PointOctetString.decode(pubkey.htb, ECDSA::Group::Secp256k1)
+        point = ECDSA::Format::PointOctetString.decode(pubkey.htb, ECDSA::Group::Secp256k1, allow_hybrid: allow_hybrid)
         ECDSA::Group::Secp256k1.valid_public_key?(point)
       rescue ECDSA::Format::DecodeError
         false

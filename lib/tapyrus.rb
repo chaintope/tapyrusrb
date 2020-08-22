@@ -48,8 +48,10 @@ module Tapyrus
   autoload :KeyPath, 'tapyrus/key_path'
   autoload :SLIP39, 'tapyrus/slip39'
   autoload :Color, 'tapyrus/script/color'
+  autoload :Errors, 'tapyrus/errors'
 
   require_relative 'tapyrus/constants'
+  require_relative 'tapyrus/ext/ecdsa'
 
   extend Util
 
@@ -204,19 +206,6 @@ module Tapyrus
       else
         to_s(2)
       end
-    end
-  end
-
-  class ::ECDSA::Signature
-    # convert signature to der string.
-    def to_der
-      ECDSA::Format::SignatureDerString.encode(self)
-    end
-  end
-
-  class ::ECDSA::Point
-    def to_hex(compression = true)
-      ECDSA::Format::PointOctetString.encode(self, compression: compression).bth
     end
   end
 

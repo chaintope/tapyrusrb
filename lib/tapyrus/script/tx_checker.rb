@@ -32,12 +32,16 @@ module Tapyrus
     # @param [String] pubkey a public key with hex format.
     # @param [String] digest a message digest with binary format to be verified.
     # @return [Boolean] if check is passed return true, otherwise false.
-    def verify_sig(sig, pubkey, digest)
+    def verify_sig(sig, pubkey, digest, allow_hybrid: false)
       key_type = pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
       sig = sig.htb
       algo = sig.bytesize == 64 ? :schnorr : :ecdsa
-      key = Key.new(pubkey: pubkey, key_type: key_type)
-      key.verify(sig, digest, algo: algo)
+      begin
+        key = Key.new(pubkey: pubkey, key_type: key_type, allow_hybrid: allow_hybrid)
+        key.verify(sig, digest, algo: algo)
+      rescue Exception
+        false
+      end
     end
 
     def check_locktime(locktime)

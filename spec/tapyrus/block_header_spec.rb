@@ -47,7 +47,7 @@ describe Tapyrus::BlockHeader do
     it 'check whether proof is valid.' do
       expect(subject.valid_proof?('0366262690cbdf648132ce0c088962c6361112582364ede120f3780ab73438fc4b')).to be true
       # another public key
-      expect(subject.valid_proof?('037f4192c630f399d9271e26c575269b1d15be553ea1a7217f0cb8513cef41cb')).to be false
+      expect(subject.valid_proof?('03004381475e4e6cc087ae46a0c4ec6fbde69bdc035e851fce8c1cdcfc9031bf0a')).to be false
     end
   end
 
