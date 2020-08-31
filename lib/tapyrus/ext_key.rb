@@ -23,7 +23,7 @@ module Tapyrus
       ext_key = ExtKey.new
       ext_key.depth = ext_key.number = 0
       ext_key.parent_fingerprint = '00000000'
-      l = Tapyrus.hmac_sha512('Bitcoin seed', seed.htb)
+      l = Tapyrus.hmac_sha512('Tapyrus seed', seed.htb)
       left = l[0..31].bth.to_i(16)
       raise 'invalid key' if left >= CURVE_ORDER || left == 0
       ext_key.key = Tapyrus::Key.new(priv_key: l[0..31].bth, key_type: Tapyrus::Key::TYPES[:compressed])
@@ -142,7 +142,6 @@ module Tapyrus
       buf = StringIO.new(payload)
       ext_key = ExtKey.new
       ext_key.ver = buf.read(4).bth # version
-      puts ext_key.ver
       raise ArgumentError, Errors::Messages::INVALID_BIP32_VERSION unless ExtKey.support_version?(ext_key.ver)
       ext_key.depth = buf.read(1).unpack('C').first
       ext_key.parent_fingerprint = buf.read(4).bth
@@ -179,7 +178,6 @@ module Tapyrus
     # check whether +version+ is supported version bytes.
     def self.support_version?(version)
       p = Tapyrus.chain_params
-      puts p.extended_privkey_version
       [p.bip49_privkey_p2wpkh_p2sh_version, p.bip84_privkey_p2wpkh_version, p.extended_privkey_version].include?(version)
     end
 

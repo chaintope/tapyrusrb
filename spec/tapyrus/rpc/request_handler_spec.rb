@@ -214,10 +214,10 @@ describe Tapyrus::RPC::RequestHandler do
         expect(accounts[0][:receive_depth]).to eq(0)
         expect(accounts[0][:change_depth]).to eq(0)
         expect(accounts[0][:look_ahead]).to eq(10)
-        expect(accounts[0][:account_key]).to eq('vpub5Y6cjg78GGuNLsaPhmYsiw4gYX3HoQiRBiSwDaBXKUafCt9bNwWQiitDk5VZ5BVxYnQdwoTyXSs2JHRPAgjAvtbBrf8ZhDYe2jWAqvZVnsc')
+        expect(accounts[0][:account_key]).to eq('vpub5YgmGYD5gaRBg3FssXTWkB8X7DfjvYhksZDQFBGPSVoB3GBN63jJkZucj9aeNQG6RJ8ymsENTB8XiPeK8fZQrsTF95VEoEngg7AMNd7798w')
         expect(accounts[0][:watch_only]).to be false
-        expect(accounts[0][:receive_address]).to eq('mzYpQmSAGYWWyTLiLGbGaG8T3rHdjNcV11')
-        expect(accounts[0][:change_address]).to eq('mjpZ9GG9z6eWeN9dUdRmxss9ajYcK47A4p')
+        expect(accounts[0][:receive_address]).to eq('mz7MBd4ew7KPY4GV3dU8GXRuutfCqSeLPW')
+        expect(accounts[0][:change_address]).to eq('muvKLFKSsWwhnBSUri7Y3pDmYjfHKvGFzi')
 
         master = result[:master]
         expect(master[:encrypted]).to be false

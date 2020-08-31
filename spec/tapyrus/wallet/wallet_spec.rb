@@ -86,12 +86,12 @@ describe Tapyrus::Wallet do
       expect(accounts[0].name).to eq('Default')
       expect(accounts[0].receive_depth).to eq(0)
       receive_keys = accounts[0].derived_receive_keys
-      expect(receive_keys[0].addr).to eq('1JaUQDVNRdhfNsVncGkXedaPSM5Gc54Hso')
+      expect(receive_keys[0].addr).to eq('1A6LEHZtqaVdT4eSLB4coYVAon35CNrLk')
       expect(receive_keys.size).to eq(1)
       expect(receive_keys[0].hardened?).to be false
       expect(accounts[0].change_depth).to eq(0)
       change_keys = accounts[0].derived_change_keys
-      expect(change_keys[0].addr).to eq('16fuuGhkywq9pB7BBxi3btQ3C3s4f4dz1N')
+      expect(change_keys[0].addr).to eq('1PuiMVhHX8whZSxeniivn5He9EHkHjS1in')
       expect(change_keys.size).to eq(1)
       expect(change_keys[0].hardened?).to be false
       expect(accounts[0].lookahead).to eq(10)
@@ -124,8 +124,8 @@ describe Tapyrus::Wallet do
       create_test_wallet(5)
     }
     it 'should return new address' do
-      expect(subject.generate_new_address('Default')).to eq('mqhB5Q36hdgWv2hLhyDk79zzi7MxjRYfHn')
-      expect(subject.generate_new_address('Default')).to eq('mkC8Nz9nnBc8RpgeKDMZLHavrHsTG3EhMA')
+      expect(subject.generate_new_address('Default')).to eq('n2jNRE6oXFTrfAaRGmLCw7S2aF5bNmCGWU')
+      expect(subject.generate_new_address('Default')).to eq('mmsVvX2JAAQMmrmozmfFe1WzvhiQJiWhY6')
       # account name does not exist.
       expect{subject.generate_new_address('hoge')}.to raise_error(ArgumentError)
     end
@@ -144,10 +144,10 @@ describe Tapyrus::Wallet do
     }
     it 'should return pubkey hash in the wallet.' do
       expect(subject.size).to eq(7)
-      expect(subject[0]).to eq('d0c4a3ef09e997b6e99e397e518fe3e41a118ca1') # m/84'/1'/0'/0/0 default
-      expect(subject[1]).to eq('2f34aa1cf00a53b055a291a03a7d45f0a6988b52') # m/84'/1'/0'/1/0 default
-      expect(subject[2]).to eq('0fa17461c68ec2241a4c4a5edf799cbe2f8fb449') # m/84'/1'/1'/0/0 account1
-      expect(subject[3]).to eq('24d6a2ce123c8be57fb5ff2394f2aadd3905419b') # m/84'/1'/1'/0/1 account1
+      expect(subject[0]).to eq('cbf383806d7e735acde8756addba679657f20341') # m/84'/1'/0'/0/0 default
+      expect(subject[1]).to eq('9dfce3bbb98107f9f6fc398e1d630a188e7593f5') # m/84'/1'/0'/1/0 default
+      expect(subject[2]).to eq('42e16f9cb0543cb759107cb1c1882638ba16e099') # m/84'/1'/1'/0/0 account1
+      expect(subject[3]).to eq('89e6ee49ccc3b233616fdcbe02f6c81371abbac3') # m/84'/1'/1'/0/1 account1
     end
   end
 
