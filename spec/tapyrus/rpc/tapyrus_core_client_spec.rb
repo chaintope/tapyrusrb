@@ -34,7 +34,7 @@ describe Tapyrus::RPC::TapyrusCoreClient do
     context 'server responded with error' do
       it 'should raise with response' do
         stub_request(:post, server_url).to_return(body: JSON.generate({ 'error': { 'code': '-1', 'message': 'RPC ERROR' } }))
-        expect { client.rpc_command }.to raise_error(RuntimeError, /RPC ERROR/)
+        expect { client.rpc_command }.to raise_error(RuntimeError, '{"code":"-1","message":"RPC ERROR"}')
       end
     end
 
