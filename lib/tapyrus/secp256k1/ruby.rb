@@ -78,6 +78,19 @@ module Tapyrus
 
       module_function :valid_sig?
 
+      # validate whether this is a valid public key (more expensive than IsValid())
+      # @param [String] pubkey public key with hex format.
+      # @param [Boolean] allow_hybrid whether support hybrid public key.
+      # @return [Boolean] If valid public key return true, otherwise false.
+      def parse_ec_pubkey?(pubkey, allow_hybrid = false)
+        begin
+          point = ECDSA::Format::PointOctetString.decode(pubkey.htb, ECDSA::Group::Secp256k1, allow_hybrid: allow_hybrid)
+          ECDSA::Group::Secp256k1.valid_public_key?(point)
+        rescue ECDSA::Format::DecodeError
+          false
+        end
+      end
+
       # if +pubkey+ is hybrid public key format, it convert uncompressed format.
       # https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2012-June/001578.html
       def repack_pubkey(pubkey)
