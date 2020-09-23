@@ -87,19 +87,31 @@ describe Tapyrus::Key do
   end
 
   describe '#sign and verify' do
-    it 'should be success' do
-      message = Tapyrus.sha256('message'.htb)
-      key = Tapyrus::Key.generate
-      # ecdsa
-      sig = key.sign(message)
-      expect(key.verify(sig, message)).to be true
-      expect(key.verify(sig, message, algo: :schnorr)).to be false
-
-      # schnorr
-      sig = key.sign(message, algo: :schnorr)
-      expect(key.verify(sig, message)).to be false
-      expect(key.verify(sig, message, algo: :schnorr)).to be true
+    context 'use ruby native code' do
+      it 'should be success' do
+        sign_verify
+      end
     end
+
+    context 'use libsecp256k1', use_secp256k1: true do
+      it 'should be success' do
+        sign_verify
+      end
+    end
+  end
+
+  def sign_verify
+    message = Tapyrus.sha256('message'.htb)
+    key = Tapyrus::Key.new(priv_key: '78999378da075ab0583873df5f2cb498f07682e5c0c92fe2d256eecdc1af133b')
+    # ecdsa
+    sig = key.sign(message)
+    expect(key.verify(sig, message)).to be true
+    expect(key.verify(sig, message, algo: :schnorr)).to be false
+
+    # schnorr
+    sig = key.sign(message, algo: :schnorr)
+    expect(key.verify(sig, message)).to be false
+    expect(key.verify(sig, message, algo: :schnorr)).to be true
   end
 
   describe 'private key range check' do

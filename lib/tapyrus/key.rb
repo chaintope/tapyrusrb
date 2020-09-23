@@ -96,10 +96,13 @@ module Tapyrus
     # @return [String] signature data with binary format
     def sign(data, low_r = true, extra_entropy = nil, algo: :ecdsa)
       raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
-      if algo == :ecdsa
+      case algo
+      when :ecdsa
         sign_ecdsa(data, low_r, extra_entropy)
+      when :schnorr
+        secp256k1_module.sign_data(data, priv_key, extra_entropy, algo: algo)
       else
-        sign_schnorr(data)
+        false
       end
     end
 
@@ -112,11 +115,8 @@ module Tapyrus
       return false unless valid_pubkey?
       begin
         raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
-        if algo == :ecdsa
-          verify_ecdsa_sig(sig, origin)
-        else
-          verify_schnorr_sig(sig, origin)
-        end
+        sig = ecdsa_signature_parse_der_lax(sig) if algo == :ecdsa
+        secp256k1_module.verify_sig(origin, sig, pubkey, algo: algo)
       rescue Exception
         false
       end
@@ -286,32 +286,16 @@ module Tapyrus
 
     # generate ecdsa signature
     def sign_ecdsa(data, low_r, extra_entropy)
-      sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
+      sig = secp256k1_module.sign_data(data, priv_key, extra_entropy, algo: :ecdsa)
       if low_r && !sig_has_low_r?(sig)
         counter = 1
         until sig_has_low_r?(sig)
           extra_entropy = [counter].pack('I*').bth.ljust(64, '0').htb
-          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy)
+          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy,  algo: :ecdsa)
           counter += 1
         end
       end
       sig
-    end
-
-    # generate schnorr signature
-    def sign_schnorr(msg)
-      Schnorr.sign(msg, priv_key.to_i(16)).encode
-    end
-
-    # verify ecdsa signature
-    def verify_ecdsa_sig(sig, message)
-      sig = ecdsa_signature_parse_der_lax(sig)
-      secp256k1_module.verify_sig(message, sig, pubkey)
-    end
-
-    # verify schnorr signature
-    def verify_schnorr_sig(sig, message)
-      Schnorr.valid_sig?(message, sig, pubkey.htb)
     end
 
   end
