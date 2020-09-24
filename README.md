@@ -12,7 +12,7 @@ Tapyrusrb supports following feature:
 * Tapyrus script interpreter
 * De/serialization of Tapyrus protocol network messages
 * De/serialization of blocks and transactions
-* Key generation and verification for ECDSA, including [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) supports.
+* Key generation and verification for Schnorr and ECDSA (including [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) supports).
 * ECDSA signature(RFC6979 -Deterministic ECDSA, LOW-S, LOW-R support)
 * [WIP] SPV node
 * [WIP] 0ff-chain protocol
