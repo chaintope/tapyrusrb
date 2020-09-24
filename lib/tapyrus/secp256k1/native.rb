@@ -4,8 +4,8 @@
 module Tapyrus
   module Secp256k1
 
-    # binding for secp256k1 (https://github.com/bitcoin/bitcoin/tree/v0.14.2/src/secp256k1)
-    # tag: v0.14.2
+    # binding for secp256k1 (https://github.com/chaintope/tapyrus-core/tree/v0.4.0/src/secp256k1)
+    # tag: v0.4.0
     # this is not included by default, to enable set shared object path to ENV['SECP256K1_LIB_PATH']
     # for linux, ENV['SECP256K1_LIB_PATH'] = '/usr/local/lib/libsecp256k1.so'
     # for mac,
