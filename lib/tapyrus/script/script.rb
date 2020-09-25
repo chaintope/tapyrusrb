@@ -75,6 +75,18 @@ module Tapyrus
       end
     end
 
+    # Remove color identifier from cp2pkh or cp2sh
+    # @param [ColorIdentifier] color identifier
+    # @return [Script] P2PKH or P2SH script
+    # @raise [RuntimeError] if script is neither cp2pkh nor cp2sh
+    def remove_color
+      raise RuntimeError, 'Only cp2pkh and cp2sh can remove color' unless cp2pkh? or cp2sh?
+
+      Tapyrus::Script.new.tap do |s|
+        s.chunks = self.chunks[2..]
+      end
+    end
+
     def get_multisig_pubkeys
       num = Tapyrus::Opcodes.opcode_to_small_int(chunks[-2].bth.to_i(16))
       (1..num).map{ |i| chunks[i].pushed_data }
@@ -229,6 +241,16 @@ module Tapyrus
       return false unless Tapyrus::Color::ColorIdentifier.parse_from_payload(chunks[0].pushed_data)&.valid?
       return false unless chunks[1].ord == OP_COLOR
       OP_HASH160 == chunks[2].ord && OP_EQUAL == chunks[4].ord && chunks[3].bytesize == 21
+    end
+  
+    def colored?
+      cp2pkh? || cp2sh?
+    end
+
+    def color_id
+      return nil unless colored?
+
+      Tapyrus::Color::ColorIdentifier.parse_from_payload(chunks[0].pushed_data)
     end
 
     def op_return_data

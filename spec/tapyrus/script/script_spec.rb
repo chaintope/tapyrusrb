@@ -59,6 +59,8 @@ describe Tapyrus::Script do
         expect(subject.multisig?).to be false
         expect(subject.op_return?).to be false
         expect(subject.standard?).to be true
+        expect(subject.colored?).to be false
+        expect(subject.color_id).to be_nil
         expect(subject.addresses.first).to eq('17T9tBC2dSpusL1rhT4T4AV4if963Tpfym')
         expect(subject.get_pubkeys).to eq([])
       end
@@ -96,6 +98,8 @@ describe Tapyrus::Script do
         expect(subject[0].multisig?).to be false
         expect(subject[0].op_return?).to be false
         expect(subject[0].standard?).to be true
+        expect(subject[0].colored?).to be false
+        expect(subject[0].color_id).to be_nil
         expect(subject[0].addresses.first).to eq('3CTcn59uJ89wCsQbeiy8AGLydXE9mh6Yrr')
         expect(subject[1].to_hex).to eq('5121021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e921032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e3552ae')
         expect(subject[1].to_s).to eq('1 021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9 032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35 2 OP_CHECKMULTISIG')
@@ -133,6 +137,8 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be true
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be true
+      expect(subject.colored?).to be false
+      expect(subject.color_id).to be_nil
       expect(subject.addresses).to eq(['n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 'mvqSumyieKezeESrga7dGBmgm7cfuATBvf'])
       expect(subject.get_pubkeys).to eq(['021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9', '032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35'])
     end
@@ -149,6 +155,8 @@ describe Tapyrus::Script do
         expect(subject.multisig?).to be false
         expect(subject.op_return?).to be true
         expect(subject.standard?).to be true
+        expect(subject.colored?).to be false
+        expect(subject.color_id).to be_nil
         expect(subject.op_return_data.bth).to eq('04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3804678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38')
         expect(subject.get_pubkeys).to eq([])
       end
@@ -219,6 +227,8 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
+      expect(subject.colored?).to be true
+      expect(subject.color_id).to eq color
       expect(subject.addresses.first).to eq('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')
       expect(subject.get_pubkeys).to eq([])
     end
@@ -254,6 +264,8 @@ describe Tapyrus::Script do
       expect(subject.multisig?).to be false
       expect(subject.op_return?).to be false
       expect(subject.standard?).to be false
+      expect(subject.colored?).to be true
+      expect(subject.color_id).to eq color
       expect(subject.addresses.first).to eq('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
       expect(subject.get_pubkeys).to eq([])
     end
@@ -334,6 +346,28 @@ describe Tapyrus::Script do
       let(:script) { Tapyrus::Script.to_p2pkh('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0') }
 
       it { expect { subject }.to raise_error ArgumentError, 'Specified color identifier is invalid' }
+    end
+  end
+
+  describe '#remove_color' do
+    subject { script.remove_color }
+
+    context 'for cp2pkh' do
+      let(:script) { Tapyrus::Script.parse_from_payload('21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bc76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb) }
+
+      it { expect(subject.to_hex).to eq '76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac' }
+    end
+
+    context 'for cp2sh' do
+      let(:script) { Tapyrus::Script.parse_from_payload('21c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b46bca9147620a79e8657d066cff10e21228bf983cf546ac687'.htb) }
+
+      it { expect(subject.to_hex).to eq('a9147620a79e8657d066cff10e21228bf983cf546ac687') }
+    end
+
+    context 'for op_return' do
+      let(:script) { Tapyrus::Script.new << OP_RETURN }
+
+      it { expect { subject }.to raise_error }
     end
   end
 

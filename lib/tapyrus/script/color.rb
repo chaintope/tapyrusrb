@@ -53,11 +53,11 @@ module Tapyrus
 
     module ColoredOutput
       def colored?
-        script_pubkey.cp2pkh? || script_pubkey.cp2sh?
+        script_pubkey.colored?
       end
 
       def color_id
-        @color_id ||= ColorIdentifier.parse_from_payload(script_pubkey.chunks[0].pushed_data)
+        @color_id ||= script_pubkey.color_id
       end
 
       def reissuable?
