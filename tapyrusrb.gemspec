@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["azuchi"]
   spec.email         = ["azuchi@chaintope.com"]
 
-  spec.summary       = %q{[WIP]The implementation of Tapyrus Protocol for Ruby.}
-  spec.description   = %q{[WIP]The implementation of Tapyrus Protocol for Ruby.}
+  spec.summary       = %q{The implementation of Tapyrus Protocol for Ruby.}
+  spec.description   = %q{The implementation of Tapyrus Protocol for Ruby.}
   spec.homepage      = 'https://github.com/chaintope/tapyrusrb'
   spec.license       = "MIT"
 
