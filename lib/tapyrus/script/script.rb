@@ -83,7 +83,7 @@ module Tapyrus
       raise RuntimeError, 'Only cp2pkh and cp2sh can remove color' unless cp2pkh? or cp2sh?
 
       Tapyrus::Script.new.tap do |s|
-        s.chunks = self.chunks[2..]
+        s.chunks = self.chunks[2..-1]
       end
     end
 
