@@ -197,7 +197,7 @@ module Tapyrus
           signature = FFI::MemoryPointer.new(:uchar, 64)
           msg32 = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, data)
           raise 'Failed to generate schnorr signature.' unless secp256k1_schnorr_sign(context, signature, msg32, secret, nil, nil) == 1
-          signature.read_string
+          signature.read_string(64)
         end
       end
 
