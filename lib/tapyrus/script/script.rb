@@ -226,6 +226,8 @@ module Tapyrus
           (chunks.size == 1 || chunks[1].opcode <= OP_16)
     end
 
+    # Return whether this script is a CP2PKH format script or not.
+    # @return [Boolean] true if this script is cp2pkh, otherwise false.
     def cp2pkh?
       return false unless chunks.size == 7
       return false unless chunks[0].bytesize == 34
@@ -235,6 +237,8 @@ module Tapyrus
           (chunks[2..3]+ chunks[5..6]).map(&:ord) && chunks[4].bytesize == 21
     end
 
+    # Return whether this script is a CP2SH format script or not.
+    # @return [Boolean] true if this script is cp2pkh, otherwise false.
     def cp2sh?
       return false unless chunks.size == 5
       return false unless chunks[0].bytesize == 34
@@ -243,10 +247,14 @@ module Tapyrus
       OP_HASH160 == chunks[2].ord && OP_EQUAL == chunks[4].ord && chunks[3].bytesize == 21
     end
   
+    # Return whether this script represents colored coin.
+    # @return [Boolean] true if this script is colored, otherwise false.
     def colored?
       cp2pkh? || cp2sh?
     end
 
+    # Return color identifier for this script.
+    # @return [ColorIdentifer] color identifier for this script if this script is colored. return nil if this script is not colored.
     def color_id
       return nil unless colored?
 
