@@ -43,6 +43,14 @@ module Tapyrus
         true
       end
 
+      def hash
+        to_payload.hash
+      end
+
+      def eql?(other)
+        to_payload.eql?(other.to_payload)
+      end
+
       private
 
       def initialize(type, payload)
