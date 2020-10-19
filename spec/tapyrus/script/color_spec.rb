@@ -38,6 +38,25 @@ describe Tapyrus::Color::ColorIdentifier do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe '#eql?' do
+    let(:color1) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
+    let(:color1_another_obj) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
+    let(:color2) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 2)) }
+
+    it { expect(color1.eql?(color1)).to be_truthy }
+    it { expect(color1.eql?(color1_another_obj)).to be_truthy }
+    it { expect(color1.eql?(color2)).to be_falsey }
+  end
+
+  describe '#hash' do
+    let(:color1) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
+    let(:color1_another_obj) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
+    let(:color2) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 2)) }
+
+    it { expect(color1.hash).to eq color1_another_obj.hash }
+    it { expect(color1.hash).not_to eq color2.hash }
+  end
 end
 
 describe 'Tapyrus::Color::ColoredOutput' do
