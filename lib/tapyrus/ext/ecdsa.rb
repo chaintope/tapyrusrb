@@ -29,7 +29,7 @@ module ::ECDSA::Format::PointOctetString
     when 4
       decode_uncompressed string, group
     when 6..7
-      raise DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord unless allow_hybrid
+      raise ECDSA::Format::DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord unless allow_hybrid
       decode_uncompressed string, group if allow_hybrid
     else
       raise ECDSA::Format::DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord
