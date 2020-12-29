@@ -30,8 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'eventmachine_httpserver'
   spec.add_runtime_dependency 'iniparse'
   spec.add_runtime_dependency 'siphash'
-  spec.add_runtime_dependency 'protobuf', '3.8.5'
-  spec.add_runtime_dependency 'scrypt'
   spec.add_runtime_dependency 'activesupport', '>= 5.2.3'
   spec.add_runtime_dependency 'json_pure', '>= 2.3.1'
 
