@@ -119,10 +119,12 @@ module Tapyrus
     # get opcode
     def opcode
       case encoding
-      when Encoding::ASCII_8BIT
-        each_byte.next
-      when Encoding::US_ASCII
-        ord
+      when Encoding::ASCII_8BIT,Encoding::US_ASCII
+        begin
+          ord
+        rescue ArgumentError
+          each_byte.next
+        end
       else
         to_i
       end
