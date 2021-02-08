@@ -118,16 +118,7 @@ module Tapyrus
 
     # get opcode
     def opcode
-      case encoding
-      when Encoding::ASCII_8BIT,Encoding::US_ASCII
-        begin
-          ord
-        rescue ArgumentError
-          each_byte.next
-        end
-      else
-        to_i
-      end
+      force_encoding(Encoding::ASCII_8BIT).ord
     end
 
     def opcode?
