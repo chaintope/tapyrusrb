@@ -55,6 +55,15 @@ describe Tapyrus::RPC::TapyrusCoreClient do
         client.rpc_command
       end
     end
+
+    context '401 unauthorized' do
+      it 'should return rpc response' do
+        stub_request(:post, server_url).to_return(
+            status: [401, "Unauthorized"]
+        )
+        expect {client.rpc_command}.to raise_error(Tapyrus::RPC::ConnectionError, 'Unauthorized')
+      end
+    end
   end
 
 end

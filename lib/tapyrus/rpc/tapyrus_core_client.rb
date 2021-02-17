@@ -4,6 +4,33 @@ require 'json/pure'
 module Tapyrus
   module RPC
 
+    # Throw when happened anything http's error with connect to server.
+    #
+    # Almost case this exception happened from 401 Unauthorized.
+    # And also, throw by cause of other http's errors.
+    #
+    # You can get raw response as cause, like as:
+    #
+    # rescue TapyrusClientConnectionError => ex
+    #   ex.response
+    # end
+    class ConnectionError < StandardError
+      attr_reader :response
+
+      def initialize(response)
+        raise ArgumentError, "Must set response as cause." unless response
+        @response = response
+      end
+
+      def message
+        @response&.msg
+      end
+
+      def to_s
+        "#{@response&.code} #{@response&.message}"
+      end
+    end
+
     # Client implementation for RPC to Tapyrus Core.
     #
     # [Usage]
@@ -62,6 +89,7 @@ module Tapyrus
         request.content_type = 'application/json'
         request.body = data.to_json
         response = http.request(request)
+        raise ConnectionError.new(response) unless response.is_a? Net::HTTPOK
         body = response.body
         response = Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
         raise response['error'].to_json if response['error']
