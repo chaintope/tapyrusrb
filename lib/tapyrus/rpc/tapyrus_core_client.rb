@@ -14,7 +14,7 @@ module Tapyrus
     # rescue TapyrusClientConnectionError => ex
     #   ex.response
     # end
-    class ConnectionError < StandardError
+    class Error < StandardError
       attr_reader :response
 
       def initialize(response)
