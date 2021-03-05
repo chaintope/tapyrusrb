@@ -89,7 +89,7 @@ module Tapyrus
         request.content_type = 'application/json'
         request.body = data.to_json
         response = http.request(request)
-        raise ConnectionError.new(response) unless response.is_a? Net::HTTPOK
+        raise Error.new(response) unless response.is_a? Net::HTTPOK
         body = response.body
         response = Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
         raise response['error'].to_json if response['error']
