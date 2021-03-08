@@ -31,10 +31,24 @@ describe Tapyrus::RPC::TapyrusCoreClient do
       end
     end
 
-    context 'server responded with error' do
+    context '500 internal server error' do
       it 'should raise with response' do
-        stub_request(:post, server_url).to_return(body: JSON.generate({ 'error': { 'code': '-1', 'message': 'RPC ERROR' } }))
-        expect { client.rpc_command }.to raise_error(RuntimeError, '{"code":"-1","message":"RPC ERROR"}')
+        stub_request(:post, server_url).to_return(
+          status: [500, "Internal Server Error"],
+        )
+        expect { client.rpc_command }.to raise_error(Tapyrus::RPC::Error, "500 Internal Server Error")
+      end
+    end
+
+    context '500 internal error with error message' do
+      it 'should raise with response' do
+        stub_request(:post, server_url).to_return(
+          status: [500, "Internal Server Error"],
+          body: JSON.generate({ 'error': { 'code': '-1', 'message': 'RPC ERROR' } })
+        )
+        expect { client.rpc_command }.to raise_error do |e|
+          expect(e.message).to eq({"code"=>"-1", "message"=>"RPC ERROR"})
+        end
       end
     end
 
@@ -61,7 +75,7 @@ describe Tapyrus::RPC::TapyrusCoreClient do
         stub_request(:post, server_url).to_return(
             status: [401, "Unauthorized"]
         )
-        expect {client.rpc_command}.to raise_error(Tapyrus::RPC::ConnectionError, 'Unauthorized')
+        expect {client.rpc_command}.to raise_error(Tapyrus::RPC::Error, '401 Unauthorized')
       end
     end
   end

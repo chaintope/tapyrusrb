@@ -16,18 +16,23 @@ module Tapyrus
     # end
     class Error < StandardError
       attr_reader :response
+      attr_reader :message
 
       def initialize(response)
         raise ArgumentError, "Must set response as cause." unless response
         @response = response
-      end
 
-      def message
-        @response&.msg
+        # set message from response body or status code.
+        begin
+          @message = Tapyrus::RPC::response_body2json(response.body)['error']
+        rescue JSON::ParserError => _
+          # if RPC server don't send error message, then set http status message.
+          @message = "#{response&.code} #{response&.msg}"
+        end
       end
 
       def to_s
-        "#{@response&.code} #{@response&.message}"
+        @message.to_s
       end
     end
 
@@ -90,13 +95,16 @@ module Tapyrus
         request.body = data.to_json
         response = http.request(request)
         raise Error.new(response) unless response.is_a? Net::HTTPOK
-        body = response.body
-        response = Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
-        raise response['error'].to_json if response['error']
+        response = Tapyrus::RPC::response_body2json(response.body)
         response['result']
       end
 
     end
 
+    def response_body2json(body)
+      Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
+    end
+
+    module_function :response_body2json
   end
 end
