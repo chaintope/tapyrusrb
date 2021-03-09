@@ -89,5 +89,38 @@ describe Tapyrus::Util do
     end
   end
 
+  describe '#valid_address?' do
+    context 'prod', network: :prod do
+      it 'should be true' do
+        # P2PKH
+        expect(util.valid_address?('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to be true
+        # P2SH
+        expect(util.valid_address?('3HG15Tn6hEd1WVR1ySQtWRstTbvyy6B5V8')).to be true
+        # CP2PKH
+        expect(util.valid_address?('w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC')).to be true
+        # CP2SH
+        expect(util.valid_address?('4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB')).to be true
+
+        expect(util.valid_address?('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to be false
+        expect(util.valid_address?('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')).to be false
+        expect(util.valid_address?('tb1qgmp0h7lvexdxx9y05pmdukx09xcteu9sx2h4ya')).to be false
+        expect(util.valid_address?('tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy8')).to be false
+      end
+    end
+
+    context 'dev' do
+      it 'should be true' do
+        expect(util.valid_address?('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to be true
+        expect(util.valid_address?('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')).to be true
+        expect(util.valid_address?('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')).to be true
+        expect(util.valid_address?('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')).to be true
+
+        expect(util.valid_address?('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to be false
+        expect(util.valid_address?('3HG15Tn6hEd1WVR1ySQtWRstTbvyy6B5V8')).to be false
+        expect(util.valid_address?('bc1q2lw52zhd202wxhf42k3y4e7m70sg578ver73dn')).to be false
+        expect(util.valid_address?('bc1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607s264w7g')).to be false
+      end
+    end
+  end
 
 end
