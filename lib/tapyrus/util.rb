@@ -113,6 +113,9 @@ module Tapyrus
       if hex.size == 50 && calc_checksum(hex[0...-8]) == hex[-8..-1]
         raise 'Invalid version bytes.' unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version].include?(hex[0..1])
         [hex[2...-8], hex[0..1]]
+      elsif hex.size == 116 && calc_checksum(hex[0...-8]) == hex[-8..-1]
+        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
+        [hex[2...-8], hex[0..1]]
       else
         raise 'Invalid address.'
       end
@@ -126,6 +129,18 @@ module Tapyrus
 
     def hmac_sha256(key, data)
       OpenSSL::HMAC.digest(DIGEST_NAME_SHA256, key, data)
+    end
+
+    # check whether +addr+ is valid address.
+    # @param [String] addr an address
+    # @return [Boolean] if valid address return true, otherwise false.
+    def valid_address?(addr)
+      begin
+        Tapyrus::Script.parse_from_addr(addr)
+        true
+      rescue Exception => e
+        false
+      end
     end
 
   end

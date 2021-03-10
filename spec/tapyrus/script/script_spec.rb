@@ -519,12 +519,17 @@ describe Tapyrus::Script do
   end
 
   describe '#parse_from_addr' do
+    let(:color) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))}
     context 'prod', network: :prod do
       it 'should generate script' do
         # P2PKH
         expect(Tapyrus::Script.parse_from_addr('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to eq(Tapyrus::Script.parse_from_payload('76a91457dd450aed53d4e35d3555a24ae7dbf3e08a78ec88ac'.htb))
         # P2SH
         expect(Tapyrus::Script.parse_from_addr('3HG15Tn6hEd1WVR1ySQtWRstTbvyy6B5V8')).to eq(Tapyrus::Script.parse_from_payload('a914aac6e837af9eba6951552e83862740b069cf59f587'.htb))
+        # CP2PKH
+        expect(Tapyrus::Script.parse_from_addr('w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC')).to eq(Tapyrus::Script.to_cp2pkh(color, '46c2fbfbecc99a63148fa076de58cf29b0bcf0b0'))
+        # CP2SH
+        expect(Tapyrus::Script.parse_from_addr('4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB')).to eq(Tapyrus::Script.to_cp2sh(color, '7620a79e8657d066cff10e21228bf983cf546ac6'))
       end
     end
 
@@ -534,6 +539,10 @@ describe Tapyrus::Script do
         expect(Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to eq(Tapyrus::Script.parse_from_payload('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb))
         # P2SH
         expect(Tapyrus::Script.parse_from_addr('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')).to eq(Tapyrus::Script.parse_from_payload('a914755874542a017c665184c356f67c20cf4a0621ca87'.htb))
+        # CP2PKH
+        expect(Tapyrus::Script.parse_from_addr('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')).to eq(Tapyrus::Script.to_cp2pkh(color, '46c2fbfbecc99a63148fa076de58cf29b0bcf0b0'))
+        # CP2SH
+        expect(Tapyrus::Script.parse_from_addr('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')).to eq(Tapyrus::Script.to_cp2sh(color, '7620a79e8657d066cff10e21228bf983cf546ac6'))
       end
     end
 
