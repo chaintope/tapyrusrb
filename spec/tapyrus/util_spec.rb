@@ -80,12 +80,44 @@ describe Tapyrus::Util do
   end
 
   describe '#decode_base58_address' do
-    subject {
-      util.decode_base58_address('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
-    }
-    it 'should be encoded' do
-      expect(subject[0]).to eq('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
-      expect(subject[1]).to eq('6f')
+    context 'p2pkh address' do
+      subject {
+        util.decode_base58_address('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
+      }
+      it 'should be encoded' do
+        expect(subject[0]).to eq('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
+        expect(subject[1]).to eq('6f')
+      end
+    end
+
+    context 'p2sh address' do
+      subject {
+        util.decode_base58_address('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')
+      }
+      it 'should be encoded' do
+        expect(subject[0]).to eq('755874542a017c665184c356f67c20cf4a0621ca')
+        expect(subject[1]).to eq('c4')
+      end
+    end
+
+    context 'cp2pkh address' do
+      subject {
+        util.decode_base58_address('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')
+      }
+      it 'should be encoded' do
+        expect(subject[0]).to eq('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
+        expect(subject[1]).to eq('70')
+      end
+    end
+
+    context 'cp2sh address' do
+      subject {
+        util.decode_base58_address('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
+      }
+      it 'should be encoded' do
+        expect(subject[0]).to eq('7620a79e8657d066cff10e21228bf983cf546ac6')
+        expect(subject[1]).to eq('c5')
+      end
     end
   end
 
@@ -103,8 +135,8 @@ describe Tapyrus::Util do
 
         expect(util.valid_address?('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to be false
         expect(util.valid_address?('2N3wh1eYqMeqoLxuKFv8PBsYR4f8gYn8dHm')).to be false
-        expect(util.valid_address?('tb1qgmp0h7lvexdxx9y05pmdukx09xcteu9sx2h4ya')).to be false
-        expect(util.valid_address?('tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy8')).to be false
+        expect(util.valid_address?('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')).to be false
+        expect(util.valid_address?('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')).to be false
       end
     end
 
@@ -117,8 +149,8 @@ describe Tapyrus::Util do
 
         expect(util.valid_address?('191arn68nSLRiNJXD8srnmw4bRykBkVv6o')).to be false
         expect(util.valid_address?('3HG15Tn6hEd1WVR1ySQtWRstTbvyy6B5V8')).to be false
-        expect(util.valid_address?('bc1q2lw52zhd202wxhf42k3y4e7m70sg578ver73dn')).to be false
-        expect(util.valid_address?('bc1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607s264w7g')).to be false
+        expect(util.valid_address?('w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC')).to be false
+        expect(util.valid_address?('4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB')).to be false
       end
     end
   end

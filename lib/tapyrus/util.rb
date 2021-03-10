@@ -110,9 +110,12 @@ module Tapyrus
     # @return [Array] hex and address version
     def decode_base58_address(addr)
       hex = Base58.decode(addr)
-      if (hex.size == 50 || 116) && calc_checksum(hex[0...-8]) == hex[-8..-1]
-        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version, Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
+      if hex.size == 50 && calc_checksum(hex[0...-8]) == hex[-8..-1]
+        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version].include?(hex[0..1])
         [hex[2...-8], hex[0..1]]
+      elsif hex.size == 116 && calc_checksum(hex[0...-8]) == hex[-8..-1]
+        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
+        [hex[68...-8], hex[0..1]]
       else
         raise 'Invalid address.'
       end
