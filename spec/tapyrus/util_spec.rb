@@ -105,7 +105,7 @@ describe Tapyrus::Util do
         util.decode_base58_address('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')
       }
       it 'should be encoded' do
-        expect(subject[0]).to eq('46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
+        expect(subject[0]).to eq('c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b4646c2fbfbecc99a63148fa076de58cf29b0bcf0b0')
         expect(subject[1]).to eq('70')
       end
     end
@@ -115,7 +115,7 @@ describe Tapyrus::Util do
         util.decode_base58_address('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
       }
       it 'should be encoded' do
-        expect(subject[0]).to eq('7620a79e8657d066cff10e21228bf983cf546ac6')
+        expect(subject[0]).to eq('c3ec2fd806701a3f55808cbec3922c38dafaa3070c48c803e9043ee3642c660b467620a79e8657d066cff10e21228bf983cf546ac6')
         expect(subject[1]).to eq('c5')
       end
     end

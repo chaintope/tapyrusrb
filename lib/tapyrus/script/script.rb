@@ -131,11 +131,11 @@ module Tapyrus
         when Tapyrus.chain_params.p2sh_version
           Tapyrus::Script.to_p2sh(hex)
         when Tapyrus.chain_params.cp2pkh_version
-          color = Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))
-          Tapyrus::Script.to_cp2pkh(color, hex)
+          color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
+          Tapyrus::Script.to_cp2pkh(color, hex[66..-1])
         when Tapyrus.chain_params.cp2sh_version
-          color = Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1))
-          Tapyrus::Script.to_cp2sh(color, hex)
+          color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
+          Tapyrus::Script.to_cp2sh(color, hex[66..-1])
         else
           throw e
         end

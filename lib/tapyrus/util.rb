@@ -115,7 +115,7 @@ module Tapyrus
         [hex[2...-8], hex[0..1]]
       elsif hex.size == 116 && calc_checksum(hex[0...-8]) == hex[-8..-1]
         raise 'Invalid version bytes.' unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
-        [hex[68...-8], hex[0..1]]
+        [hex[2...-8], hex[0..1]]
       else
         raise 'Invalid address.'
       end

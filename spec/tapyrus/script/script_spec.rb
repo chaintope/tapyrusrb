@@ -534,7 +534,6 @@ describe Tapyrus::Script do
     end
 
     context 'dev' do
-      subject {Tapyrus::Script.to_cp2pkh(color, '46c2fbfbecc99a63148fa076de58cf29b0bcf0b0')}
       it 'should generate script' do
         # P2PKH
         expect(Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')).to eq(Tapyrus::Script.parse_from_payload('76a91446c2fbfbecc99a63148fa076de58cf29b0bcf0b088ac'.htb))
