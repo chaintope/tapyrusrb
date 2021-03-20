@@ -6,13 +6,21 @@ module Tapyrus
 
     # Throw when happened anything http's error with connect to server.
     #
-    # Almost case this exception happened from 401 Unauthorized.
+    # Almost case this exception happened from 401 Unauthorized or 500 Internal Server Error.
     # And also, throw by cause of other http's errors.
     #
     # You can get raw response as cause, like as:
     #
-    # rescue TapyrusClientConnectionError => ex
+    # rescue Tapyrus::RPC::Error => ex
     #   ex.response
+    # end
+    #
+    # And, You can pull RPC error message when happened 500 Internal Server Error, like below:
+    #
+    # rescue Tapyrus::RPC::Error => ex
+    #   if ex.message.response_code == 500
+    #     puts ex.message[:rpc_error]
+    #   end
     # end
     class Error < StandardError
       attr_reader :response
@@ -23,11 +31,11 @@ module Tapyrus
         @response = response
 
         # set message from response body or status code.
+        @message = {:response_code => response&.code, :response_msg => response&.msg}
         begin
-          @message = Tapyrus::RPC::response_body2json(response.body)['error']
+          @message.merge!({:rpc_error => Tapyrus::RPC::response_body2json(response.body)['error']})
         rescue JSON::ParserError => _
-          # if RPC server don't send error message, then set http status message.
-          @message = "#{response&.code} #{response&.msg}"
+          # if RPC server don't send error message.
         end
       end
 
