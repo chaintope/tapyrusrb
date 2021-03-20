@@ -9,13 +9,7 @@ module Tapyrus
     # Almost case this exception happened from 401 Unauthorized or 500 Internal Server Error.
     # And also, throw by cause of other http's errors.
     #
-    # You can get raw response as cause, like as:
-    #
-    # rescue Tapyrus::RPC::Error => ex
-    #   ex.response
-    # end
-    #
-    # And, You can pull RPC error message when happened 500 Internal Server Error, like below:
+    # You can pull RPC error message when happened 500 Internal Server Error, like below:
     #
     # rescue Tapyrus::RPC::Error => ex
     #   if ex.message.response_code == 500
@@ -23,12 +17,10 @@ module Tapyrus
     #   end
     # end
     class Error < StandardError
-      attr_reader :response
       attr_reader :message
 
       def initialize(response)
         raise ArgumentError, "Must set response as cause." unless response
-        @response = response
 
         # set message from response body or status code.
         @message = {:response_code => response&.code, :response_msg => response&.msg}
