@@ -49,6 +49,7 @@ module Tapyrus
   autoload :SLIP39, 'tapyrus/slip39'
   autoload :Color, 'tapyrus/script/color'
   autoload :Errors, 'tapyrus/errors'
+  autoload :TxBuilder, 'tapyrus/tx_builder'
 
   require_relative 'tapyrus/constants'
   require_relative 'tapyrus/ext/ecdsa'

@@ -24,6 +24,11 @@ module Tapyrus
         new(TokenTypes::NFT, Tapyrus.sha256(out_point.to_payload))
       end
 
+      # Return ColorIdentifier for native token(i.e TPC)
+      def self.default
+        new(TokenTypes::NONE, '0000000000000000000000000000000000000000000000000000000000000000'.htb)
+      end
+
       def to_payload
         [type, payload].pack('Ca*')
       end
@@ -49,6 +54,11 @@ module Tapyrus
 
       def eql?(other)
         to_payload.eql?(other.to_payload)
+      end
+
+      # Return true if the coin is native token(i.e TPC), otherwise false
+      def default?
+        self == ColorIdentifier.default
       end
 
       private

@@ -57,6 +57,13 @@ describe Tapyrus::Color::ColorIdentifier do
     it { expect(color1.hash).to eq color1_another_obj.hash }
     it { expect(color1.hash).not_to eq color2.hash }
   end
+
+  describe '#default?' do
+    let(:color_id) { Tapyrus::Color::ColorIdentifier.nft(Tapyrus::OutPoint.new("01" * 32, 1)) }
+
+    it { expect(color_id.default?).to be_falsy }
+    it { expect(Tapyrus::Color::ColorIdentifier.default.default?).to be_truthy }
+  end
 end
 
 describe 'Tapyrus::Color::ColoredOutput' do
