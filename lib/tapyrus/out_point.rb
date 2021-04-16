@@ -34,6 +34,10 @@ module Tapyrus
       index >= 0 && (!coinbase? && tx_hash != COINBASE_HASH)
     end
 
+    def ==(other)
+      to_payload == other&.to_payload
+    end
+
     # convert hash to txid
     def txid
       tx_hash.rhex
