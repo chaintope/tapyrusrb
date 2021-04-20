@@ -96,9 +96,7 @@ module Tapyrus
     # Create data output
     # @param contents [[String]] array of hex string
     def data(*contents)
-      payload = contents.inject('') do |payload, content|
-        payload << content
-      end
+      payload = contents.join
       script = Tapyrus::Script.new << Tapyrus::Script::OP_RETURN << payload
       @tx.outputs << Tapyrus::TxOut.new(script_pubkey: script)
       self
@@ -115,7 +113,8 @@ module Tapyrus
     # If set, #build method add output for change which has the specified address
     # If not set, transaction built by #build method has no output for change.
     # @param address [String] p2pkh or p2sh address.
-    def change_script_pubkey(script_pubkey)
+    def change_address(address)
+      script_pubkey = Tapyrus::Script.parse_from_addr(address)
       raise ArgumentError, 'invalid address' if !script_pubkey.p2pkh? && !script_pubkey.p2sh?
       @change_script_pubkey = script_pubkey
       self
