@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Tapyrus::TxBuilder' do
   let(:txb) { Tapyrus::TxBuilder.new.fee(1_000) }
   let(:p2pkh) { Tapyrus::Script.parse_from_payload('76a91492b7cc6e97407258428c23e1c936753ce41bbfbf88ac'.htb) }
-  let(:change_script_pubkey) { Tapyrus::Script.parse_from_payload('76a914078eb33618f15d0a1ce400f91074485d37dd987a88ac'.htb) }
+  let(:change_address) { 'mgCuyNQ1pUbKqL57tJQZX3hhUCaZcuX3RQ' }
 
   let(:utxo1) do
     {
@@ -28,7 +28,7 @@ describe 'Tapyrus::TxBuilder' do
       txb
         .add_utxo(utxo1)
         .reissuable(utxo1[:script_pubkey], address, 10_000)
-        .change_script_pubkey(change_script_pubkey)
+        .change_address(change_address)
         .build
     end
 
@@ -38,7 +38,7 @@ describe 'Tapyrus::TxBuilder' do
     it { expect(tx.outputs[0].script_pubkey.to_hex).to eq '21c1058f891e11dd6e67f8ea54f9bc80b7268313319572033d48218af91c5355c4f9bc76a914fea16b404e5c76d17e690ec08000eb55952c777988ac' }
     # change output
     it { expect(tx.outputs[1].value).to eq  2_000 }
-    it { expect(tx.outputs[1].script_pubkey).to eq change_script_pubkey }
+    it { expect(tx.outputs[1].script_pubkey.to_hex).to eq '76a914078eb33618f15d0a1ce400f91074485d37dd987a88ac' }
   end
 
   describe '#non_reissuable' do
@@ -76,7 +76,7 @@ describe 'Tapyrus::TxBuilder' do
       subject(:tx) do
         txb
           .add_utxo(utxo1)
-          .change_script_pubkey(change_script_pubkey)
+          .change_address(change_address)
           .pay(address, 1_000)
           .build
       end
@@ -96,7 +96,7 @@ describe 'Tapyrus::TxBuilder' do
         txb
           .add_utxo(utxo1)
           .add_utxo(utxo2)
-          .change_script_pubkey(change_script_pubkey)
+          .change_address(change_address)
           .pay(address, 1_000, color_id)
           .build
       end
@@ -108,7 +108,7 @@ describe 'Tapyrus::TxBuilder' do
           script_pubkey: Tapyrus::Script.parse_from_payload('76a9141654c4fcb23c1b50fa0270249eb6120a133cd32e88ac'.htb).add_color(color_id),
           color_id: color_id,
           txid: 'e1fb3255ead43dccd3ae0ac2c4f81b32260ca52749936a739669918bbb895411',
-          index: 0,
+          index: 1,
           value: 3_000
         }
       end
@@ -147,11 +147,9 @@ describe 'Tapyrus::TxBuilder' do
     end
   end
 
-  describe '#change_script_pubkey' do
-    context 'if cp2pkh' do
-      subject { txb.change_script_pubkey(script) }
-
-      let(:script) { Tapyrus::Script.parse_from_payload('21c3beb3290e67a30ce8cb42b553d20d4adf2493285c88d8adcb8289bd27f575cd75bc76a914fea16b404e5c76d17e690ec08000eb55952c777988ac'.htb) }
+  describe '#change_address' do
+    context 'if cp2pkh address' do
+      subject { txb.change_address('22VZyRTDaMem4DcgBgRZgbo7PZm45gXSMWzHrYiYE9j1qVUYjiQPNdB25ke8eWnMS2styanta57D9PAT') }
 
       it { expect { subject }.to raise_error(ArgumentError) }
     end
