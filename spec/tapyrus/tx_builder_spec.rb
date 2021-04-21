@@ -189,6 +189,19 @@ describe 'Tapyrus::TxBuilder' do
       it { expect(tx.outputs[2].script_pubkey.to_hex).to eq '21c36db65fd59fd356f6729140571b5bcd6bb3b83492a16e1bf0a3884442fc3c8a0ebc76a914fea16b404e5c76d17e690ec08000eb55952c777988ac' }
       it { expect(tx.outputs[3].value).to eq 0 }
       it { expect(tx.outputs[3].script_pubkey.to_hex).to eq '6a0101' }
+
+      context 'call twice' do
+        it 'should return same tx' do
+          txb
+            .add_utxo(utxo1)
+            .pay(address, 1_000, color_id)
+            .change_address(change_address)
+            .data("01")
+          one = txb.build.to_hex
+          another = txb.build.to_hex
+          expect(one).to eq another
+        end
+      end
     end
   end
 end
