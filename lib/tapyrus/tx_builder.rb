@@ -5,7 +5,7 @@ module Tapyrus
   # TxBuilder makes it easy to  build transactions without having to deal with TxOut/TxIn/Script directly.
   #
   # @example
-  #
+  # 
   #   txb = Tapyrus::TxBuilder.new
   #   utxo1 = {
   #     script_pubkey: Tapyrus::Script.parse_from_addr('mgCuyNQ1pUbKqL57tJQZX3hhUCaZcuX3RQ'),
@@ -21,7 +21,7 @@ module Tapyrus
   #     index: 1,
   #     value: 3_000
   #   }
-  #
+  #   
   #   tx = txb
   #     .add_utxo(utxo1)
   #     .add_utxo(utxo2)
@@ -29,13 +29,13 @@ module Tapyrus
   #     .reissuable(utxo1[:script_pubkey],'n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 10_000)
   #     .pay('n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 1_000)
   #     .build
-  #
+  # 
   class TxBuilder
     def initialize
       @utxos = []
       @incomings = {}
       @outgoings = {}
-      @tx = Tapyrus::Tx.new
+      @outputs = []
     end
 
     # Add utxo for transaction input
@@ -89,7 +89,7 @@ module Tapyrus
 
       @outgoings[color_id] ||= 0
       @outgoings[color_id] += value
-      @tx.outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
+      @outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
       self
     end
 
@@ -98,7 +98,7 @@ module Tapyrus
     def data(*contents)
       payload = contents.join
       script = Tapyrus::Script.new << Tapyrus::Script::OP_RETURN << payload
-      @tx.outputs << Tapyrus::TxOut.new(script_pubkey: script)
+      @outputs << Tapyrus::TxOut.new(script_pubkey: script)
       self
     end
 
@@ -122,14 +122,16 @@ module Tapyrus
 
     # Build transaction
     def build
-      expand_input
-      add_change if @change_script_pubkey
-      @tx
+      tx = Tapyrus::Tx.new
+      expand_input(tx)
+      @outputs.each { |output| tx.outputs << output }
+      add_change(tx) if @change_script_pubkey
+      tx
     end
 
     private
 
-    def add_change
+    def add_change(tx)
       @incomings.each do |color_id, in_amount|
         out_amount = @outgoings[color_id] || 0
         change, script_pubkey = if color_id.default?
@@ -137,13 +139,13 @@ module Tapyrus
         else
           [in_amount - out_amount, @change_script_pubkey.add_color(color_id)]
         end
-        @tx.outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: change) if change > 0
+        tx.outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: change) if change > 0
       end
     end
 
-    def expand_input
+    def expand_input(tx)
       @utxos.each do |utxo|
-        @tx.inputs << Tapyrus::TxIn.new(out_point: Tapyrus::OutPoint.from_txid(utxo[:txid], utxo[:index]))
+        tx.inputs << Tapyrus::TxIn.new(out_point: Tapyrus::OutPoint.from_txid(utxo[:txid], utxo[:index]))
       end
     end
 
