@@ -22,8 +22,7 @@ jobs:
         ruby-version: ['2.6', '2.7', '3.0']
 
     steps:
-    - name: Install leveldb
-      run: sudo apt-get install libleveldb-dev
+    - run: sudo apt install libleveldb-dev
     - uses: actions/checkout@v2
     - name: Set up Ruby
     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
