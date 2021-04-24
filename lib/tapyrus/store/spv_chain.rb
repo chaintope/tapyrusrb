@@ -1,18 +1,15 @@
 module Tapyrus
-
   module Store
-
     KEY_PREFIX = {
-        entry: 'e',             # key: block hash, value: Tapyrus::Store::ChainEntry payload
-        height: 'h',            # key: block height, value: block hash.
-        best: 'B',              # value: best block hash.
-        next: 'n',              # key: block hash, value: A hash of the next block of the specified hash
-        agg_pubkey: 'a',        # key: index, value: Activated block height | aggregated public key.
-        latest_agg_pubkey: 'g'  # value: latest agg pubkey index.
+      entry: 'e', # key: block hash, value: Tapyrus::Store::ChainEntry payload
+      height: 'h', # key: block height, value: block hash.
+      best: 'B', # value: best block hash.
+      next: 'n', # key: block hash, value: A hash of the next block of the specified hash
+      agg_pubkey: 'a', # key: index, value: Activated block height | aggregated public key.
+      latest_agg_pubkey: 'g' # value: latest agg pubkey index.
     }
 
     class SPVChain
-
       attr_reader :db
       attr_reader :logger
 
@@ -53,7 +50,9 @@ module Tapyrus
         logger.info("append header #{header.block_id}")
         best_block = latest_block
         current_height = best_block.height
-        raise "this header is invalid. #{header.block_hash}" unless header.valid?(db.agg_pubkey_with_height(current_height + 1))
+        unless header.valid?(db.agg_pubkey_with_height(current_height + 1))
+          raise "this header is invalid. #{header.block_hash}"
+        end
         if best_block.block_hash == header.prev_hash
           entry = Tapyrus::Store::ChainEntry.new(header, current_height + 1)
           db.save_entry(entry)
@@ -107,13 +106,8 @@ module Tapyrus
       # if database is empty, put genesis block.
       # @param [Tapyrus::Block] genesis genesis block
       def initialize_block(genesis)
-        unless latest_block
-          db.save_entry(ChainEntry.new(genesis.header, 0))
-        end
+        db.save_entry(ChainEntry.new(genesis.header, 0)) unless latest_block
       end
-
     end
-
   end
-
 end

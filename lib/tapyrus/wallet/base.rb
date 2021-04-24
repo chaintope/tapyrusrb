@@ -2,9 +2,7 @@ require 'leveldb-native'
 
 module Tapyrus
   module Wallet
-
     class Base
-
       attr_accessor :wallet_id
       attr_reader :db
       attr_reader :path
@@ -24,6 +22,7 @@ module Tapyrus
       def self.create(wallet_id = 1, path_prefix = default_path_prefix)
         raise ArgumentError, "wallet_id : #{wallet_id} already exist." if self.exist?(wallet_id, path_prefix)
         w = self.new(wallet_id, path_prefix)
+
         # generate seed
         raise RuntimeError, 'the seed already exist.' if w.db.registered_master?
         master = Tapyrus::Wallet::MasterKey.generate
@@ -122,14 +121,20 @@ module Tapyrus
 
       # decrypt wallet
       # @param [String] passphrase the wallet passphrase
-      def decrypt(passphrase)
-
-      end
+      def decrypt(passphrase); end
 
       # wallet information
       def to_h
         a = accounts.map(&:to_h)
-        { wallet_id: wallet_id, version: version, account_depth: a.size, accounts: a, master: {encrypted: master_key.encrypted} }
+        {
+          wallet_id: wallet_id,
+          version: version,
+          account_depth: a.size,
+          accounts: a,
+          master: {
+            encrypted: master_key.encrypted
+          }
+        }
       end
 
       # get data elements tobe monitored with Bloom Filter.
@@ -153,10 +158,8 @@ module Tapyrus
 
       # find account using +account_name+
       def find_account(account_name, purpose = nil)
-        accounts(purpose).find{|a| a.name == account_name}
+        accounts(purpose).find { |a| a.name == account_name }
       end
-
     end
-
   end
 end

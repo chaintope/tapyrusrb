@@ -2,12 +2,10 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # tapyrus utility.
   # following methods can be used as follows.
   #     Tapyrus.pack_var_int(5)
   module Util
-
     def pack_var_string(payload)
       pack_var_int(payload.bytesize) + payload
     end
@@ -18,7 +16,7 @@ module Tapyrus
     end
 
     def pack_var_int(i)
-      if i <  0xfd
+      if i < 0xfd
         [i].pack('C')
       elsif i <= 0xffff
         [0xfd, i].pack('Cv')
@@ -111,10 +109,14 @@ module Tapyrus
     def decode_base58_address(addr)
       hex = Base58.decode(addr)
       if hex.size == 50 && calc_checksum(hex[0...-8]) == hex[-8..-1]
-        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version].include?(hex[0..1])
+        unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version].include?(hex[0..1])
+          raise 'Invalid version bytes.'
+        end
         [hex[2...-8], hex[0..1]]
       elsif hex.size == 116 && calc_checksum(hex[0...-8]) == hex[-8..-1]
-        raise 'Invalid version bytes.' unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
+        unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
+          raise 'Invalid version bytes.'
+        end
         [hex[2...-8], hex[0..1]]
       else
         raise 'Invalid address.'
@@ -142,15 +144,11 @@ module Tapyrus
         false
       end
     end
-
   end
 
   module HexConverter
-
     def to_hex
       to_payload.bth
     end
-
   end
-
 end

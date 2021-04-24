@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # sendcmpct message
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class SendCmpct < Base
-
       COMMAND = 'sendcmpct'
 
       MODE_HIGH = 1
@@ -12,6 +10,7 @@ module Tapyrus
 
       attr_accessor :mode
       attr_accessor :version
+
       # TODO support version 2
 
       def initialize(mode = MODE_HIGH, version = 1)
@@ -38,6 +37,5 @@ module Tapyrus
         mode.zero?
       end
     end
-
   end
 end

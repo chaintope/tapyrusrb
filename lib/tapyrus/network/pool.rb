@@ -1,11 +1,11 @@
 module Tapyrus
-
   module Network
-
     # Time between pings automatically sent out for latency probing and keepalive (in seconds).
     PING_INTERVAL = 2 * 60
+
     # Time after which to disconnect, after waiting for a ping response (or inactivity).
     TIMEOUT_INTERVAL = 20 * 60
+
     # Maximum number of automatic outgoing nodes
     MAX_OUTBOUND_CONNECTIONS = 4
 
@@ -112,23 +112,23 @@ module Tapyrus
       # allocate new peer id
       def allocate_peer_id
         id = 0
-        until peers.empty? || peers.find{|p|p.id == id}.nil?
-          id += 1
-        end
+        id += 1 until peers.empty? || peers.find { |p| p.id == id }.nil?
         id
       end
 
       def connect(addr_list)
         port = Tapyrus.chain_params.default_port
 
-        EM::Iterator.new(addr_list, Tapyrus::PARALLEL_THREAD).each do |ip, iter|
-          if pending_peers.size + peers.size < MAX_OUTBOUND_CONNECTIONS
-            peer = Peer.new(ip, port, self, @configuration)
-            pending_peers << peer
-            peer.connect
-            iter.next
+        EM::Iterator
+          .new(addr_list, Tapyrus::PARALLEL_THREAD)
+          .each do |ip, iter|
+            if pending_peers.size + peers.size < MAX_OUTBOUND_CONNECTIONS
+              peer = Peer.new(ip, port, self, @configuration)
+              pending_peers << peer
+              peer.connect
+              iter.next
+            end
           end
-        end
       end
     end
   end

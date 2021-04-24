@@ -3,7 +3,6 @@
 
 module Tapyrus
   module Secp256k1
-
     # binding for secp256k1 (https://github.com/chaintope/tapyrus-core/tree/v0.4.0/src/secp256k1)
     # tag: v0.4.0
     # this is not included by default, to enable set shared object path to ENV['SECP256K1_LIB_PATH']
@@ -80,8 +79,8 @@ module Tapyrus
             priv_key = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, SecureRandom.random_bytes(32))
             ret = secp256k1_ec_seckey_verify(context, priv_key)
           end
-          private_key =  priv_key.read_string(32).bth
-          [private_key , generate_pubkey_in_context(context,  private_key, compressed: compressed) ]
+          private_key = priv_key.read_string(32).bth
+          [private_key, generate_pubkey_in_context(context, private_key, compressed: compressed)]
         end
       end
 
@@ -92,9 +91,7 @@ module Tapyrus
       end
 
       def generate_pubkey(priv_key, compressed: true)
-        with_context do |context|
-          generate_pubkey_in_context(context, priv_key, compressed: compressed)
-        end
+        with_context { |context| generate_pubkey_in_context(context, priv_key, compressed: compressed) }
       end
 
       # sign data.
@@ -152,13 +149,14 @@ module Tapyrus
 
         pubkey = FFI::MemoryPointer.new(:uchar, 65)
         pubkey_len = FFI::MemoryPointer.new(:uint64)
-        result = if compressed
-                   pubkey_len.put_uint64(0, 33)
-                   secp256k1_ec_pubkey_serialize(context, pubkey, pubkey_len, internal_pubkey, SECP256K1_EC_COMPRESSED)
-                 else
-                   pubkey_len.put_uint64(0, 65)
-                   secp256k1_ec_pubkey_serialize(context, pubkey, pubkey_len, internal_pubkey, SECP256K1_EC_UNCOMPRESSED)
-                 end
+        result =
+          if compressed
+            pubkey_len.put_uint64(0, 33)
+            secp256k1_ec_pubkey_serialize(context, pubkey, pubkey_len, internal_pubkey, SECP256K1_EC_COMPRESSED)
+          else
+            pubkey_len.put_uint64(0, 65)
+            secp256k1_ec_pubkey_serialize(context, pubkey, pubkey_len, internal_pubkey, SECP256K1_EC_UNCOMPRESSED)
+          end
         raise 'error serialize pubkey' unless result || pubkey_len.read_uint64 > 0
         pubkey.read_string(pubkey_len.read_uint64).bth
       end
@@ -196,7 +194,9 @@ module Tapyrus
 
           signature = FFI::MemoryPointer.new(:uchar, 64)
           msg32 = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, data)
-          raise 'Failed to generate schnorr signature.' unless secp256k1_schnorr_sign(context, signature, msg32, secret, nil, nil) == 1
+          unless secp256k1_schnorr_sign(context, signature, msg32, secret, nil, nil) == 1
+            raise 'Failed to generate schnorr signature.'
+          end
           signature.read_string(64)
         end
       end
@@ -241,7 +241,6 @@ module Tapyrus
           result == 1
         end
       end
-
     end
   end
 end

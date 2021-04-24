@@ -16,7 +16,7 @@ describe Tapyrus::Wallet::DB do
     end
 
     it 'store public key to database' do
-      expect{ subject }.to change { wallet.db.get_keys(account).length }.by(1)
+      expect { subject }.to change { wallet.db.get_keys(account).length }.by(1)
     end
   end
 
@@ -28,9 +28,7 @@ describe Tapyrus::Wallet::DB do
     let(:purpose) { 1 }
     let(:master) { Tapyrus::ExtKey.generate_master('000102030405060708090a0b0c0d0e0f') }
 
-    before do
-      wallet.db.save_key(account, purpose, 0xffffffff, master.derive(2))
-    end
+    before { wallet.db.save_key(account, purpose, 0xffffffff, master.derive(2)) }
 
     after do
       wallet.close

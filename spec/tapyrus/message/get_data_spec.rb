@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Tapyrus::Message::GetData do
-
   describe 'parse' do
-    subject {
-      Tapyrus::Message::GetData.parse_from_payload('0201000000099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f109601000000e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05'.htb)
-    }
+    subject do
+      Tapyrus::Message::GetData.parse_from_payload(
+        '0201000000099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f109601000000e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05'
+          .htb
+      )
+    end
     it do
       expect(subject.inventories.length).to eq(2)
       expect(subject.inventories[0].hash).to eq('099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f1096')
@@ -16,15 +18,18 @@ describe Tapyrus::Message::GetData do
   end
 
   describe 'to_pkt' do
-    subject {
+    subject do
       inv = Tapyrus::Message::GetData.new
-      inv.inventories << Tapyrus::Message::Inventory.new(1, '099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f1096')
-      inv.inventories << Tapyrus::Message::Inventory.new(1, 'e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05')
+      inv.inventories <<
+        Tapyrus::Message::Inventory.new(1, '099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f1096')
+      inv.inventories <<
+        Tapyrus::Message::Inventory.new(1, 'e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05')
       inv.to_pkt
-    }
+    end
     it do
-      expect(subject.bth).to eq('0b1109076765746461746100000000004900000075a56c590201000000099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f109601000000e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05')
+      expect(subject.bth).to eq(
+        '0b1109076765746461746100000000004900000075a56c590201000000099c332dc6d71c968a3f47d6ffd43436062c72dad477b515ce2e108e1e6f109601000000e6cf87650476e8677543885e388761f09c732e66d479501f9d9c19cdb2b50e05'
+      )
     end
   end
-
 end

@@ -12,7 +12,6 @@ class ::ECDSA::Point
 end
 
 module ::ECDSA::Format::PointOctetString
-
   def self.decode(string, group, allow_hybrid: false)
     string = string.dup.force_encoding('BINARY')
 
@@ -29,11 +28,12 @@ module ::ECDSA::Format::PointOctetString
     when 4
       decode_uncompressed string, group
     when 6..7
-      raise ECDSA::Format::DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord unless allow_hybrid
+      unless allow_hybrid
+        raise ECDSA::Format::DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord
+      end
       decode_uncompressed string, group if allow_hybrid
     else
       raise ECDSA::Format::DecodeError, 'Unrecognized start byte for point octet string: 0x%x' % string[0].ord
     end
   end
-
 end

@@ -1,10 +1,8 @@
 require 'yaml'
 
 module Tapyrus
-
   # Network parameter class
   class ChainParams
-
     attr_reader :network
     attr_reader :magic_head
     attr_reader :message_magic
@@ -63,5 +61,4 @@ module Tapyrus
 
     private_class_method :init
   end
-
 end

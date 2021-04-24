@@ -1,6 +1,5 @@
 module Tapyrus
   module Store
-
     # wrap a block header object with extra data.
     class ChainEntry
       include Tapyrus::HexConverter
@@ -60,9 +59,6 @@ module Tapyrus
         height_value = height_value.htb.reverse
         Tapyrus.pack_var_int(height_value.bytesize) + height_value + header.to_payload
       end
-
     end
-
   end
-
 end

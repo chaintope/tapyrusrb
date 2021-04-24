@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 describe OpenAssets::Payload do
-
   describe '#parse_from_payload' do
-    subject {
-      OpenAssets::Payload.parse_from_payload('4f4101000364007b1b753d68747470733a2f2f6370722e736d2f35596753553150672d71'.htb)
-    }
+    subject do
+      OpenAssets::Payload.parse_from_payload(
+        '4f4101000364007b1b753d68747470733a2f2f6370722e736d2f35596753553150672d71'.htb
+      )
+    end
     it 'should be parsed' do
       expect(subject.quantities.length).to eq(3)
       expect(subject.quantities[0]).to eq(100)
@@ -16,9 +17,7 @@ describe OpenAssets::Payload do
   end
 
   describe '#to_payload' do
-    subject {
-      OpenAssets::Payload.new([100, 0, 123], metadata).to_payload
-    }
+    subject { OpenAssets::Payload.new([100, 0, 123], metadata).to_payload }
     context 'metadata is asset definition url' do
       let(:metadata) { 'u=https://cpr.sm/5YgSU1Pg-q' }
       it 'generate payload' do
@@ -32,5 +31,4 @@ describe OpenAssets::Payload do
       end
     end
   end
-
 end

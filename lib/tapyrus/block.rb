@@ -37,6 +37,5 @@ module Tapyrus
     def height
       transactions.first.in.first.out_point.index
     end
-
   end
 end

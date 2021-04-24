@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # cmpctblock message. support only version 1.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class CmpctBlock < Base
-
       COMMAND = 'cmpctblock'
 
       attr_accessor :header_and_short_ids
@@ -19,9 +17,7 @@ module Tapyrus
       # @return [Tapyrus::Message::CmpctBlock]
       def self.from_block(block, nonce = SecureRandom.hex(8).to_i(16))
         h = HeaderAndShortIDs.new(block.header, nonce)
-        block.transactions[1..-1].each do |tx|
-          h.short_ids << h.short_id(tx.txid)
-        end
+        block.transactions[1..-1].each { |tx| h.short_ids << h.short_id(tx.txid) }
         h.prefilled_txn << PrefilledTx.new(0, block.transactions.first)
         self.new(h)
       end
@@ -33,8 +29,6 @@ module Tapyrus
       def to_payload
         header_and_short_ids.to_payload
       end
-
     end
-
   end
 end

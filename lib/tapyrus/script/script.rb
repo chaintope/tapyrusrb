@@ -2,7 +2,6 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # tapyrus script
   class Script
     include Tapyrus::HexConverter
@@ -82,14 +81,12 @@ module Tapyrus
     def remove_color
       raise RuntimeError, 'Only cp2pkh and cp2sh can remove color' unless cp2pkh? or cp2sh?
 
-      Tapyrus::Script.new.tap do |s|
-        s.chunks = self.chunks[2..-1]
-      end
+      Tapyrus::Script.new.tap { |s| s.chunks = self.chunks[2..-1] }
     end
 
     def get_multisig_pubkeys
       num = Tapyrus::Opcodes.opcode_to_small_int(chunks[-2].bth.to_i(16))
-      (1..num).map{ |i| chunks[i].pushed_data }
+      (1..num).map { |i| chunks[i].pushed_data }
     end
 
     # generate m of n multisig script
@@ -104,14 +101,16 @@ module Tapyrus
     # generate script from string.
     def self.from_string(string)
       script = new
-      string.split(' ').each do |v|
-        opcode = Opcodes.name_to_opcode(v)
-        if opcode
-          script << (v =~ /^\d/ && Opcodes.small_int_to_opcode(v.ord) ? v.ord : opcode)
-        else
-          script << (v =~ /^[0-9]+$/ ? v.to_i : v)
+      string
+        .split(' ')
+        .each do |v|
+          opcode = Opcodes.name_to_opcode(v)
+          if opcode
+            script << (v =~ /^\d/ && Opcodes.small_int_to_opcode(v.ord) ? v.ord : opcode)
+          else
+            script << (v =~ /^[0-9]+$/ ? v.to_i : v)
+          end
         end
-      end
       script
     end
 
@@ -150,19 +149,20 @@ module Tapyrus
         if opcode.pushdata?
           pushcode = opcode.ord
           packed_size = nil
-          len = case pushcode
-                  when OP_PUSHDATA1
-                    packed_size = buf.read(1)
-                    packed_size.unpack('C').first
-                  when OP_PUSHDATA2
-                    packed_size = buf.read(2)
-                    packed_size.unpack('v').first
-                  when OP_PUSHDATA4
-                    packed_size = buf.read(4)
-                    packed_size.unpack('V').first
-                  else
-                    pushcode if pushcode < OP_PUSHDATA1
-                end
+          len =
+            case pushcode
+            when OP_PUSHDATA1
+              packed_size = buf.read(1)
+              packed_size.unpack('C').first
+            when OP_PUSHDATA2
+              packed_size = buf.read(2)
+              packed_size.unpack('v').first
+            when OP_PUSHDATA4
+              packed_size = buf.read(4)
+              packed_size.unpack('V').first
+            else
+              pushcode if pushcode < OP_PUSHDATA1
+            end
           if len
             s.chunks << [len].pack('C') if buf.eof?
             unless buf.eof?
@@ -194,7 +194,7 @@ module Tapyrus
       return [p2sh_addr] if p2sh?
       return [cp2pkh_addr] if cp2pkh?
       return [cp2sh_addr] if cp2sh?
-      return get_multisig_pubkeys.map{|pubkey| Tapyrus::Key.new(pubkey: pubkey.bth).to_p2pkh} if multisig?
+      return get_multisig_pubkeys.map { |pubkey| Tapyrus::Key.new(pubkey: pubkey.bth).to_p2pkh } if multisig?
       []
     end
 
@@ -206,8 +206,8 @@ module Tapyrus
     # whether this script is a P2PKH format script.
     def p2pkh?
       return false unless chunks.size == 5
-      [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] ==
-          (chunks[0..1]+ chunks[3..4]).map(&:ord) && chunks[2].bytesize == 21
+      [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] == (chunks[0..1] + chunks[3..4]).map(&:ord) &&
+        chunks[2].bytesize == 21
     end
 
     def p2sh?
@@ -228,8 +228,7 @@ module Tapyrus
     end
 
     def standard_op_return?
-      op_return? && size <= MAX_OP_RETURN_RELAY &&
-          (chunks.size == 1 || chunks[1].opcode <= OP_16)
+      op_return? && size <= MAX_OP_RETURN_RELAY && (chunks.size == 1 || chunks[1].opcode <= OP_16)
     end
 
     # Return whether this script is a CP2PKH format script or not.
@@ -239,8 +238,8 @@ module Tapyrus
       return false unless chunks[0].bytesize == 34
       return false unless Tapyrus::Color::ColorIdentifier.parse_from_payload(chunks[0].pushed_data)&.valid?
       return false unless chunks[1].ord == OP_COLOR
-      [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] ==
-          (chunks[2..3]+ chunks[5..6]).map(&:ord) && chunks[4].bytesize == 21
+      [OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG] == (chunks[2..3] + chunks[5..6]).map(&:ord) &&
+        chunks[4].bytesize == 21
     end
 
     # Return whether this script is a CP2SH format script or not.
@@ -252,7 +251,7 @@ module Tapyrus
       return false unless chunks[1].ord == OP_COLOR
       OP_HASH160 == chunks[2].ord && OP_EQUAL == chunks[4].ord && chunks[3].bytesize == 21
     end
-  
+
     # Return whether this script represents colored coin.
     # @return [Boolean] true if this script is colored, otherwise false.
     def colored?
@@ -275,24 +274,23 @@ module Tapyrus
 
     # whether data push only script which dose not include other opcode
     def push_only?
-      chunks.each do |c|
-        return false if !c.opcode.nil? && c.opcode > OP_16
-      end
+      chunks.each { |c| return false if !c.opcode.nil? && c.opcode > OP_16 }
       true
     end
 
     # get public keys in the stack.
     # @return[Array[String]] an array of the pubkeys with hex format.
     def get_pubkeys
-      chunks.select{|c|c.pushdata? && [33, 65].include?(c.pushed_data.bytesize) && [2, 3, 4, 6, 7].include?(c.pushed_data[0].bth.to_i(16))}.map{|c|c.pushed_data.bth}
+      chunks.select do |c|
+        c.pushdata? && [33, 65].include?(c.pushed_data.bytesize) &&
+          [2, 3, 4, 6, 7].include?(c.pushed_data[0].bth.to_i(16))
+      end.map { |c| c.pushed_data.bth }
     end
 
     # returns the self payload. ScriptInterpreter does not use this.
     def to_script_code(skip_separator_index = 0)
       payload = to_payload
-      if skip_separator_index > 0
-        payload = subscript_codeseparator(skip_separator_index)
-      end
+      payload = subscript_codeseparator(skip_separator_index) if skip_separator_index > 0
       Tapyrus.pack_var_string(payload)
     end
 
@@ -303,7 +301,7 @@ module Tapyrus
       elsif obj.is_a?(String)
         append_data(obj)
       elsif obj.is_a?(Array)
-        obj.each { |o| self.<< o}
+        obj.each { |o| self.<< o }
         self
       end
     end
@@ -339,18 +337,19 @@ module Tapyrus
 
     # Check the item is in the chunk of the script.
     def include?(item)
-      chunk_item = if item.is_a?(Integer)
-                     item.chr
-                   elsif item.is_a?(String)
-                     data = Encoding::ASCII_8BIT == item.encoding ? item : item.htb
-                     Tapyrus::Script.pack_pushdata(data)
-                   end
+      chunk_item =
+        if item.is_a?(Integer)
+          item.chr
+        elsif item.is_a?(String)
+          data = Encoding::ASCII_8BIT == item.encoding ? item : item.htb
+          Tapyrus::Script.pack_pushdata(data)
+        end
       return false unless chunk_item
       chunks.include?(chunk_item)
     end
 
     def to_s
-      chunks.map { |c|
+      chunks.map do |c|
         case c
         when Integer
           opcode_to_name(c)
@@ -373,7 +372,7 @@ module Tapyrus
             opcode ? opcode : 'OP_UNKNOWN [error]'
           end
         end
-      }.join(' ')
+      end.join(' ')
     end
 
     # generate sha-256 hash for payload
@@ -431,17 +430,18 @@ module Tapyrus
     # binary +data+ convert pushdata which contains data length and append PUSHDATA opcode if necessary.
     def self.pack_pushdata(data)
       size = data.bytesize
-      header = if size < OP_PUSHDATA1
-                 [size].pack('C')
-               elsif size < 0xff
-                 [OP_PUSHDATA1, size].pack('CC')
-               elsif size < 0xffff
-                 [OP_PUSHDATA2, size].pack('Cv')
-               elsif size < 0xffffffff
-                 [OP_PUSHDATA4, size].pack('CV')
-               else
-                 raise ArgumentError, 'data size is too big.'
-               end
+      header =
+        if size < OP_PUSHDATA1
+          [size].pack('C')
+        elsif size < 0xff
+          [OP_PUSHDATA1, size].pack('CC')
+        elsif size < 0xffff
+          [OP_PUSHDATA2, size].pack('Cv')
+        elsif size < 0xffffffff
+          [OP_PUSHDATA4, size].pack('CV')
+        else
+          raise ArgumentError, 'data size is too big.'
+        end
       header + data
     end
 
@@ -465,8 +465,12 @@ module Tapyrus
           if chunk == sub_chunk
             buf << chunk
             i += 1
-            (i = 0; buf.clear) if i == subscript.chunks.size # matched the whole subscript
-          else # matched the part of head
+            (
+              i = 0
+              buf.clear
+            ) if i == subscript.chunks.size # matched the whole subscript
+          else
+            # matched the part of head
             i = 0
             tmp = chunk.dup
             tmp.slice!(sub_chunk)
@@ -488,7 +492,7 @@ module Tapyrus
 
     # remove all occurences of opcode. Typically it's OP_CODESEPARATOR.
     def delete_opcode(opcode)
-      @chunks = chunks.select{|chunk| chunk.ord != opcode}
+      @chunks = chunks.select { |chunk| chunk.ord != opcode }
       self
     end
 
@@ -496,12 +500,10 @@ module Tapyrus
     def subscript_codeseparator(separator_index)
       buf = []
       process_separator_index = 0
-      chunks.each{|chunk|
+      chunks.each do |chunk|
         buf << chunk if process_separator_index == separator_index
-        if chunk.ord == OP_CODESEPARATOR && process_separator_index < separator_index
-          process_separator_index += 1
-        end
-      }
+        process_separator_index += 1 if chunk.ord == OP_CODESEPARATOR && process_separator_index < separator_index
+      end
       buf.join
     end
 
@@ -518,10 +520,10 @@ module Tapyrus
     end
 
     def to_h
-      h = {asm: to_s, hex: to_hex, type: type}
+      h = { asm: to_s, hex: to_hex, type: type }
       addrs = addresses
       unless addrs.empty?
-        h[:req_sigs] = multisig? ? Tapyrus::Opcodes.opcode_to_small_int(chunks[0].bth.to_i(16)) :addrs.size
+        h[:req_sigs] = multisig? ? Tapyrus::Opcodes.opcode_to_small_int(chunks[0].bth.to_i(16)) : addrs.size
         h[:addresses] = addrs
       end
       h
@@ -568,5 +570,4 @@ module Tapyrus
       Tapyrus.encode_base58_address(color_id + hash160, Tapyrus.chain_params.cp2sh_version)
     end
   end
-
 end

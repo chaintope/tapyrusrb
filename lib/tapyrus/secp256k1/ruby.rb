@@ -1,10 +1,8 @@
 module Tapyrus
   module Secp256k1
-
     # secp256 module using ecdsa gem
     # https://github.com/DavidEGrayson/ruby_ecdsa
     module Ruby
-
       module_function
 
       # generate ec private key and public key
@@ -58,7 +56,7 @@ module Tapyrus
         end
       end
 
-      alias :valid_sig? :verify_sig
+      alias valid_sig? verify_sig
 
       module_function :valid_sig?
 
@@ -68,7 +66,8 @@ module Tapyrus
       # @return [Boolean] If valid public key return true, otherwise false.
       def parse_ec_pubkey?(pubkey, allow_hybrid = false)
         begin
-          point = ECDSA::Format::PointOctetString.decode(pubkey.htb, ECDSA::Group::Secp256k1, allow_hybrid: allow_hybrid)
+          point =
+            ECDSA::Format::PointOctetString.decode(pubkey.htb, ECDSA::Group::Secp256k1, allow_hybrid: allow_hybrid)
           ECDSA::Group::Secp256k1.valid_public_key?(point)
         rescue ECDSA::Format::DecodeError
           false
@@ -80,11 +79,11 @@ module Tapyrus
       def repack_pubkey(pubkey)
         p = pubkey.htb
         case p[0]
-          when "\x06", "\x07"
-            p[0] = "\x04"
-            p
-          else
-            pubkey.htb
+        when "\x06", "\x07"
+          p[0] = "\x04"
+          p
+        else
+          pubkey.htb
         end
       end
 
@@ -104,7 +103,8 @@ module Tapyrus
         e = ECDSA.normalize_digest(data, GROUP.bit_length)
         s = point_field.mod(point_field.inverse(nonce) * (e + r * private_key))
 
-        if s > (GROUP.order / 2) # convert low-s
+        if s > (GROUP.order / 2)
+          # convert low-s
           s = GROUP.order - s
         end
 
@@ -125,8 +125,6 @@ module Tapyrus
           false
         end
       end
-
     end
-
   end
 end

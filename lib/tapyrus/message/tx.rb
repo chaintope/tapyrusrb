@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # tx message
     # https://bitcoin.org/en/developer-reference#tx
     class Tx < Base
-
       COMMAND = 'tx'
 
       attr_accessor :tx
@@ -23,8 +21,6 @@ module Tapyrus
       def to_payload
         tx.to_payload
       end
-
     end
-
   end
 end

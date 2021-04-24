@@ -2,11 +2,9 @@ require 'json/pure'
 
 module Tapyrus
   module Ext
-
     # Extension of JSON::Pure::Parser.
     # This class convert Float value to String value.
     class JsonParser < JSON::Pure::Parser
-
       def parse_value
         case
         when scan(FLOAT)
@@ -41,7 +39,6 @@ module Tapyrus
           UNPARSED
         end
       end
-
     end
   end
 end

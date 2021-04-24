@@ -1,8 +1,6 @@
 module Tapyrus
-
   # merkle tree
   class MerkleTree
-
     attr_accessor :root
 
     def initialize(root = nil)
@@ -17,11 +15,12 @@ module Tapyrus
       if txids.size == 1
         nodes = [Node.new(txids.first)]
       else
-        nodes = txids.each_slice(2).map{ |m|
-          left = Node.new(m[0])
-          right = Node.new(m[1] ? m[1] : m[0])
-          [left, right]
-        }.flatten
+        nodes =
+          txids.each_slice(2).map do |m|
+            left = Node.new(m[0])
+            right = Node.new(m[1] ? m[1] : m[0])
+            [left, right]
+          end.flatten
       end
       new(build_initial_tree(nodes))
     end
@@ -29,7 +28,7 @@ module Tapyrus
     # https://bitcoin.org/en/developer-reference#creating-a-merkleblock-message
     def self.build_partial(tx_count, hashes, flags)
       flags = flags.each_char.map(&:to_i)
-      root = build_initial_tree( Array.new(tx_count) { Node.new })
+      root = build_initial_tree(Array.new(tx_count) { Node.new })
       current_node = root
       hash_index = 0
       flags.each do |f|
@@ -40,9 +39,7 @@ module Tapyrus
         end
         current_node = current_node.next_partial
         if hash_index == hashes.size
-          if current_node&.leaf?
-            current_node.value = hashes.last
-          end
+          current_node.value = hashes.last if current_node&.leaf?
           break
         end
       end
@@ -51,12 +48,15 @@ module Tapyrus
 
     def self.build_initial_tree(nodes)
       while nodes.size != 1
-        nodes = nodes.each_slice(2).map { |m|
-          parent = Node.new
-          parent.left = m[0]
-          parent.right = m[1] ? m[1] : m[0].dup
-          parent
-        }
+        nodes =
+          nodes
+            .each_slice(2)
+            .map do |m|
+              parent = Node.new
+              parent.left = m[0]
+              parent.right = m[1] ? m[1] : m[0].dup
+              parent
+            end
       end
       nodes.first
     end
@@ -67,7 +67,6 @@ module Tapyrus
 
     # node of merkle tree
     class Node
-
       attr_accessor :flag
       attr_accessor :value
       attr_accessor :parent
@@ -118,7 +117,7 @@ module Tapyrus
       def depth
         d = 0
         current_node = self
-        until current_node.root? do
+        until current_node.root?
           current_node = current_node.parent
           d += 1
         end
@@ -137,7 +136,7 @@ module Tapyrus
         i = 0
         d = 1
         current_node = self
-        until current_node.root? do
+        until current_node.root?
           i += d if current_node.parent.right == current_node
           current_node = current_node.parent
           d *= 2

@@ -1,5 +1,4 @@
 module Tapyrus
-
   # Integers modulo the order of the curve(secp256k1)
   CURVE_ORDER = ECDSA::Group::Secp256k1.order
 
@@ -45,8 +44,8 @@ module Tapyrus
 
     # serialize extended private key
     def to_payload
-      version.htb << [depth].pack('C') << parent_fingerprint.htb <<
-          [number].pack('N') << chain_code << [0x00].pack('C') << key.priv_key.htb
+      version.htb << [depth].pack('C') << parent_fingerprint.htb << [number].pack('N') << chain_code <<
+        [0x00].pack('C') << key.priv_key.htb
     end
 
     # Base58 encoded extended private key
@@ -108,8 +107,7 @@ module Tapyrus
       raise 'invalid key' if left >= CURVE_ORDER
       child_priv = (left + key.priv_key.to_i(16)) % CURVE_ORDER
       raise 'invalid key ' if child_priv >= CURVE_ORDER
-      new_key.key = Tapyrus::Key.new(
-          priv_key: child_priv.to_even_length_hex.rjust(64, '0'), key_type: key_type)
+      new_key.key = Tapyrus::Key.new(priv_key: child_priv.to_even_length_hex.rjust(64, '0'), key_type: key_type)
       new_key.chain_code = l[32..-1]
       new_key.ver = version
       new_key
@@ -147,10 +145,14 @@ module Tapyrus
       ext_key.parent_fingerprint = buf.read(4).bth
       ext_key.number = buf.read(4).unpack('N').first
       if ext_key.depth == 0
-        raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT unless ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+        unless ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+          raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT
+        end
         raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_INDEX if ext_key.number > 0
       end
-      raise ArgumentError, Errors::Messages:: INVALID_BIP32_ZERO_DEPTH if ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_key.depth > 0
+      if ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_key.depth > 0
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_DEPTH
+      end
       ext_key.chain_code = buf.read(32)
       raise ArgumentError, Errors::Messages::INVALID_BIP32_PRIV_PREFIX unless buf.read(1).bth == '00' # 0x00
       ext_key.key = Tapyrus::Key.new(priv_key: buf.read(32).bth, key_type: Tapyrus::Key::TYPES[:compressed])
@@ -166,33 +168,34 @@ module Tapyrus
     def self.version_from_purpose(purpose)
       v = purpose - Tapyrus::HARDENED_THRESHOLD
       case v
-        when 49
-          Tapyrus.chain_params.bip49_privkey_p2wpkh_p2sh_version
-        when 84
-          Tapyrus.chain_params.bip84_privkey_p2wpkh_version
-        else
-          Tapyrus.chain_params.extended_privkey_version
+      when 49
+        Tapyrus.chain_params.bip49_privkey_p2wpkh_p2sh_version
+      when 84
+        Tapyrus.chain_params.bip84_privkey_p2wpkh_version
+      else
+        Tapyrus.chain_params.extended_privkey_version
       end
     end
 
     # check whether +version+ is supported version bytes.
     def self.support_version?(version)
       p = Tapyrus.chain_params
-      [p.bip49_privkey_p2wpkh_p2sh_version, p.bip84_privkey_p2wpkh_version, p.extended_privkey_version].include?(version)
+      [p.bip49_privkey_p2wpkh_p2sh_version, p.bip84_privkey_p2wpkh_version, p.extended_privkey_version].include?(
+        version
+      )
     end
 
     # convert privkey version to pubkey version
     def priv_ver_to_pub_ver
       case version
-        when Tapyrus.chain_params.bip49_privkey_p2wpkh_p2sh_version
-          Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version
-        when Tapyrus.chain_params.bip84_privkey_p2wpkh_version
-          Tapyrus.chain_params.bip84_pubkey_p2wpkh_version
-        else
-          Tapyrus.chain_params.extended_pubkey_version
+      when Tapyrus.chain_params.bip49_privkey_p2wpkh_p2sh_version
+        Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version
+      when Tapyrus.chain_params.bip84_privkey_p2wpkh_version
+        Tapyrus.chain_params.bip84_pubkey_p2wpkh_version
+      else
+        Tapyrus.chain_params.extended_pubkey_version
       end
     end
-
   end
 
   # BIP-32 Extended public key
@@ -208,8 +211,7 @@ module Tapyrus
 
     # serialize extended pubkey
     def to_payload
-      version.htb << [depth].pack('C') <<
-          parent_fingerprint.htb << [number].pack('N') << chain_code << pub.htb
+      version.htb << [depth].pack('C') << parent_fingerprint.htb << [number].pack('N') << chain_code << pub.htb
     end
 
     def pub
@@ -309,10 +311,14 @@ module Tapyrus
       ext_pubkey.parent_fingerprint = buf.read(4).bth
       ext_pubkey.number = buf.read(4).unpack('N').first
       if ext_pubkey.depth == 0
-        raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT unless ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+        unless ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
+          raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT
+        end
         raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_INDEX if ext_pubkey.number > 0
       end
-      raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_DEPTH if ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_pubkey.depth > 0
+      if ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT && ext_pubkey.depth > 0
+        raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_DEPTH
+      end
       ext_pubkey.chain_code = buf.read(32)
       ext_pubkey.pubkey = Tapyrus::Key.new(pubkey: buf.read(33).bth).pubkey
       ext_pubkey
@@ -336,12 +342,12 @@ module Tapyrus
     def self.version_from_purpose(purpose)
       v = purpose - Tapyrus::HARDENED_THRESHOLD
       case v
-        when 49
-          Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version
-        when 84
-          Tapyrus.chain_params.bip84_pubkey_p2wpkh_version
-        else
-          Tapyrus.chain_params.extended_pubkey_version
+      when 49
+        Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version
+      when 84
+        Tapyrus.chain_params.bip84_pubkey_p2wpkh_version
+      else
+        Tapyrus.chain_params.extended_pubkey_version
       end
     end
 
@@ -350,7 +356,5 @@ module Tapyrus
       p = Tapyrus.chain_params
       [p.bip49_pubkey_p2wpkh_p2sh_version, p.bip84_pubkey_p2wpkh_version, p.extended_pubkey_version].include?(version)
     end
-
   end
-
 end

@@ -1,8 +1,6 @@
 module Tapyrus
-
   # tapyrus script error
   class ScriptError < Exception
-
     attr_accessor :code
     attr_accessor :extra_msg
 
@@ -100,6 +98,5 @@ module Tapyrus
     def self.name_to_code(name)
       NAME_MAP[name]
     end
-
   end
 end

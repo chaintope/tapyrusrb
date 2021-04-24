@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # BIP-152 Compact Block's data format.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki#BlockTransactionsRequest
     class BlockTransactionRequest
-
       attr_accessor :block_hash # When matching with Tapyrus::BlockHeader#hash It is necessary to reverse the byte order.
       attr_accessor :indexes
 
@@ -17,7 +15,8 @@ module Tapyrus
         buf = StringIO.new(payload)
         block_hash = buf.read(32).bth
         index_len = Tapyrus.unpack_var_int_from_io(buf)
-        indexes = index_len.times.map{Tapyrus.unpack_var_int_from_io(buf)}
+        indexes = index_len.times.map { Tapyrus.unpack_var_int_from_io(buf) }
+
         # index data differentially encoded
         offset = 0
         index_len.times do |i|
@@ -33,13 +32,11 @@ module Tapyrus
         p = block_hash.htb << Tapyrus.pack_var_int(indexes.size)
         indexes.size.times do |i|
           index = indexes[i]
-          index -= indexes[i-1] + 1 if i > 0
+          index -= indexes[i - 1] + 1 if i > 0
           p << Tapyrus.pack_var_int(index)
         end
         p
       end
-
     end
-
   end
 end

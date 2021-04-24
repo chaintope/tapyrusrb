@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # filteradd message
     # https://bitcoin.org/en/developer-reference#filteradd
     class FilterAdd < Base
-
       COMMAND = 'filteradd'
 
       # element must be sent in the byte order they would use when appearing in a raw transaction;
@@ -21,8 +19,6 @@ module Tapyrus
       def to_payload
         Tapyrus.pack_var_string(element.htb)
       end
-
     end
-
   end
 end

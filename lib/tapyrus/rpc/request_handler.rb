@@ -1,9 +1,7 @@
 module Tapyrus
   module RPC
-
     # RPC server's request handler.
     module RequestHandler
-
       # Returns an object containing various state info regarding blockchain processing.
       def getblockchaininfo
         h = {}
@@ -28,19 +26,19 @@ module Tapyrus
         raise ArgumentError.new('Block not found') unless entry
         if verbose
           {
-              hash: block_id,
-              height: entry.height,
-              features: entry.header.features,
-              featuresHex: entry.header.features.to_even_length_hex.ljust(8, '0'),
-              merkleroot: entry.header.merkle_root.rhex,
-              immutablemerkleroot: entry.header.im_merkle_root.rhex,
-              time: entry.header.time,
-              mediantime: node.chain.mtp(block_hash),
-              xfield_type: entry.header.x_field_type,
-              xfield: entry.header.x_field,
-              proof: entry.header.proof,
-              previousblockhash: entry.prev_hash.rhex,
-              nextblockhash: node.chain.next_hash(block_hash).rhex
+            hash: block_id,
+            height: entry.height,
+            features: entry.header.features,
+            featuresHex: entry.header.features.to_even_length_hex.ljust(8, '0'),
+            merkleroot: entry.header.merkle_root.rhex,
+            immutablemerkleroot: entry.header.im_merkle_root.rhex,
+            time: entry.header.time,
+            mediantime: node.chain.mtp(block_hash),
+            xfield_type: entry.header.x_field_type,
+            xfield: entry.header.x_field,
+            proof: entry.header.proof,
+            previousblockhash: entry.prev_hash.rhex,
+            nextblockhash: node.chain.next_hash(block_hash).rhex
           }
         else
           entry.header.to_hex
@@ -49,34 +47,38 @@ module Tapyrus
 
       # Returns connected peer information.
       def getpeerinfo
-        node.pool.peers.map do |peer|
-          local_addr = "#{peer.remote_version.remote_addr.ip}:18333"
-          {
-            id: peer.id,
-            addr: "#{peer.host}:#{peer.port}",
-            addrlocal: local_addr,
-            services: peer.remote_version.services.to_even_length_hex.rjust(16, '0'),
-            relaytxes: peer.remote_version.relay,
-            lastsend: peer.last_send,
-            lastrecv: peer.last_recv,
-            bytessent: peer.bytes_sent,
-            bytesrecv: peer.bytes_recv,
-            conntime: peer.conn_time,
-            pingtime: peer.ping_time,
-            minping: peer.min_ping,
-            version: peer.remote_version.version,
-            subver: peer.remote_version.user_agent,
-            inbound: !peer.outbound?,
-            startingheight: peer.remote_version.start_height,
-            best_hash: peer.best_hash,
-            best_height: peer.best_height
-          }
-        end
+        node
+          .pool
+          .peers
+          .map do |peer|
+            local_addr = "#{peer.remote_version.remote_addr.ip}:18333"
+            {
+              id: peer.id,
+              addr: "#{peer.host}:#{peer.port}",
+              addrlocal: local_addr,
+              services: peer.remote_version.services.to_even_length_hex.rjust(16, '0'),
+              relaytxes: peer.remote_version.relay,
+              lastsend: peer.last_send,
+              lastrecv: peer.last_recv,
+              bytessent: peer.bytes_sent,
+              bytesrecv: peer.bytes_recv,
+              conntime: peer.conn_time,
+              pingtime: peer.ping_time,
+              minping: peer.min_ping,
+              version: peer.remote_version.version,
+              subver: peer.remote_version.user_agent,
+              inbound: !peer.outbound?,
+              startingheight: peer.remote_version.start_height,
+              best_hash: peer.best_hash,
+              best_height: peer.best_height
+            }
+          end
       end
 
       # broadcast transaction
       def sendrawtransaction(hex_tx)
         tx = Tapyrus::Tx.parse_from_payload(hex_tx.htb)
+
         # TODO check wether tx is valid
         node.broadcast(tx)
         tx.txid
@@ -110,7 +112,7 @@ module Tapyrus
       def createwallet(wallet_id = 1, wallet_path_prefix = Tapyrus::Wallet::Base.default_path_prefix)
         wallet = Tapyrus::Wallet::Base.create(wallet_id, wallet_path_prefix)
         node.wallet = wallet unless node.wallet
-        {wallet_id: wallet.wallet_id, mnemonic: wallet.master_key.mnemonic}
+        { wallet_id: wallet.wallet_id, mnemonic: wallet.master_key.mnemonic }
       end
 
       # get wallet list.
@@ -127,9 +129,7 @@ module Tapyrus
       def listaccounts
         return {} unless node.wallet
         accounts = {}
-        node.wallet.accounts.each do |a|
-          accounts[a.name] = node.wallet.get_balance(a)
-        end
+        node.wallet.accounts.each { |a| accounts[a.name] = node.wallet.get_balance(a) }
         accounts
       end
 
@@ -144,8 +144,6 @@ module Tapyrus
       def getnewaddress(account_name)
         node.wallet.generate_new_address(account_name)
       end
-
     end
-
   end
 end

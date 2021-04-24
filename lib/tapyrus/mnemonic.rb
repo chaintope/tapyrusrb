@@ -1,9 +1,7 @@
 module Tapyrus
-
   # Mnemonic code for generating deterministic keys
   # https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
   class Mnemonic
-
     WORD_DIR = "#{__dir__}/mnemonic/wordlist"
 
     attr_reader :word_list
@@ -15,7 +13,7 @@ module Tapyrus
 
     # get support language list
     def self.word_lists
-      Dir.glob("#{WORD_DIR}/**.txt").map{|f| f.gsub("#{WORD_DIR}/", '').gsub('.txt', '') }
+      Dir.glob("#{WORD_DIR}/**.txt").map { |f| f.gsub("#{WORD_DIR}/", '').gsub('.txt', '') }
     end
 
     # generate entropy from mnemonic word
@@ -23,11 +21,12 @@ module Tapyrus
     # @return [String] an entropy with hex format.
     def to_entropy(words)
       word_master = load_words
-      mnemonic = words.map do |w|
-        index = word_master.index(w.downcase)
-        raise IndexError, 'word not found in words list.' unless index
-        index.to_s(2).rjust(11, '0')
-      end.join
+      mnemonic =
+        words.map do |w|
+          index = word_master.index(w.downcase)
+          raise IndexError, 'word not found in words list.' unless index
+          index.to_s(2).rjust(11, '0')
+        end.join
       entropy = mnemonic.slice(0, (mnemonic.length * 32) / 33)
       checksum = mnemonic.gsub(entropy, '')
       raise SecurityError, 'checksum mismatch.' unless checksum == checksum(entropy)
@@ -41,9 +40,9 @@ module Tapyrus
       raise ArgumentError, 'entropy is empty.' if entropy.nil? || entropy.empty?
       e = entropy.htb.unpack('B*').first
       seed = e + checksum(e)
-      mnemonic_index = seed.chars.each_slice(11).map{|i|i.join.to_i(2)}
+      mnemonic_index = seed.chars.each_slice(11).map { |i| i.join.to_i(2) }
       word_master = load_words
-      mnemonic_index.map{|i|word_master[i]}
+      mnemonic_index.map { |i| word_master[i] }
     end
 
     # generate seed from mnemonic
@@ -53,8 +52,13 @@ module Tapyrus
     # @return [String] seed
     def to_seed(mnemonic, passphrase: '')
       to_entropy(mnemonic)
-      OpenSSL::PKCS5.pbkdf2_hmac(mnemonic.join(' ').downcase,
-                                 'mnemonic' + passphrase, 2048, 64, OpenSSL::Digest::SHA512.new).bth
+      OpenSSL::PKCS5.pbkdf2_hmac(
+        mnemonic.join(' ').downcase,
+        'mnemonic' + passphrase,
+        2048,
+        64,
+        OpenSSL::Digest::SHA512.new
+      ).bth
     end
 
     # calculate entropy checksum
@@ -62,7 +66,7 @@ module Tapyrus
     # @return [String] an entropy checksum with bit string format
     def checksum(entropy)
       b = Tapyrus.sha256([entropy].pack('B*')).unpack('B*').first
-      b.slice(0, (entropy.length/32))
+      b.slice(0, (entropy.length / 32))
     end
 
     private
@@ -71,7 +75,5 @@ module Tapyrus
     def load_words
       File.readlines("#{WORD_DIR}/#{word_list}.txt").map(&:strip)
     end
-
   end
-
 end

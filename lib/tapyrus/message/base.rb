@@ -1,6 +1,5 @@
 module Tapyrus
   module Message
-
     # Base message class
     class Base
       include Tapyrus::HexConverter
@@ -22,8 +21,6 @@ module Tapyrus
       def to_payload
         raise 'to_payload must be implemented in a child class.'
       end
-
     end
-
   end
 end

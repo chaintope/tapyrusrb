@@ -1,7 +1,6 @@
 require 'siphash'
 module Tapyrus
   module Message
-
     # BIP-152 Compact Block's data format.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki#HeaderAndShortIDs
     class HeaderAndShortIDs
@@ -24,13 +23,9 @@ module Tapyrus
         header = Tapyrus::BlockHeader.parse_from_payload(buf)
         nonce = buf.read(8).unpack('q*').first
         short_ids_len = Tapyrus.unpack_var_int_from_io(buf)
-        short_ids = short_ids_len.times.map do
-           buf.read(6).reverse.bth.to_i(16)
-        end
+        short_ids = short_ids_len.times.map { buf.read(6).reverse.bth.to_i(16) }
         prefilled_txn_len = Tapyrus.unpack_var_int_from_io(buf)
-        prefilled_txn = prefilled_txn_len.times.map do
-          PrefilledTx.parse_from_io(buf)
-        end
+        prefilled_txn = prefilled_txn_len.times.map { PrefilledTx.parse_from_io(buf) }
         self.new(header, nonce, short_ids, prefilled_txn)
       end
 
@@ -38,7 +33,7 @@ module Tapyrus
         p = header.to_payload
         p << [nonce].pack('q*')
         p << Tapyrus.pack_var_int(short_ids.size)
-        p << short_ids.map{|id|sprintf('%12x', id).htb.reverse}.join
+        p << short_ids.map { |id| sprintf('%12x', id).htb.reverse }.join
         p << Tapyrus.pack_var_int(prefilled_txn.size)
         p << prefilled_txn.map(&:to_payload).join
         p
@@ -51,7 +46,6 @@ module Tapyrus
         hash = SipHash.digest(siphash_key, txid.htb.reverse).to_even_length_hex
         [hash].pack('H*')[2...8].bth.to_i(16)
       end
-
     end
   end
 end

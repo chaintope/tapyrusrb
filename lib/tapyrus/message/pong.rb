@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # pong message
     # https://bitcoin.org/en/developer-reference#pong
     class Pong < Base
-
       COMMAND = 'pong'
 
       attr_reader :nonce
@@ -21,6 +19,5 @@ module Tapyrus
         [nonce].pack('Q')
       end
     end
-
   end
 end

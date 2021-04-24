@@ -1,11 +1,10 @@
 module Schnorr
-
-  class InvalidSignatureError < StandardError; end
+  class InvalidSignatureError < StandardError
+  end
 
   # Instances of this class represents Schnorr signatures,
   # which are simply a pair of integers named `r` and `s`.
   class Signature
-
     attr_reader :r
     attr_reader :s
 
@@ -32,7 +31,5 @@ module Schnorr
     def encode
       ECDSA::Format::IntegerOctetString.encode(r, 32) + ECDSA::Format::IntegerOctetString.encode(s, 32)
     end
-
   end
-
 end

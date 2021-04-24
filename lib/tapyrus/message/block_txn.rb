@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # blocktxn message.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki#blocktxn
     class BlockTxn < Base
-
       COMMAND = 'blocktxn'
 
       attr_accessor :block_transactions
@@ -20,8 +18,6 @@ module Tapyrus
       def to_payload
         block_transactions.to_payload
       end
-
     end
-
   end
 end

@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # feefilter message
     # https://bitcoin.org/en/developer-reference#feefilter
     class FeeFilter < Base
-
       COMMAND = 'feefilter'
 
       # The fee rate (in satoshis per kilobyte)
@@ -21,7 +19,6 @@ module Tapyrus
       def to_payload
         [fee_rate].pack('Q')
       end
-
     end
   end
 end

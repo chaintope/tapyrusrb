@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Tapyrus::Opcodes do
-
   describe 'convert opcode to name' do
     it 'should be convert' do
       expect(Tapyrus::Opcodes.opcode_to_name(Tapyrus::Opcodes::OP_DROP)).to eq('OP_DROP')
@@ -64,5 +63,4 @@ describe Tapyrus::Opcodes do
       end
     end
   end
-
 end

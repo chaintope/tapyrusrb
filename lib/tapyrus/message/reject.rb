@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # reject message
     # https://bitcoin.org/en/developer-reference#reject
     class Reject < Base
-
       attr_accessor :message
       attr_accessor :code
       attr_accessor :reason
@@ -40,7 +38,6 @@ module Tapyrus
         e = ['tx', 'block'].include?(message) ? extra.htb : extra
         Tapyrus.pack_var_string(message) << [code].pack('C') << Tapyrus.pack_var_string(reason) << e
       end
-
     end
   end
 end

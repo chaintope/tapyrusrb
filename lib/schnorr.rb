@@ -76,8 +76,7 @@ module Schnorr
   # @return (Integer) digest e.
   def create_challenge(x, p, message)
     r_x = ECDSA::Format::IntegerOctetString.encode(x, GROUP.byte_length)
-    p_str= p.to_hex.htb
+    p_str = p.to_hex.htb
     (ECDSA.normalize_digest(Digest::SHA256.digest(r_x + p_str + message), GROUP.bit_length)) % GROUP.order
   end
-
 end

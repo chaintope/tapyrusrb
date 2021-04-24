@@ -1,9 +1,7 @@
 module Tapyrus
   module Network
-
     # remote peer class.
     class Peer
-
       # Interval for pinging peers.
       PING_INTERVAL = 2 * 60
 
@@ -22,13 +20,16 @@ module Tapyrus
       attr_accessor :outbound # TODO need implements to accept inbound connection
       attr_accessor :best_hash
       attr_accessor :best_height
+
       # remote peer info
       attr_reader :host
       attr_reader :port
+
       # remote peer connection
       attr_accessor :conn
       attr_accessor :connected
       attr_accessor :primary
+
       # parent pool
       attr_reader :pool
       attr_reader :chain
@@ -51,7 +52,8 @@ module Tapyrus
         @relay = configuration.conf[:relay]
         current_height = @chain.latest_block.height
         remote_addr = Tapyrus::Message::NetworkAddr.new(ip: host, port: port, time: nil)
-        @local_version = Tapyrus::Message::Version.new(remote_addr: remote_addr, start_height: current_height, relay: @relay)
+        @local_version =
+          Tapyrus::Message::Version.new(remote_addr: remote_addr, start_height: current_height, relay: @relay)
       end
 
       def connect
@@ -84,16 +86,17 @@ module Tapyrus
       def post_handshake
         @connected = true
         pool.handle_new_peer(self)
+
         # require remote peer to use headers message instead fo inv message.
         conn.send_message(Tapyrus::Message::SendHeaders.new)
-        EM.add_periodic_timer(PING_INTERVAL) {send_ping}
+        EM.add_periodic_timer(PING_INTERVAL) { send_ping }
       end
 
       # start block header download
       def start_block_header_download
         logger.info("[#{addr}] start block header download.")
-        get_headers = Tapyrus::Message::GetHeaders.new(
-            Tapyrus.chain_params.protocol_version, [chain.latest_block.block_hash])
+        get_headers =
+          Tapyrus::Message::GetHeaders.new(Tapyrus.chain_params.protocol_version, [chain.latest_block.block_hash])
         conn.send_message(get_headers)
       end
 
@@ -129,7 +132,7 @@ module Tapyrus
           @best_height = entry.height
         end
         pool.changed
-        pool.notify_observers(:header, {hash: @best_hash, height: @best_height})
+        pool.notify_observers(:header, { hash: @best_hash, height: @best_height })
         start_block_header_download if headers.headers.size > 0 # next header download
       end
 
@@ -156,14 +159,13 @@ module Tapyrus
 
       # send +addr+ message to remote peer
       def send_addrs
-        addrs = pool.peers.select{|p|p != self}.map(&:to_network_addr)
+        addrs = pool.peers.select { |p| p != self }.map(&:to_network_addr)
         conn.send_message(Tapyrus::Message::Addr.new(addrs))
       end
 
       # handle block inv message.
       def handle_block_inv(hashes)
-        getdata = Tapyrus::Message::GetData.new(
-            hashes.map{|h|Tapyrus::Message::Inventory.new(block_type, h)})
+        getdata = Tapyrus::Message::GetData.new(hashes.map { |h| Tapyrus::Message::Inventory.new(block_type, h) })
         conn.send_message(getdata)
       end
 
@@ -188,8 +190,7 @@ module Tapyrus
 
       # send filterload message.
       def send_filter_load(bloom)
-        filter_load = Tapyrus::Message::FilterLoad.new(
-            bloom, Tapyrus::Message::FilterLoad::BLOOM_UPDATE_ALL)
+        filter_load = Tapyrus::Message::FilterLoad.new(bloom, Tapyrus::Message::FilterLoad::BLOOM_UPDATE_ALL)
         conn.send_message(filter_load)
       end
 

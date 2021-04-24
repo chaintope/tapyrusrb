@@ -13,7 +13,6 @@ require_relative 'openassets'
 require_relative 'schnorr'
 
 module Tapyrus
-
   autoload :Ext, 'tapyrus/ext'
   autoload :Util, 'tapyrus/util'
   autoload :ChainParams, 'tapyrus/chain_params'
@@ -60,7 +59,7 @@ module Tapyrus
 
   # set tapyrus network chain params
   def self.chain_params=(name)
-    raise "chain params for #{name} is not defined." unless %i(prod dev).include?(name.to_sym)
+    raise "chain params for #{name} is not defined." unless %i[prod dev].include?(name.to_sym)
     @current_chain = nil
     @chain_param = name.to_sym
   end
@@ -154,17 +153,11 @@ module Tapyrus
     def valid_hex?
       !self[/\H/]
     end
-
   end
 
   class ::Object
-
     def build_json
-      if self.is_a?(Array)
-        "[#{self.map{|o|o.to_h.to_json}.join(',')}]"
-      else
-        to_h.to_json
-      end
+      self.is_a?(Array) ? "[#{self.map { |o| o.to_h.to_json }.join(',')}]" : to_h.to_json
     end
 
     def to_h
@@ -173,14 +166,9 @@ module Tapyrus
         key = var.to_s
         key.slice!(0) if key.start_with?('@')
         value = instance_variable_get(var)
-        if value.is_a?(Array)
-          result.update(key => value.map{|v|v.to_h})
-        else
-          result.update(key => value)
-        end
+        value.is_a?(Array) ? result.update(key => value.map { |v| v.to_h }) : result.update(key => value)
       end
     end
-
   end
 
   class ::Integer
@@ -194,13 +182,8 @@ module Tapyrus
     end
 
     # convert bit string
-    def to_bits(length = nil )
-      if length
-        to_s(2).rjust(length, '0')
-      else
-        to_s(2)
-      end
+    def to_bits(length = nil)
+      length ? to_s(2).rjust(length, '0') : to_s(2)
     end
   end
-
 end

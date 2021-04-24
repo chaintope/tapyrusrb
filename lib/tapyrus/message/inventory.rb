@@ -3,7 +3,6 @@ module Tapyrus
     # inventory class. inventory is a part of message.
     # https://bitcoin.org/en/developer-reference#term-inventory
     class Inventory
-
       SEGWIT_FLAG = 1 << 30
 
       MSG_TX = 1
@@ -18,7 +17,9 @@ module Tapyrus
       attr_accessor :hash
 
       def initialize(identifier, hash)
-        raise Error, "invalid type identifier specified. identifier = #{identifier}" unless valid_identifier?(identifier)
+        unless valid_identifier?(identifier)
+          raise Error, "invalid type identifier specified. identifier = #{identifier}"
+        end
         @identifier = identifier
         @hash = hash
       end
@@ -42,10 +43,16 @@ module Tapyrus
       private
 
       def valid_identifier?(identifier)
-        [MSG_TX, MSG_BLOCK, MSG_FILTERED_BLOCK, MSG_CMPCT_BLOCK, MSG_WITNESS_TX,
-         MSG_WITNESS_BLOCK, MSG_FILTERED_WITNESS_BLOCK].include?(identifier)
+        [
+          MSG_TX,
+          MSG_BLOCK,
+          MSG_FILTERED_BLOCK,
+          MSG_CMPCT_BLOCK,
+          MSG_WITNESS_TX,
+          MSG_WITNESS_BLOCK,
+          MSG_FILTERED_WITNESS_BLOCK
+        ].include?(identifier)
       end
-
     end
   end
 end

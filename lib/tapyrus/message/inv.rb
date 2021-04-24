@@ -1,6 +1,5 @@
 module Tapyrus
   module Message
-
     # inv message
     # https://bitcoin.org/en/developer-reference#inv
     class Inv < Base
@@ -14,8 +13,6 @@ module Tapyrus
       def initialize(inventories = [])
         @inventories = inventories
       end
-
     end
-
   end
 end

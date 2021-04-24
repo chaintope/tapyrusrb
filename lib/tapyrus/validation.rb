@@ -1,7 +1,5 @@
 module Tapyrus
-
   class Validation
-
     # check transaction validation
     def check_tx(tx, state)
       # Basic checks that don't depend on any context
@@ -16,14 +14,20 @@ module Tapyrus
       # Check for negative or overflow output values
       amount = 0
       tx.outputs.each do |o|
-        return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-negative') if o.value < 0
-        return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-toolarge') if MAX_MONEY < o.value
+        if o.value < 0
+          return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-negative')
+        end
+        if MAX_MONEY < o.value
+          return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-toolarge')
+        end
         amount += o.value
-        return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-toolarge') if MAX_MONEY < amount
+        if MAX_MONEY < amount
+          return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-vout-toolarge')
+        end
       end
 
       # Check for duplicate inputs - note that this check is slow so we skip it in CheckBlock
-      out_points = tx.inputs.map{|i|i.out_point.to_payload}
+      out_points = tx.inputs.map { |i| i.out_point.to_payload }
       unless out_points.size == out_points.uniq.size
         return state.DoS(100, reject_code: Message::Reject::CODE_INVALID, reject_reason: 'bad-txns-inputs-duplicate')
       end
@@ -46,7 +50,6 @@ module Tapyrus
     def check_block_header(header, state)
       header.block_hash
       header.bits
-
     end
 
     def check_block(block, state)
@@ -63,12 +66,10 @@ module Tapyrus
 
       # check sigop count
     end
-
   end
 
   class ValidationState
-
-    MODE = {valid: 0, invlid: 1, error: 2}
+    MODE = { valid: 0, invlid: 1, error: 2 }
 
     attr_accessor :mode
     attr_accessor :n_dos

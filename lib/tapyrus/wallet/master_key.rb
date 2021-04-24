@@ -1,6 +1,5 @@
 module Tapyrus
   module Wallet
-
     # HD Wallet master seed
     class MasterKey
       include Tapyrus::HexConverter
@@ -53,7 +52,7 @@ module Tapyrus
       # [encrypted(false:0, true:1)][salt(var str)][seed(var str)]
       def to_payload
         flg = encrypted ? 1 : 0
-        pack_var_int(flg) << [salt, seed].map{|v|pack_var_string(v.htb)}.join
+        pack_var_int(flg) << [salt, seed].map { |v| pack_var_string(v.htb) }.join
       end
 
       # get master key
@@ -67,7 +66,7 @@ module Tapyrus
       # @return [Tapyrus::ExtKey]
       def derive(path)
         derived_key = key
-        parse_key_path(path).each{|num| derived_key = derived_key.derive(num)}
+        parse_key_path(path).each { |num| derived_key = derived_key.derive(num) }
         derived_key
       end
 
@@ -105,7 +104,6 @@ module Tapyrus
         key_iv = OpenSSL::PKCS5.pbkdf2_hmac_sha1(passphrase, salt, 2000, enc.key_len + enc.iv_len)
         [key_iv[0, enc.key_len], key_iv[enc.key_len, enc.iv_len]]
       end
-
     end
   end
 end

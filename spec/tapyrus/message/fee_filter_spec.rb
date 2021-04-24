@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Tapyrus::Message::FeeFilter do
-
   describe 'to_pkt' do
     subject { Tapyrus::Message::FeeFilter.new(1_000).to_pkt }
     it 'generate pkt' do
@@ -15,5 +14,4 @@ describe Tapyrus::Message::FeeFilter do
       expect(subject.fee_rate).to eq(1_000)
     end
   end
-
 end

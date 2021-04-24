@@ -1,4 +1,4 @@
-require "murmurhash3"
+require 'murmurhash3'
 module Tapyrus
   class BloomFilter
     LN2_SQUARED = 0.4804530139182014246671025263266649717305529515945455 # log(2) ** 2
@@ -23,6 +23,7 @@ module Tapyrus
       # The size S of the filter in bytes is given by (-1 / pow(log(2), 2) * N * log(P)) / 8
       len = [[(-elements_length * Math.log(fp_rate) / (LN2_SQUARED * 8)).to_i, MAX_BLOOM_FILTER_SIZE].min, 1].max
       filter = Array.new(len, 0)
+
       # The number of hash functions required is given by S * 8 / N * log(2)
       hash_funcs = [[(filter.size * 8 * LN2 / elements_length).to_i, MAX_HASH_FUNCS].min, 1].max
       BloomFilter.new(filter, hash_funcs, tweak)
@@ -59,8 +60,9 @@ module Tapyrus
     end
 
     private
+
     def to_hash(data, i)
-      MurmurHash3::V32.str_hash(data, (i * 0xfba4c795 + tweak) & 0xffffffff)  % (filter.length * 8)
+      MurmurHash3::V32.str_hash(data, (i * 0xfba4c795 + tweak) & 0xffffffff) % (filter.length * 8)
     end
 
     def set_bit(data)
@@ -72,7 +74,7 @@ module Tapyrus
     end
 
     def full?
-      @full |= filter.all? {|byte| byte == 0xff}
+      @full |= filter.all? { |byte| byte == 0xff }
     end
   end
 end

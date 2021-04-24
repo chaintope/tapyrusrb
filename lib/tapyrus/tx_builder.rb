@@ -5,7 +5,7 @@ module Tapyrus
   # TxBuilder makes it easy to  build transactions without having to deal with TxOut/TxIn/Script directly.
   #
   # @example
-  # 
+  #
   #   txb = Tapyrus::TxBuilder.new
   #   utxo1 = {
   #     script_pubkey: Tapyrus::Script.parse_from_addr('mgCuyNQ1pUbKqL57tJQZX3hhUCaZcuX3RQ'),
@@ -21,7 +21,7 @@ module Tapyrus
   #     index: 1,
   #     value: 3_000
   #   }
-  #   
+  #
   #   tx = txb
   #     .add_utxo(utxo1)
   #     .add_utxo(utxo2)
@@ -29,7 +29,7 @@ module Tapyrus
   #     .reissuable(utxo1[:script_pubkey],'n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 10_000)
   #     .pay('n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 1_000)
   #     .build
-  # 
+  #
   class TxBuilder
     def initialize
       @utxos = []
@@ -42,7 +42,7 @@ module Tapyrus
     # @param utxo [Hash] a hash whose fields are `txid`, `index`, `script_pubkey`, `value`, and `color_id` (color_id is optional)
     def add_utxo(utxo)
       @utxos << utxo
-      color_id = utxo[:color_id] || Tapyrus::Color::ColorIdentifier::default
+      color_id = utxo[:color_id] || Tapyrus::Color::ColorIdentifier.default
       @incomings[color_id] ||= 0
       @incomings[color_id] += utxo[:value]
       self
@@ -79,7 +79,7 @@ module Tapyrus
     # @param address [String] tapyrus address with Base58 format
     # @param value [Integer] issued or transferred amount
     # @param color_id [Tapyrus::Color::ColorIdentifier] color id
-    def pay(address, value, color_id = Tapyrus::Color::ColorIdentifier::default)
+    def pay(address, value, color_id = Tapyrus::Color::ColorIdentifier.default)
       script_pubkey = Tapyrus::Script.parse_from_addr(address)
 
       unless color_id.default?
@@ -134,11 +134,12 @@ module Tapyrus
     def add_change(tx)
       @incomings.each do |color_id, in_amount|
         out_amount = @outgoings[color_id] || 0
-        change, script_pubkey = if color_id.default?
-          [in_amount - out_amount - estimated_fee, @change_script_pubkey]
-        else
-          [in_amount - out_amount, @change_script_pubkey.add_color(color_id)]
-        end
+        change, script_pubkey =
+          if color_id.default?
+            [in_amount - out_amount - estimated_fee, @change_script_pubkey]
+          else
+            [in_amount - out_amount, @change_script_pubkey.add_color(color_id)]
+          end
         tx.outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: change) if change > 0
       end
     end

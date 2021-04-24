@@ -3,9 +3,7 @@ require 'leveldb-native'
 module Tapyrus
   module Store
     module DB
-
       class LevelDB
-
         attr_reader :db
         attr_reader :logger
 
@@ -62,9 +60,11 @@ module Tapyrus
         # @param [Tapyrus::Store::ChainEntry]
         def save_entry(entry)
           db.batch do
-            db.put(entry.key ,entry.to_payload)
+            db.put(entry.key, entry.to_payload)
             db.put(height_key(entry.height), entry.block_hash)
-            add_agg_pubkey(entry.height == 0 ? 0 : entry.height + 1, entry.header.x_field) if entry.header.upgrade_agg_pubkey?
+            if entry.header.upgrade_agg_pubkey?
+              add_agg_pubkey(entry.height == 0 ? 0 : entry.height + 1, entry.header.x_field)
+            end
             connect_entry(entry)
           end
         end
@@ -134,9 +134,7 @@ module Tapyrus
             unless tip_block.block_hash == entry.prev_hash
               raise "entry(#{entry.block_hash}) does not reference current best block hash(#{tip_block.block_hash})"
             end
-            unless tip_block.height + 1 == entry.height
-              raise "block height is small than current best block."
-            end
+            raise 'block height is small than current best block.' unless tip_block.height + 1 == entry.height
           end
           db.put(KEY_PREFIX[:best], entry.block_hash)
           db.put(KEY_PREFIX[:next] + entry.prev_hash, entry.block_hash)
@@ -148,9 +146,7 @@ module Tapyrus
           index = db.get(KEY_PREFIX[:latest_agg_pubkey])
           index&.to_i(16)
         end
-
       end
-
     end
   end
 end

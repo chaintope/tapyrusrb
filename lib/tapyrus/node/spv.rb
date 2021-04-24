@@ -1,9 +1,7 @@
 module Tapyrus
   module Node
-
     # SPV class
     class SPV
-
       attr_reader :chain
       attr_reader :pool
       attr_reader :logger
@@ -20,6 +18,7 @@ module Tapyrus
         @logger = Tapyrus::Logger.create(:debug)
         @running = false
         @wallet = Tapyrus::Wallet::Base.current_wallet
+
         # TODO : optimize bloom filter parameters
         setup_filter
       end
@@ -72,7 +71,7 @@ module Tapyrus
 
       def setup_filter
         @bloom = Tapyrus::BloomFilter.create_filter(512, 0.01)
-        wallet.watch_targets.each{|t|bloom.add(t.htb)} if wallet
+        wallet.watch_targets.each { |t| bloom.add(t.htb) } if wallet
       end
     end
   end

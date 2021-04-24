@@ -1,11 +1,10 @@
 module Tapyrus
   module Wallet
-
     # the account in BIP-44
     class Account
       include Tapyrus::HexConverter
 
-      PURPOSE_TYPE = {legacy: 44, nested_witness: 49, native_segwit: 84}
+      PURPOSE_TYPE = { legacy: 44, nested_witness: 49, native_segwit: 84 }
 
       attr_reader :purpose # either 44 or 49 or 84
       attr_reader :index # BIP-44 index
@@ -86,26 +85,26 @@ module Tapyrus
       # get the list of derived keys for receive key.
       # @return [Array[Tapyrus::ExtPubkey]]
       def derived_receive_keys
-        (receive_depth + 1).times.map{|i|derive_key(0,i)}
+        (receive_depth + 1).times.map { |i| derive_key(0, i) }
       end
 
       # get the list of derived keys for change key.
       # @return [Array[Tapyrus::ExtPubkey]]
       def derived_change_keys
-        (change_depth + 1).times.map{|i|derive_key(1,i)}
+        (change_depth + 1).times.map { |i| derive_key(1, i) }
       end
 
       # get account type label.
       def type
         case purpose
-          when PURPOSE_TYPE[:legacy]
-            'pubkeyhash'
-          when PURPOSE_TYPE[:nested_witness]
-            'p2wpkh-p2sh'
-          when PURPOSE_TYPE[:native_segwit]
-            'p2wpkh'
-          else
-            'unknown'
+        when PURPOSE_TYPE[:legacy]
+          'pubkeyhash'
+        when PURPOSE_TYPE[:nested_witness]
+          'p2wpkh-p2sh'
+        when PURPOSE_TYPE[:native_segwit]
+          'p2wpkh'
+        else
+          'unknown'
         end
       end
 
@@ -126,10 +125,17 @@ module Tapyrus
 
       def to_h
         {
-            name: name, type: type, index: index, receive_depth: receive_depth, change_depth: change_depth,
-            look_ahead: lookahead, receive_address: derive_key(0, receive_depth).addr,
-            change_address: derive_key(1, change_depth).addr,
-            account_key: account_key.to_base58, path: path, watch_only: watch_only
+          name: name,
+          type: type,
+          index: index,
+          receive_depth: receive_depth,
+          change_depth: change_depth,
+          look_ahead: lookahead,
+          receive_address: derive_key(0, receive_depth).addr,
+          change_address: derive_key(1, change_depth).addr,
+          account_key: account_key.to_base58,
+          path: path,
+          watch_only: watch_only
         }
       end
 
@@ -145,8 +151,6 @@ module Tapyrus
         version_bytes = Tapyrus::ExtPubkey.version_from_purpose(purpose + Tapyrus::HARDENED_THRESHOLD)
         raise 'The purpose and the account key do not match.' unless account_key.version == version_bytes
       end
-
     end
-
   end
 end

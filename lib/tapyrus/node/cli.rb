@@ -4,9 +4,7 @@ require 'json'
 
 module Tapyrus
   module Node
-
     class CLI < Thor
-
       class_option :network, aliases: '-n', default: :prod
 
       desc 'getblockchaininfo', 'Returns an object containing various state info regarding blockchain processing.'
@@ -19,7 +17,8 @@ module Tapyrus
         request('stop')
       end
 
-      desc 'getblockheader "hash" ( verbose )', 'If verbose is false, returns a string that is serialized, hex-encoded data for blockheader "hash". If verbose is true, returns an Object with information about blockheader <hash>.'
+      desc 'getblockheader "hash" ( verbose )',
+           'If verbose is false, returns a string that is serialized, hex-encoded data for blockheader "hash". If verbose is true, returns an Object with information about blockheader <hash>.'
       def getblockheader(hash, verbose = true)
         verbose = verbose.is_a?(String) ? (verbose == 'true') : verbose
         request('getblockheader', hash, verbose)
@@ -30,7 +29,8 @@ module Tapyrus
         request('getpeerinfo')
       end
 
-      desc 'decoderawtransaction "hexstring"', 'Return a JSON object representing the serialized, hex-encoded transaction.'
+      desc 'decoderawtransaction "hexstring"',
+           'Return a JSON object representing the serialized, hex-encoded transaction.'
       def decoderawtransaction(hexstring)
         request('decoderawtransaction', hexstring)
       end
@@ -47,12 +47,14 @@ module Tapyrus
         request('sendrawtransaction', hex_tx)
       end
 
-      desc 'createwallet "wallet_id"', 'Create new HD wallet. It returns an error if an existing wallet_id is specified. '
+      desc 'createwallet "wallet_id"',
+           'Create new HD wallet. It returns an error if an existing wallet_id is specified. '
       def createwallet(wallet_id)
         request('createwallet', wallet_id)
       end
 
-      desc 'listwallets', 'Returns a list of currently loaded wallets. For full information on the wallet, use "getwalletinfo"'
+      desc 'listwallets',
+           'Returns a list of currently loaded wallets. For full information on the wallet, use "getwalletinfo"'
       def listwallets
         request('listwallets')
       end
@@ -67,7 +69,8 @@ module Tapyrus
         request('listaccounts')
       end
 
-      desc 'encryptwallet "passphrase"', 'Encrypts the wallet with "passphrase". This is for first time encryption.After this, any calls that interact with private keys such as sending or signing will require the passphrase to be set prior the making these calls.'
+      desc 'encryptwallet "passphrase"',
+           'Encrypts the wallet with "passphrase". This is for first time encryption.After this, any calls that interact with private keys such as sending or signing will require the passphrase to be set prior the making these calls.'
       def encryptwallet(passhphrase)
         request('encryptwallet', passhphrase)
       end
@@ -86,15 +89,11 @@ module Tapyrus
       end
 
       def request(command, *params)
-        data = {
-            :method => command,
-            :params => params,
-            :id => 'jsonrpc'
-        }
+        data = { method: command, params: params, id: 'jsonrpc' }
         begin
           uri = URI.parse(config.server_url)
           http = Net::HTTP.new(uri.hostname, uri.port)
-          http.use_ssl = uri.scheme === "https"
+          http.use_ssl = uri.scheme === 'https'
           request = Net::HTTP::Post.new('/')
           request.content_type = 'application/json'
           request.body = data.to_json
@@ -110,7 +109,6 @@ module Tapyrus
           puts e.message
         end
       end
-
     end
   end
 end

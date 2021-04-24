@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # headers message
     # https://bitcoin.org/en/developer-reference#headers
     class Headers < Base
-
       COMMAND = 'headers'
 
       # Array[Tapyrus::BlockHeader]
@@ -28,8 +26,6 @@ module Tapyrus
       def to_payload
         Tapyrus.pack_var_int(headers.size) << headers.map { |h| h.to_payload << 0x00 }.join
       end
-
     end
-
   end
 end
