@@ -2,10 +2,8 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # transaction output
   class TxOut
-
     include OpenAssets::MarkerOutput
     include Tapyrus::Color::ColoredOutput
 
@@ -39,7 +37,7 @@ module Tapyrus
     end
 
     def to_h
-      {value: value_to_btc, script_pubkey: script_pubkey.to_h}
+      { value: value_to_btc, script_pubkey: script_pubkey.to_h }
     end
 
     def ==(other)
@@ -65,11 +63,8 @@ module Tapyrus
       n_size = size
       n_size += (32 + 4 + 1 + 107 + 4)
       fee = n_size * Tapyrus.chain_params.dust_relay_fee / 1000
-      if fee == 0 && n_size != 0
-        fee = Tapyrus.chain_params.dust_relay_fee > 0 ? 1 : -1
-      end
+      fee = Tapyrus.chain_params.dust_relay_fee > 0 ? 1 : -1 if fee == 0 && n_size != 0
       fee
     end
   end
-
 end

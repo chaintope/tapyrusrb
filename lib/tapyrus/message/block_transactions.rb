@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # BIP-152 Compact Block's data format.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki#BlockTransactions
     class BlockTransactions
-
       attr_accessor :block_hash
       attr_accessor :transactions
 
@@ -17,15 +15,13 @@ module Tapyrus
         buf = StringIO.new(payload)
         block_hash = buf.read(32).bth
         tx_count = Tapyrus.unpack_var_int_from_io(buf)
-        txn = tx_count.times.map{Tapyrus::Tx.parse_from_payload(buf)}
+        txn = tx_count.times.map { Tapyrus::Tx.parse_from_payload(buf) }
         self.new(block_hash, txn)
       end
 
       def to_payload
         block_hash.htb << Tapyrus.pack_var_int(transactions.size) << transactions.map(&:to_payload).join
       end
-
     end
-
   end
 end

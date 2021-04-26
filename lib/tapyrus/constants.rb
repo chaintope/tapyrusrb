@@ -1,20 +1,23 @@
 module Tapyrus
-
   COIN = 100_000_000
   MAX_MONEY = 21_000_000 * COIN
 
   # The maximum allowed size for a serialized block, in bytes (only for buffer size limits)
   MAX_BLOCK_SERIALIZED_SIZE = 4_000_000
+
   # The maximum allowed weight for a block, see BIP 141 (network rule)
   MAX_BLOCK_WEIGHT = 4_000_000
+
   # The maximum allowed number of signature check operations in a block (network rule)
   MAX_BLOCK_SIGOPS_COST = 80_000
+
   # Coinbase transaction outputs can only be spent after this number of new blocks (network rule)
   COINBASE_MATURITY = 100
   WITNESS_SCALE_FACTOR = 4
 
   # 60 is the lower bound for the size of a valid serialized Tx
   MIN_TRANSACTION_WEIGHT = WITNESS_SCALE_FACTOR * 60
+
   # 10 is the lower bound for the size of a serialized Tx
   MIN_SERIALIZABLE_TRANSACTION_WEIGHT = WITNESS_SCALE_FACTOR * 10
 
@@ -26,11 +29,11 @@ module Tapyrus
   DUST_RELAY_TX_FEE = 3000
 
   # script verify flags
-  SCRIPT_VERIFY_NONE      = 0
-  SCRIPT_VERIFY_P2SH      = (1 << 0)
+  SCRIPT_VERIFY_NONE = 0
+  SCRIPT_VERIFY_P2SH = (1 << 0)
   SCRIPT_VERIFY_STRICTENC = (1 << 1)
-  SCRIPT_VERIFY_DERSIG    = (1 << 2)
-  SCRIPT_VERIFY_LOW_S     = (1 << 3)
+  SCRIPT_VERIFY_DERSIG = (1 << 2)
+  SCRIPT_VERIFY_LOW_S = (1 << 3)
   SCRIPT_VERIFY_NULLDUMMY = (1 << 4)
   SCRIPT_VERIFY_SIGPUSHONLY = (1 << 5)
   SCRIPT_VERIFY_MINIMALDATA = (1 << 6)
@@ -45,24 +48,27 @@ module Tapyrus
   MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_P2SH
 
   # Standard script verification flags that standard transactions will comply with.
-  STANDARD_SCRIPT_VERIFY_FLAGS = [MANDATORY_SCRIPT_VERIFY_FLAGS,
-                                  SCRIPT_VERIFY_DERSIG,
-                                  SCRIPT_VERIFY_STRICTENC,
-                                  SCRIPT_VERIFY_MINIMALDATA,
-                                  SCRIPT_VERIFY_NULLDUMMY,
-                                  SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
-                                  SCRIPT_VERIFY_CLEANSTACK,
-                                  SCRIPT_VERIFY_MINIMALIF,
-                                  SCRIPT_VERIFY_NULLFAIL,
-                                  SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY,
-                                  SCRIPT_VERIFY_CHECKSEQUENCEVERIFY,
-                                  SCRIPT_VERIFY_LOW_S,
-                                  SCRIPT_VERIFY_CONST_SCRIPTCODE].inject(SCRIPT_VERIFY_NONE){|flags, f| flags |= f}
+  STANDARD_SCRIPT_VERIFY_FLAGS =
+    [
+      MANDATORY_SCRIPT_VERIFY_FLAGS,
+      SCRIPT_VERIFY_DERSIG,
+      SCRIPT_VERIFY_STRICTENC,
+      SCRIPT_VERIFY_MINIMALDATA,
+      SCRIPT_VERIFY_NULLDUMMY,
+      SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
+      SCRIPT_VERIFY_CLEANSTACK,
+      SCRIPT_VERIFY_MINIMALIF,
+      SCRIPT_VERIFY_NULLFAIL,
+      SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY,
+      SCRIPT_VERIFY_CHECKSEQUENCEVERIFY,
+      SCRIPT_VERIFY_LOW_S,
+      SCRIPT_VERIFY_CONST_SCRIPTCODE
+    ].inject(SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
 
   # for script
 
   # Maximum script length in bytes
-  MAX_SCRIPT_SIZE = 10000
+  MAX_SCRIPT_SIZE = 10_000
 
   # Maximum number of public keys per multisig
   MAX_PUBKEYS_PER_MULTISIG = 20
@@ -77,7 +83,7 @@ module Tapyrus
   MAX_STACK_SIZE = 1000
 
   # Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
-  LOCKTIME_THRESHOLD = 500000000
+  LOCKTIME_THRESHOLD = 500_000_000
 
   # Signature hash types/flags
   SIGHASH_TYPE = { all: 1, none: 2, single: 3, anyonecanpay: 128 }
@@ -153,7 +159,7 @@ module Tapyrus
   ERRCODES_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [const_get(c), c.to_s] }.flatten]
   NAME_MAP = Hash[*constants.grep(/^SCRIPT_ERR_/).map { |c| [c.to_s, const_get(c)] }.flatten]
 
-  COINBASE_WTXID = '00'* 32
+  COINBASE_WTXID = '00' * 32
 
   # for message
   MESSAGE_HEADER_SIZE = 24
@@ -169,5 +175,5 @@ module Tapyrus
 
   BIP32_EXTKEY_WITH_VERSION_SIZE = 78
 
-  HARDENED_THRESHOLD = 2147483648 # 2**31
+  HARDENED_THRESHOLD = 2_147_483_648 # 2**31
 end

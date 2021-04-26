@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # filterload message
     # https://bitcoin.org/en/developer-reference#filterload
     class FilterLoad < Base
-
       COMMAND = 'filterload'
 
       BLOOM_UPDATE_NONE = 0
@@ -30,10 +28,9 @@ module Tapyrus
       end
 
       def to_payload
-        Tapyrus.pack_var_int(filter.filter.size) << filter.filter.pack('C*') << [filter.hash_funcs, filter.tweak, flag].pack('VVC')
+        Tapyrus.pack_var_int(filter.filter.size) << filter.filter.pack('C*') <<
+          [filter.hash_funcs, filter.tweak, flag].pack('VVC')
       end
-
     end
-
   end
 end

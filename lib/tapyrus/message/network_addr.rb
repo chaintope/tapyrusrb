@@ -2,9 +2,7 @@ require 'ipaddr'
 
 module Tapyrus
   module Message
-
     class NetworkAddr
-
       # unix time.
       # Nodes advertising their own IP address set this to the current time.
       # Nodes advertising IP addresses they’ve connected to set this to the last time they connected to that node.
@@ -20,7 +18,12 @@ module Tapyrus
 
       attr_reader :skip_time
 
-      def initialize(ip: '127.0.0.1', port: Tapyrus.chain_params.default_port, services: DEFAULT_SERVICE_FLAGS, time: Time.now.to_i)
+      def initialize(
+        ip: '127.0.0.1',
+        port: Tapyrus.chain_params.default_port,
+        services: DEFAULT_SERVICE_FLAGS,
+        time: Time.now.to_i
+      )
         @time = time
         @ip_addr = IPAddr.new(ip)
         @port = port
@@ -33,7 +36,7 @@ module Tapyrus
         addr = new(time: nil)
         addr.time = buf.read(4).unpack('V').first if has_time
         addr.services = buf.read(8).unpack('Q').first
-        addr.ip_addr = IPAddr::new_ntoh(buf.read(16))
+        addr.ip_addr = IPAddr.new_ntoh(buf.read(16))
         addr.port = buf.read(2).unpack('n').first
         addr
       end
@@ -56,8 +59,6 @@ module Tapyrus
         addr = ip_addr.ipv4? ? ip_addr.ipv4_mapped : ip_addr
         p << [services].pack('Q') << addr.hton << [port].pack('n')
       end
-
     end
-
   end
 end

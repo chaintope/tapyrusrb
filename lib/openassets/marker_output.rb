@@ -1,7 +1,5 @@
 module OpenAssets
-
   module MarkerOutput
-
     # whether this output is marker output for open assets.
     def open_assets_marker?
       return false unless script_pubkey.op_return?
@@ -14,7 +12,5 @@ module OpenAssets
       return nil unless script_pubkey.op_return?
       Payload.parse_from_payload(script_pubkey.op_return_data)
     end
-
   end
-
 end

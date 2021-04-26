@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # block message
     # https://bitcoin.org/en/developer-reference#block
     class Block < Base
-
       attr_accessor :header
       attr_accessor :transactions
       attr_accessor :use_segwit
@@ -23,24 +21,19 @@ module Tapyrus
         transactions = []
         unless buf.eof?
           tx_count = Tapyrus.unpack_var_int_from_io(buf)
-          tx_count.times do
-            transactions << Tapyrus::Tx.parse_from_payload(buf)
-          end
+          tx_count.times { transactions << Tapyrus::Tx.parse_from_payload(buf) }
         end
         new(header, transactions)
       end
 
       def to_payload
-        header.to_payload << Tapyrus.pack_var_int(transactions.size) <<
-          transactions.map(&:to_payload).join
+        header.to_payload << Tapyrus.pack_var_int(transactions.size) << transactions.map(&:to_payload).join
       end
 
       # generate Tapyrus::Block object.
       def to_block
         Tapyrus::Block.new(header, transactions)
       end
-
     end
-
   end
 end

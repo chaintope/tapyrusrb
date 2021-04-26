@@ -1,11 +1,10 @@
 module Tapyrus
-
   # utility for multisig
   module Multisig
     include Tapyrus::Opcodes
 
     def self.prefix
-      [OP_0].pack("C*")
+      [OP_0].pack('C*')
     end
 
     # generate input script sig spending a multisig output script.
@@ -23,7 +22,7 @@ module Tapyrus
     # multiple parties. Signatures must be in the same order as the
     # pubkeys in the output script being redeemed.
     def self.add_sig_to_multisig_script_sig(sig_to_add, script_sig, hash_type = SIGHASH_TYPE[:all])
-      signature = sig_to_add + [hash_type].pack("C*")
+      signature = sig_to_add + [hash_type].pack('C*')
       offset = script_sig.empty? ? 0 : 1
       script_sig.insert(offset, Tapyrus::Script.pack_pushdata(signature))
     end
@@ -49,14 +48,16 @@ module Tapyrus
       pubkeys = redeem_script.get_multisig_pubkeys
 
       # find the pubkey for each signature by trying to verify it
-      sigs = Hash[script.chunks[1...-1].map.with_index do |sig, idx|
-        sig = sig.pushed_data
-        pubkey = pubkeys.map do |key|
-          Tapyrus::Key.new(pubkey: key.bth).verify(sig, sig_hash) ? key : nil
-        end.compact.first
-        raise "Key for signature ##{idx} not found in redeem script!"  unless pubkey
-        [pubkey, sig]
-      end]
+      sigs =
+        Hash[
+          script.chunks[1...-1].map.with_index do |sig, idx|
+            sig = sig.pushed_data
+            pubkey =
+              pubkeys.map { |key| Tapyrus::Key.new(pubkey: key.bth).verify(sig, sig_hash) ? key : nil }.compact.first
+            raise "Key for signature ##{idx} not found in redeem script!" unless pubkey
+            [pubkey, sig]
+          end
+        ]
 
       prefix + pubkeys.map { |k| sigs[k] ? Tapyrus::Script.pack_pushdata(sigs[k]) : nil }.join +
         Tapyrus::Script.pack_pushdata(script.chunks[-1].pushed_data)

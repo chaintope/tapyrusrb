@@ -1,23 +1,22 @@
 require 'spec_helper'
 
 describe Tapyrus::SLIP39 do
-
-  let(:master_secret) {'4142434445464748494a4b4c4d4e4f50'}  # 'ABCDEFGHIJKLMNOP'.unpack("H*").first
-  let(:passphrase) {'TREZOR'}
+  let(:master_secret) { '4142434445464748494a4b4c4d4e4f50' } # 'ABCDEFGHIJKLMNOP'.unpack("H*").first
+  let(:passphrase) { 'TREZOR' }
 
   describe 'Test Vector' do
     vectors = fixture_file('slip39/vectors.json')
     vectors.each do |v|
       it "#{v[0]}" do
         if v[2].empty?
-          expect{
-            shares = v[1].map{|words|Tapyrus::SLIP39::Share.from_words(words.split(' '))}
+          expect {
+            shares = v[1].map { |words| Tapyrus::SLIP39::Share.from_words(words.split(' ')) }
             Tapyrus::SLIP39::SSS.recover_secret(shares, passphrase: 'TREZOR')
           }.to raise_error(ArgumentError)
         else
-          shares = v[1].map{|words|Tapyrus::SLIP39::Share.from_words(words.split(' '))}
+          shares = v[1].map { |words| Tapyrus::SLIP39::Share.from_words(words.split(' ')) }
           expect(Tapyrus::SLIP39::SSS.recover_secret(shares, passphrase: 'TREZOR')).to eq(v[2])
-          words = shares.map{|s|s.to_words.join(' ')}
+          words = shares.map { |s| s.to_words.join(' ') }
           expect(words).to eq(v[1])
         end
       end
@@ -38,7 +37,13 @@ describe Tapyrus::SLIP39 do
 
   describe 'test_passphrase' do
     it 'cannot be restored without a passphrase.' do
-      shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret, passphrase: passphrase).first
+      shares =
+        Tapyrus::SLIP39::SSS.setup_shares(
+          group_threshold: 1,
+          groups: [[3, 5]],
+          secret: master_secret,
+          passphrase: passphrase
+        ).first
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[1..3], passphrase: passphrase)).to eq(master_secret)
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[1..3])).not_to eq(master_secret)
     end
@@ -46,11 +51,25 @@ describe Tapyrus::SLIP39 do
 
   describe 'test_iteration_exponent' do
     it 'should generate with iteration exponent.' do
-      shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret, passphrase: passphrase, exp: 1).first
+      shares =
+        Tapyrus::SLIP39::SSS.setup_shares(
+          group_threshold: 1,
+          groups: [[3, 5]],
+          secret: master_secret,
+          passphrase: passphrase,
+          exp: 1
+        ).first
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[2..4], passphrase: passphrase)).to eq(master_secret)
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[2..4])).not_to eq(master_secret)
 
-      shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret, passphrase: passphrase, exp: 2).first
+      shares =
+        Tapyrus::SLIP39::SSS.setup_shares(
+          group_threshold: 1,
+          groups: [[3, 5]],
+          secret: master_secret,
+          passphrase: passphrase,
+          exp: 2
+        ).first
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[2..4], passphrase: passphrase)).to eq(master_secret)
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares[2..4])).not_to eq(master_secret)
     end
@@ -60,12 +79,15 @@ describe Tapyrus::SLIP39 do
     it 'should generate group shares.' do
       group_threshold = 2
       groups = [[3, 5], [2, 3], [2, 5], [1, 1]]
-      group_shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: group_threshold, groups: groups, secret: master_secret)
+      group_shares =
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: group_threshold, groups: groups, secret: master_secret)
 
       # Test all valid combinations of mnemonics.
-      group_shares.combination(group_threshold).each do |multi_groups_shares|
-        expect(Tapyrus::SLIP39::SSS.recover_secret(multi_groups_shares.flatten)).to eq(master_secret)
-      end
+      group_shares
+        .combination(group_threshold)
+        .each do |multi_groups_shares|
+          expect(Tapyrus::SLIP39::SSS.recover_secret(multi_groups_shares.flatten)).to eq(master_secret)
+        end
 
       # Minimal sets of mnemonics.
       expect(Tapyrus::SLIP39::SSS.recover_secret([group_shares[2][0], group_shares[2][2], group_shares[3][0]]))
@@ -73,11 +95,17 @@ describe Tapyrus::SLIP39 do
 
       # One complete group and one incomplete group out of two groups required.
       shares = group_shares[0][2..-1] + [group_shares[1][0]]
-      expect{Tapyrus::SLIP39::SSS.recover_secret(shares)}.to raise_error(ArgumentError, 'Wrong number of mnemonics. Threshold is 2, but share count is 1')
+      expect { Tapyrus::SLIP39::SSS.recover_secret(shares) }.to raise_error(
+        ArgumentError,
+        'Wrong number of mnemonics. Threshold is 2, but share count is 1'
+      )
 
       # One group of two required.
       shares = group_shares[0][1...4]
-      expect{Tapyrus::SLIP39::SSS.recover_secret(shares)}.to raise_error(ArgumentError, 'Wrong number of mnemonics. Group threshold is 2, but share count is 1')
+      expect { Tapyrus::SLIP39::SSS.recover_secret(shares) }.to raise_error(
+        ArgumentError,
+        'Wrong number of mnemonics. Group threshold is 2, but share count is 1'
+      )
     end
   end
 
@@ -87,9 +115,9 @@ describe Tapyrus::SLIP39 do
       group_shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: groups, secret: master_secret)
       group_shares.each.with_index do |group, index|
         member_threshold = groups[index][0]
-        group.combination(member_threshold).each do |shares|
-          expect(Tapyrus::SLIP39::SSS.recover_secret(shares)).to eq(master_secret)
-        end
+        group
+          .combination(member_threshold)
+          .each { |shares| expect(Tapyrus::SLIP39::SSS.recover_secret(shares)).to eq(master_secret) }
       end
     end
   end
@@ -98,7 +126,8 @@ describe Tapyrus::SLIP39 do
     it 'should generate all shares.' do
       groups = [[3, 5], [1, 1], [2, 3], [2, 5], [3, 5]]
       [1, 2, 5].each do |threshold|
-        group_shares = Tapyrus::SLIP39::SSS.setup_shares(group_threshold: threshold, groups: groups, secret: master_secret)
+        group_shares =
+          Tapyrus::SLIP39::SSS.setup_shares(group_threshold: threshold, groups: groups, secret: master_secret)
         expect(group_shares.length).to eq(5)
         expect(group_shares.flatten.length).to eq(19)
       end
@@ -108,20 +137,39 @@ describe Tapyrus::SLIP39 do
   describe 'test_invalid_sharing' do
     it 'should raise error.' do
       # short secret
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret[0..14])}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret[0..14])
+      }.to raise_error(ArgumentError)
+
       # odd length secret
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret + '1')}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 1, groups: [[3, 5]], secret: master_secret + '1')
+      }.to raise_error(ArgumentError)
+
       # group threshold exceeds number of groups
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 3, groups: [[3, 5], [2, 5]], secret: master_secret)}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 3, groups: [[3, 5], [2, 5]], secret: master_secret)
+      }.to raise_error(ArgumentError)
+
       # invalid group threshold
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 0, groups: [[3, 5], [2, 5]], secret: master_secret)}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 0, groups: [[3, 5], [2, 5]], secret: master_secret)
+      }.to raise_error(ArgumentError)
+
       # member threshold exceeds number of members
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[3, 2], [2, 5]], secret: master_secret)}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[3, 2], [2, 5]], secret: master_secret)
+      }.to raise_error(ArgumentError)
+
       # invalid member threshold
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[0, 2], [2, 5]], secret: master_secret)}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[0, 2], [2, 5]], secret: master_secret)
+      }.to raise_error(ArgumentError)
+
       # group with multiple members and threshold 1
-      expect{Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[3, 5], [1, 3], [2, 5]], secret: master_secret)}.to raise_error(ArgumentError)
+      expect {
+        Tapyrus::SLIP39::SSS.setup_shares(group_threshold: 2, groups: [[3, 5], [1, 3], [2, 5]], secret: master_secret)
+      }.to raise_error(ArgumentError)
     end
   end
-
 end

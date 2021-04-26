@@ -2,7 +2,6 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # Transaction class
   class Tx
     include Tapyrus::HexConverter
@@ -10,7 +9,7 @@ module Tapyrus
     MAX_STANDARD_VERSION = 2
 
     # The maximum weight for transactions we're willing to relay/mine
-    MAX_STANDARD_TX_WEIGHT = 400000
+    MAX_STANDARD_TX_WEIGHT = 400_000
 
     attr_accessor :features
     attr_reader :inputs
@@ -34,14 +33,10 @@ module Tapyrus
 
       in_count = Tapyrus.unpack_var_int_from_io(buf)
 
-      in_count.times do
-        tx.inputs << TxIn.parse_from_payload(buf)
-      end
+      in_count.times { tx.inputs << TxIn.parse_from_payload(buf) }
 
       out_count = Tapyrus.unpack_var_int_from_io(buf)
-      out_count.times do
-        tx.outputs << TxOut.parse_from_payload(buf)
-      end
+      out_count.times { tx.outputs << TxOut.parse_from_payload(buf) }
 
       tx.lock_time = buf.read(4).unpack('V').first
 
@@ -58,7 +53,7 @@ module Tapyrus
 
     def txid
       buf = [features].pack('V')
-      buf << Tapyrus.pack_var_int(inputs.length) << inputs.map{|i|i.to_payload(use_malfix: true)}.join
+      buf << Tapyrus.pack_var_int(inputs.length) << inputs.map { |i| i.to_payload(use_malfix: true) }.join
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
       buf << [lock_time].pack('V')
       Tapyrus.double_sha256(buf).reverse.bth
@@ -95,6 +90,7 @@ module Tapyrus
       outputs.each do |o|
         return false unless o.script_pubkey.standard?
         data_count += 1 if o.script_pubkey.op_return?
+
         # TODO add non P2SH multisig relay(permitbaremultisig)
         return false if o.dust?
       end
@@ -114,8 +110,14 @@ module Tapyrus
     # @param [Integer] amount tapyrus amount locked in input. required for witness input only.
     # @param [Integer] skip_separator_index If output_script is P2WSH and output_script contains any OP_CODESEPARATOR,
     # the script code needs  is the witnessScript but removing everything up to and including the last executed OP_CODESEPARATOR before the signature checking opcode being executed.
-    def sighash_for_input(input_index, output_script, hash_type: SIGHASH_TYPE[:all],
-                          sig_version: :base, amount: nil, skip_separator_index: 0)
+    def sighash_for_input(
+      input_index,
+      output_script,
+      hash_type: SIGHASH_TYPE[:all],
+      sig_version: :base,
+      amount: nil,
+      skip_separator_index: 0
+    )
       raise ArgumentError, 'input_index must be specified.' unless input_index
       raise ArgumentError, 'does not exist input corresponding to input_index.' if input_index >= inputs.size
       raise ArgumentError, 'script_pubkey must be specified.' unless output_script
@@ -129,16 +131,19 @@ module Tapyrus
     # @param [Integer] amount the amount of tapyrus, require for witness program only.
     # @param [Array] flags the flags used when execute script interpreter.
     def verify_input_sig(input_index, script_pubkey, amount: nil, flags: STANDARD_SCRIPT_VERIFY_FLAGS)
-      if script_pubkey.p2sh?
-        flags << SCRIPT_VERIFY_P2SH
-      end
+      flags << SCRIPT_VERIFY_P2SH if script_pubkey.p2sh?
       verify_input_sig_for_legacy(input_index, script_pubkey, flags)
     end
 
     def to_h
       {
-          txid: txid, hash: tx_hash, features: features, size: size, locktime: lock_time,
-          vin: inputs.map(&:to_h), vout: outputs.map.with_index{|tx_out, index| tx_out.to_h.merge({n: index})}
+        txid: txid,
+        hash: tx_hash,
+        features: features,
+        size: size,
+        locktime: lock_time,
+        vin: inputs.map(&:to_h),
+        vout: outputs.map.with_index { |tx_out, index| tx_out.to_h.merge({ n: index }) }
       }
     end
 
@@ -154,42 +159,47 @@ module Tapyrus
 
     # generate sighash with legacy format
     def sighash_for_legacy(index, script_code, hash_type)
-      ins = inputs.map.with_index do |i, idx|
-        if idx == index
-          i.to_payload(script_code.delete_opcode(Tapyrus::Opcodes::OP_CODESEPARATOR))
-        else
-          case hash_type & 0x1f
+      ins =
+        inputs.map.with_index do |i, idx|
+          if idx == index
+            i.to_payload(script_code.delete_opcode(Tapyrus::Opcodes::OP_CODESEPARATOR))
+          else
+            case hash_type & 0x1f
             when SIGHASH_TYPE[:none], SIGHASH_TYPE[:single]
               i.to_payload(Tapyrus::Script.new, 0)
             else
               i.to_payload(Tapyrus::Script.new)
+            end
           end
         end
-      end
 
       outs = outputs.map(&:to_payload)
       out_size = Tapyrus.pack_var_int(outputs.size)
 
       case hash_type & 0x1f
-        when SIGHASH_TYPE[:none]
-          outs = ''
-          out_size = Tapyrus.pack_var_int(0)
-        when SIGHASH_TYPE[:single]
-          return "\x01".ljust(32, "\x00") if index >= outputs.size
-          outs = outputs[0...(index + 1)].map.with_index { |o, idx| (idx == index) ? o.to_payload : o.to_empty_payload }.join
-          out_size = Tapyrus.pack_var_int(index + 1)
+      when SIGHASH_TYPE[:none]
+        outs = ''
+        out_size = Tapyrus.pack_var_int(0)
+      when SIGHASH_TYPE[:single]
+        return "\x01".ljust(32, "\x00") if index >= outputs.size
+        outs =
+          outputs[0...(index + 1)].map.with_index { |o, idx| (idx == index) ? o.to_payload : o.to_empty_payload }.join
+        out_size = Tapyrus.pack_var_int(index + 1)
       end
 
-      if hash_type & SIGHASH_TYPE[:anyonecanpay] != 0
-        ins = [ins[index]]
-      end
+      ins = [ins[index]] if hash_type & SIGHASH_TYPE[:anyonecanpay] != 0
 
-      buf = [[features].pack('V'), Tapyrus.pack_var_int(ins.size),
-          ins, out_size, outs, [lock_time, hash_type].pack('VV')].join
+      buf = [
+        [features].pack('V'),
+        Tapyrus.pack_var_int(ins.size),
+        ins,
+        out_size,
+        outs,
+        [lock_time, hash_type].pack('VV')
+      ].join
 
       Tapyrus.double_sha256(buf)
     end
-
 
     # verify input signature for legacy tx.
     def verify_input_sig_for_legacy(input_index, script_pubkey, flags)
@@ -199,7 +209,5 @@ module Tapyrus
 
       interpreter.verify_script(script_sig, script_pubkey)
     end
-
   end
-
 end

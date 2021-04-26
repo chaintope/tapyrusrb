@@ -5,18 +5,16 @@ describe Tapyrus::Network::Pool do
   let(:pool) { Tapyrus::Network::Pool.new(node_mock, chain, configuration) }
   let(:node_mock) { double('node mock') }
   let(:configuration) { Tapyrus::Node::Configuration.new }
-  let(:peer1) { Tapyrus::Network::Peer.new('192.168.0.1', 18333, pool, configuration) }
-  let(:peer2) { Tapyrus::Network::Peer.new('192.168.0.2', 18333, pool, configuration) }
-  let(:peer3) { Tapyrus::Network::Peer.new('192.168.0.3', 18333, pool, configuration) }
+  let(:peer1) { Tapyrus::Network::Peer.new('192.168.0.1', 18_333, pool, configuration) }
+  let(:peer2) { Tapyrus::Network::Peer.new('192.168.0.2', 18_333, pool, configuration) }
+  let(:peer3) { Tapyrus::Network::Peer.new('192.168.0.3', 18_333, pool, configuration) }
 
   before do
     threads = []
     allow(node_mock).to receive(:wallet).and_return(nil)
     [peer1, peer2, peer3].each do |peer|
       allow(peer).to receive(:start_block_header_download) { sleep(1) }
-      threads << Thread.start(peer) do |p|
-        pool.handle_new_peer(peer)
-      end
+      threads << Thread.start(peer) { |p| pool.handle_new_peer(peer) }
     end
     threads.each(&:join)
   end
@@ -34,15 +32,16 @@ describe Tapyrus::Network::Pool do
     end
 
     context 'when allocate again after disconnect' do
-      subject {
+      subject do
         pool.started = true
         allow(pool).to receive(:connect).and_return(nil)
+
         # delete second peer and register again.
         peer = pool.peers[1]
         pool.handle_close_peer(peer)
         pool.handle_new_peer(peer)
         pool
-      }
+      end
       it 'should allocate peer id' do
         expect(subject.peers.size).to eq(3)
         expect(subject.peers[0].id).to eq(0)

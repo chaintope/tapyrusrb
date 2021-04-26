@@ -1,10 +1,7 @@
 module Tapyrus
-
   module Network
-
     # Basic Bitcoin P2P connection class
     class Connection < EM::Connection
-
       include MessageHandler
 
       attr_reader :peer, :logger

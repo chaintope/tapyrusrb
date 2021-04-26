@@ -1,6 +1,5 @@
 module Tapyrus
   module SLIP39
-
     WORDS = File.readlines("#{__dir__}/slip39/wordlist/english.txt").map(&:strip)
 
     module_function
@@ -15,37 +14,53 @@ module Tapyrus
 
     # The length of the radix in bits.
     RADIX_BITS = 10
+
     # The number of words in the wordlist.
-    RADIX = 2 ** RADIX_BITS
+    RADIX = 2**RADIX_BITS
+
     # The length of the random identifier in bits.
     ID_LENGTH_BITS = 15
+
     # The length of the iteration exponent in bits.
     ITERATION_EXP_LENGTH_BITS = 5
+
     # The length of the random identifier and iteration exponent in words.
     ID_EXP_LENGTH_WORDS = bits_to_words(ID_LENGTH_BITS + ITERATION_EXP_LENGTH_BITS)
+
     # The maximum number of shares that can be created.
     MAX_SHARE_COUNT = 16
+
     # The length of the RS1024 checksum in words.
     CHECKSUM_LENGTH_WORDS = 3
+
     # The length of the digest of the shared secret in bytes.
     DIGEST_LENGTH_BYTES = 4
+
     # The customization string used in the RS1024 checksum and in the PBKDF2 salt.
     CUSTOMIZATION_STRING = 'shamir'.bytes
+
     # The length of the mnemonic in words without the share value.
     METADATA_LENGTH_WORDS = ID_EXP_LENGTH_WORDS + 2 + CHECKSUM_LENGTH_WORDS
+
     # The minimum allowed entropy of the master secret.
     MIN_STRENGTH_BITS = 128
+
     # The minimum allowed length of the mnemonic in words.
     MIN_MNEMONIC_LENGTH_WORDS = METADATA_LENGTH_WORDS + bits_to_words(MIN_STRENGTH_BITS)
+
     # The minimum number of iterations to use in PBKDF2.
-    BASE_ITERATION_COUNT = 10000
+    BASE_ITERATION_COUNT = 10_000
+
     # The number of rounds to use in the Feistel cipher.
     ROUND_COUNT = 4
+
     # The index of the share containing the shared secret.
     SECRET_INDEX = 255
+
     # The index of the share containing the digest of the shared secret.
     DIGEST_INDEX = 254
 
+    # prettier-ignore
     EXP_TABLE = [
         1, 3, 5, 15, 17, 51, 85, 255, 26, 46, 114, 150, 161, 248, 19,
         53, 95, 225, 56, 72, 216, 115, 149, 164, 247, 2, 6, 10, 30, 34,
@@ -66,6 +81,7 @@ module Tapyrus
         57, 75, 221, 124, 132, 151, 162, 253, 28, 36, 108, 180, 199, 82, 246
     ]
 
+    # prettier-ignore
     LOG_TABLE = [
         0, 0, 25, 1, 50, 2, 26, 198, 75, 199, 27, 104, 51, 238, 223, 3,
         100, 4, 224, 14, 52, 141, 129, 239, 76, 113, 8, 200, 248, 105, 28,
@@ -88,6 +104,5 @@ module Tapyrus
 
     autoload :SSS, 'tapyrus/slip39/sss'
     autoload :Share, 'tapyrus/slip39/share'
-
   end
 end

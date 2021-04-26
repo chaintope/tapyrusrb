@@ -1,14 +1,15 @@
 require 'spec_helper'
 
 describe Tapyrus::Secp256k1::Ruby do
-
   describe '#generate_key_pair' do
     context 'compressed' do
       subject { Tapyrus::Secp256k1::Ruby.generate_key_pair }
       it 'should be generate' do
         expect(subject.length).to eq(2)
+
         # privkey
         expect(subject[0].htb.bytesize).to eq(32)
+
         # pubkey
         expect(subject[1].htb.bytesize).to eq(33)
         expect(['02', '03'].include?(subject[1].htb[0].bth)).to be true
@@ -19,8 +20,10 @@ describe Tapyrus::Secp256k1::Ruby do
       subject { Tapyrus::Secp256k1::Ruby.generate_key_pair(compressed: false) }
       it 'should be generate' do
         expect(subject.length).to eq(2)
+
         # privkey
         expect(subject[0].htb.bytesize).to eq(32)
+
         # pubkey
         expect(subject[1].htb.bytesize).to eq(65)
         expect(subject[1].htb[0].bth).to eq('04')
@@ -63,7 +66,8 @@ describe Tapyrus::Secp256k1::Ruby do
       # generate signature compatible with RFC 6979
       priv_key = 'bbc27228ddcb9209d7fd6f36b02f7dfa6252af40bb2f1cbc7a557da8027ff866'
       message = '63cec688ee06a91e913875356dd4dea2f8e0f2a2659885372da2a37e32c7532e'.htb
-      signature = '30450221008b9d1dc26ba6a9cb62127b02742fa9d754cd3bebf337f7a55d114c8e5cdd30be022040529b194ba3f9281a99f2b1c0a19c0489bc22ede944ccf4ecbab4cc618ef3ed'
+      signature =
+        '30450221008b9d1dc26ba6a9cb62127b02742fa9d754cd3bebf337f7a55d114c8e5cdd30be022040529b194ba3f9281a99f2b1c0a19c0489bc22ede944ccf4ecbab4cc618ef3ed'
       expect(Tapyrus::Secp256k1::Ruby.sign_data(message, priv_key, nil).bth).to eq(signature)
 
       priv_key = Tapyrus::Key.generate.priv_key
@@ -72,5 +76,4 @@ describe Tapyrus::Secp256k1::Ruby do
       expect(ruby_sig.bth).to eq(secp256k1_sig.bth)
     end
   end
-
 end

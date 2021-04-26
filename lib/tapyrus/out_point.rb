@@ -1,10 +1,8 @@
 module Tapyrus
-
   # outpoint class
   class OutPoint
-
     COINBASE_HASH = '0000000000000000000000000000000000000000000000000000000000000000'
-    COINBASE_INDEX = 4294967295
+    COINBASE_INDEX = 4_294_967_295
 
     attr_reader :tx_hash
     attr_reader :index
@@ -42,7 +40,5 @@ module Tapyrus
     def txid
       tx_hash.rhex
     end
-
   end
-
 end

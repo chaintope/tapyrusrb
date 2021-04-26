@@ -1,6 +1,5 @@
 module Tapyrus
   module Message
-
     # block message
     # https://bitcoin.org/en/developer-reference#getblocks
     class GetBlocks < Base
@@ -22,8 +21,6 @@ module Tapyrus
         @hashes = hashes
         @stop_hash = stop_hash
       end
-
     end
-
   end
 end

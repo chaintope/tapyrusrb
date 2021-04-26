@@ -3,7 +3,6 @@ require 'iniparse'
 module Tapyrus
   module Node
     class Configuration
-
       attr_reader :conf
 
       def initialize(opts = {})
@@ -14,7 +13,7 @@ module Tapyrus
 
         begin
           ini_file = IniParse.parse(File.read("#{Tapyrus.base_dir}/tapyrusrb.conf"))
-          @conf = Hash[ ini_file.to_h['__anonymous__'].map{|k,v| [k.to_sym, v] } ]
+          @conf = Hash[ini_file.to_h['__anonymous__'].map { |k, v| [k.to_sym, v] }]
         rescue => e
           @conf = {}
         end
@@ -32,7 +31,6 @@ module Tapyrus
       def server_url
         "http://#{host}:#{port}"
       end
-
     end
   end
 end

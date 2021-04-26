@@ -1,4 +1,5 @@
---- !ruby/object:Tapyrus::ChainParams
+---
+!ruby/object:Tapyrus::ChainParams
 network: "prod"
 magic_head: "f9beb4d9"
 message_magic: "Tapyrus Signed Message:\n"

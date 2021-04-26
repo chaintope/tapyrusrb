@@ -3,7 +3,6 @@ require 'json/pure'
 
 module Tapyrus
   module RPC
-
     # Throw when happened anything http's error with connect to server.
     #
     # Almost case this exception happened from 401 Unauthorized or 500 Internal Server Error.
@@ -20,12 +19,12 @@ module Tapyrus
       attr_reader :message
 
       def initialize(response)
-        raise ArgumentError, "Must set response as cause." unless response
+        raise ArgumentError, 'Must set response as cause.' unless response
 
         # set message from response body or status code.
-        @message = {:response_code => response&.code, :response_msg => response&.msg}
+        @message = { response_code: response&.code, response_msg: response&.msg }
         begin
-          @message.merge!({:rpc_error => Tapyrus::RPC::response_body2json(response.body)['error']})
+          @message.merge!({ rpc_error: Tapyrus::RPC.response_body2json(response.body)['error'] })
         rescue JSON::ParserError => _
           # if RPC server don't send error message.
         end
@@ -48,25 +47,21 @@ module Tapyrus
     # client.getblockchaininfo
     #
     class TapyrusCoreClient
-
       attr_reader :config
 
       # @param [Hash] config a configuration required to connect to Bitcoin Core.
       def initialize(config)
         @config = config
 
-        commands = request(:help).split("\n").inject([]) do |memo_ary, line|
-          if !line.empty? && !line.start_with?('==')
-            memo_ary << line.split(' ').first.to_sym
-          end
-          memo_ary
-        end
-        TapyrusCoreClient.class_eval do
-          commands.each do |command|
-            define_method(command) do |*params|
-              request(command, *params)
+        commands =
+          request(:help)
+            .split("\n")
+            .inject([]) do |memo_ary, line|
+              memo_ary << line.split(' ').first.to_sym if !line.empty? && !line.start_with?('==')
+              memo_ary
             end
-          end
+        TapyrusCoreClient.class_eval do
+          commands.each { |command| define_method(command) { |*params| request(command, *params) } }
         end
       end
 
@@ -74,35 +69,32 @@ module Tapyrus
 
       def server_url
         url = "#{config[:schema]}://#{config[:user]}:#{config[:password]}@#{config[:host]}:#{config[:port]}"
-        if !config[:wallet].nil? && !config[:wallet].empty?
-          url += "/wallet/#{config[:wallet]}"
-        end
+        url += "/wallet/#{config[:wallet]}" if !config[:wallet].nil? && !config[:wallet].empty?
         url
       end
 
       def request(command, *params)
-        data = {
-            :method => command,
-            :params => params,
-            :id => 'jsonrpc'
-        }
+        data = { method: command, params: params, id: 'jsonrpc' }
         uri = URI.parse(server_url)
         http = Net::HTTP.new(uri.hostname, uri.port)
-        http.use_ssl = uri.scheme === "https"
+        http.use_ssl = uri.scheme === 'https'
         request = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.path)
         request.basic_auth(uri.user, uri.password)
         request.content_type = 'application/json'
         request.body = data.to_json
         response = http.request(request)
         raise Error.new(response) unless response.is_a? Net::HTTPOK
-        response = Tapyrus::RPC::response_body2json(response.body)
+        response = Tapyrus::RPC.response_body2json(response.body)
         response['result']
       end
-
     end
 
     def response_body2json(body)
-      Tapyrus::Ext::JsonParser.new(body.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8') }).parse
+      Tapyrus::Ext::JsonParser.new(
+        body.gsub(/\\u([\da-fA-F]{4})/) do
+          [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8')
+        end
+      ).parse
     end
 
     module_function :response_body2json

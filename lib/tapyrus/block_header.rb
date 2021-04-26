@@ -1,18 +1,17 @@
 module Tapyrus
-
   # Block Header
   class BlockHeader
     include Tapyrus::HexConverter
     extend Tapyrus::Util
     include Tapyrus::Util
 
-    X_FILED_TYPES = {none: 0, aggregate_pubkey: 1}
+    X_FILED_TYPES = { none: 0, aggregate_pubkey: 1 }
 
     attr_accessor :features
     attr_accessor :prev_hash
     attr_accessor :merkle_root
     attr_accessor :im_merkle_root # merkel root of immulable merkle tree which consist of immutable txid.
-    attr_accessor :time           # unix timestamp
+    attr_accessor :time # unix timestamp
     attr_accessor :x_field_type
     attr_accessor :x_field
     attr_accessor :proof
@@ -33,7 +32,16 @@ module Tapyrus
       features, prev_hash, merkle_root, im_merkle_root, time, x_filed_type = buf.read(105).unpack('Va32a32a32Vc')
       x_field = buf.read(unpack_var_int_from_io(buf)) unless x_filed_type == X_FILED_TYPES[:none]
       proof = buf.read(unpack_var_int_from_io(buf))
-      new(features, prev_hash.bth, merkle_root.bth, im_merkle_root.bth, time, x_filed_type, x_field ? x_field.bth : x_field, proof.bth)
+      new(
+        features,
+        prev_hash.bth,
+        merkle_root.bth,
+        im_merkle_root.bth,
+        time,
+        x_filed_type,
+        x_field ? x_field.bth : x_field,
+        proof.bth
+      )
     end
 
     def to_payload(skip_proof = false)
@@ -87,9 +95,9 @@ module Tapyrus
     # @return [Boolean] if valid return true, otherwise false
     def valid_x_field?
       case x_field_type
-      when X_FILED_TYPES[:none] then
+      when X_FILED_TYPES[:none]
         x_field.nil?
-      when X_FILED_TYPES[:aggregate_pubkey] then
+      when X_FILED_TYPES[:aggregate_pubkey]
         Tapyrus::Key.new(pubkey: x_field).fully_valid_pubkey?
       else
         false
@@ -111,7 +119,5 @@ module Tapyrus
     def size
       to_payload.bytesize
     end
-
   end
-
 end

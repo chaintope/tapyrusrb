@@ -2,10 +2,8 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # tapyrus key class
   class Key
-
     PUBLIC_KEY_SIZE = 65
     COMPRESSED_PUBLIC_KEY_SIZE = 33
     SIGNATURE_SIZE = 72
@@ -18,9 +16,10 @@ module Tapyrus
     attr_accessor :key_type
     attr_reader :secp256k1_module
 
-    TYPES = {uncompressed: 0x00, compressed: 0x01, p2pkh: 0x10, p2wpkh: 0x11, p2wpkh_p2sh: 0x12}
+    TYPES = { uncompressed: 0x00, compressed: 0x01, p2pkh: 0x10, p2wpkh: 0x11, p2wpkh_p2sh: 0x12 }
 
     MIN_PRIV_KEY_MOD_ORDER = 0x01
+
     # Order of secp256k1's generator minus 1.
     MAX_PRIV_KEY_MOD_ORDER = ECDSA::Group::Secp256k1.order - 1
 
@@ -31,18 +30,18 @@ module Tapyrus
     # @param [Boolean] compressed [Deprecated] whether public key is compressed.
     # @return [Tapyrus::Key] a key object.
     def initialize(priv_key: nil, pubkey: nil, key_type: nil, compressed: true, allow_hybrid: false)
-      puts "[Warning] Use key_type parameter instead of compressed. compressed parameter removed in the future." if key_type.nil? && !compressed.nil? && pubkey.nil?
+      if key_type.nil? && !compressed.nil? && pubkey.nil?
+        puts '[Warning] Use key_type parameter instead of compressed. compressed parameter removed in the future.'
+      end
       if key_type
         @key_type = key_type
         compressed = @key_type != TYPES[:uncompressed]
       else
         @key_type = compressed ? TYPES[:compressed] : TYPES[:uncompressed]
       end
-      @secp256k1_module =  Tapyrus.secp_impl
+      @secp256k1_module = Tapyrus.secp_impl
       @priv_key = priv_key
-      if @priv_key
-        raise ArgumentError, Errors::Messages::INVALID_PRIV_KEY unless validate_private_key_range(@priv_key)
-      end
+      raise ArgumentError, Errors::Messages::INVALID_PRIV_KEY unless validate_private_key_range(@priv_key) if @priv_key
       if pubkey
         @pubkey = pubkey
       else
@@ -66,7 +65,9 @@ module Tapyrus
       data = hex[2...-8].htb
       checksum = hex[-8..-1]
       raise ArgumentError, 'invalid version' unless version == Tapyrus.chain_params.privkey_version
-      raise ArgumentError, Errors::Messages::INVALID_CHECKSUM unless Tapyrus.calc_checksum(version + data.bth) == checksum
+      unless Tapyrus.calc_checksum(version + data.bth) == checksum
+        raise ArgumentError, Errors::Messages::INVALID_CHECKSUM
+      end
       key_len = data.bytesize
       if key_len == COMPRESSED_PUBLIC_KEY_SIZE && data[-1].unpack('C').first == 1
         key_type = TYPES[:compressed]
@@ -95,7 +96,7 @@ module Tapyrus
     # @param [Symbol] algo Algorithms used for verification. Either :ecdsa or :schnorr is supported. default value is :ecdsa.
     # @return [String] signature data with binary format
     def sign(data, low_r = true, extra_entropy = nil, algo: :ecdsa)
-      raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
+      raise ArgumentError, 'Unsupported algorithm has been specified.' unless SIG_ALGO.include?(algo)
       case algo
       when :ecdsa
         sign_ecdsa(data, low_r, extra_entropy)
@@ -114,7 +115,7 @@ module Tapyrus
     def verify(sig, origin, algo: :ecdsa)
       return false unless valid_pubkey?
       begin
-        raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
+        raise ArgumentError, 'Unsupported algorithm has been specified.' unless SIG_ALGO.include?(algo)
         sig = ecdsa_signature_parse_der_lax(sig) if algo == :ecdsa
         secp256k1_module.verify_sig(origin, sig, pubkey, algo: algo)
       rescue Exception
@@ -150,12 +151,12 @@ module Tapyrus
       p = pubkey.htb
       return false if p.bytesize < COMPRESSED_PUBLIC_KEY_SIZE
       case p[0]
-        when "\x04"
-          return false unless p.bytesize == PUBLIC_KEY_SIZE
-        when "\x02", "\x03"
-          return false unless p.bytesize == COMPRESSED_PUBLIC_KEY_SIZE
-        else
-          return false
+      when "\x04"
+        return false unless p.bytesize == PUBLIC_KEY_SIZE
+      when "\x02", "\x03"
+        return false unless p.bytesize == COMPRESSED_PUBLIC_KEY_SIZE
+      else
+        return false
       end
       true
     end
@@ -172,15 +173,16 @@ module Tapyrus
       len_r = s[3]
       len_s = s[5 + len_r]
       val_s = s.slice(6 + len_r, len_s)
-      max_mod_half_order = [
-          0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-          0x5d,0x57,0x6e,0x73,0x57,0xa4,0x50,0x1d,
-          0xdf,0xe9,0x2f,0x46,0x68,0x1b,0x20,0xa0]
-      compare_big_endian(val_s, [0]) > 0 &&
-          compare_big_endian(val_s, max_mod_half_order) <= 0
-    end
 
+      # prettier-ignore
+      max_mod_half_order = [
+          0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+          0x5d, 0x57, 0x6e, 0x73, 0x57, 0xa4, 0x50, 0x1d,
+          0xdf, 0xe9, 0x2f, 0x46, 0x68, 0x1b, 0x20, 0xa0
+      ]
+      compare_big_endian(val_s, [0]) > 0 && compare_big_endian(val_s, max_mod_half_order) <= 0
+    end
 
     # check +sig+ is correct der encoding.
     # This function is consensus-critical since BIP66.
@@ -233,15 +235,11 @@ module Tapyrus
     def self.compare_big_endian(c1, c2)
       c1, c2 = c1.dup, c2.dup # Clone the arrays
 
-      while c1.size > c2.size
-        return 1 if c1.shift > 0
-      end
+      return 1 if c1.shift > 0 while c1.size > c2.size
 
-      while c2.size > c1.size
-        return -1 if c2.shift > 0
-      end
+      return -1 if c2.shift > 0 while c2.size > c1.size
 
-      c1.size.times{|idx| return c1[idx] - c2[idx] if c1[idx] != c2[idx] }
+      c1.size.times { |idx| return c1[idx] - c2[idx] if c1[idx] != c2[idx] }
       0
     end
 
@@ -267,7 +265,7 @@ module Tapyrus
     def ecdsa_signature_parse_der_lax(sig)
       sig_array = sig.unpack('C*')
       len_r = sig_array[3]
-      r = sig_array[4...(len_r+4)].pack('C*').bth
+      r = sig_array[4...(len_r + 4)].pack('C*').bth
       len_s = sig_array[len_r + 5]
       s = sig_array[(len_r + 6)...(len_r + 6 + len_s)].pack('C*').bth
       ECDSA::Signature.new(r.to_i(16), s.to_i(16)).to_der
@@ -291,13 +289,11 @@ module Tapyrus
         counter = 1
         until sig_has_low_r?(sig)
           extra_entropy = [counter].pack('I*').bth.ljust(64, '0').htb
-          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy,  algo: :ecdsa)
+          sig = secp256k1_module.sign_data(data, priv_key, extra_entropy, algo: :ecdsa)
           counter += 1
         end
       end
       sig
     end
-
   end
-
 end

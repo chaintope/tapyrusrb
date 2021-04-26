@@ -2,10 +2,8 @@
 require 'ipaddr'
 module Tapyrus
   module Message
-
     # https://bitcoin.org/en/developer-reference#version
     class Version < Base
-
       COMMAND = 'version'
 
       attr_accessor :version
@@ -61,9 +59,8 @@ module Tapyrus
       end
 
       def unpack_relay_field(payload)
-        ( version >= 70001 && payload ) ? unpack_boolean(payload) : [ true, nil ]
+        (version >= 70_001 && payload) ? unpack_boolean(payload) : [true, nil]
       end
-
     end
   end
 end

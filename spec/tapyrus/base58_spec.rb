@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Tapyrus::Base58 do
-
   describe 'encode/decode' do
     f = fixture_file('base58_encode_decode.json')
     f.each do |hex, encoded|
@@ -40,9 +39,8 @@ describe Tapyrus::Base58 do
     invalid_json.each do |json|
       it "should be invalid. #{json}" do
         base58_str = json[0]
-        expect{Tapyrus::Key.from_wif(base58_str)}.to raise_error(ArgumentError)
+        expect { Tapyrus::Key.from_wif(base58_str) }.to raise_error(ArgumentError)
       end
     end
   end
-
 end

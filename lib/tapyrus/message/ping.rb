@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # ping message class
     # https://bitcoin.org/en/developer-reference#ping
     class Ping < Base
-
       COMMAND = 'ping'
 
       attr_accessor :nonce
@@ -24,7 +22,6 @@ module Tapyrus
       def to_response
         Pong.new(nonce)
       end
-
     end
   end
 end

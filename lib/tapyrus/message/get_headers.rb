@@ -1,6 +1,5 @@
 module Tapyrus
   module Message
-
     # getheaders message
     # https://bitcoin.org/en/developer-reference#getheaders
     class GetHeaders < Base
@@ -22,7 +21,6 @@ module Tapyrus
         @hashes = hashes
         @stop_hash = stop_hash
       end
-
     end
   end
 end

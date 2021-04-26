@@ -1,13 +1,11 @@
 module Tapyrus
   module Wallet
-
     class DB
-
       KEY_PREFIX = {
-          account: 'a',       # key: account index, value: Account raw data.
-          master: 'm',        # value: wallet seed.
-          version: 'v',       # value: wallet version
-          key: 'k',           # key: path to the key, value: public key
+        account: 'a', # key: account index, value: Account raw data.
+        master: 'm', # value: wallet seed.
+        version: 'v', # value: wallet version
+        key: 'k' # key: path to the key, value: public key
       }
 
       attr_reader :level_db
@@ -27,7 +25,7 @@ module Tapyrus
       def accounts
         from = KEY_PREFIX[:account] + '00000000'
         to = KEY_PREFIX[:account] + 'ffffffff'
-        level_db.each(from: from, to: to).map { |k, v| v}
+        level_db.each(from: from, to: to).map { |k, v| v }
       end
 
       def save_account(account)
@@ -50,7 +48,7 @@ module Tapyrus
         id = [account.purpose, account.index].pack('I*').bth
         from = KEY_PREFIX[:key] + id + '00000000'
         to = KEY_PREFIX[:key] + id + 'ffffffff'
-        level_db.each(from: from, to: to).map { |k, v| v}
+        level_db.each(from: from, to: to).map { |k, v| v }
       end
 
       # get master_key
@@ -75,7 +73,6 @@ module Tapyrus
       def version
         level_db.get(KEY_PREFIX[:version]).to_i
       end
-
     end
   end
 end

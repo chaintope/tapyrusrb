@@ -1,20 +1,41 @@
 require 'spec_helper'
 include Tapyrus::Opcodes
-describe "Tapyrus::Script::CheckDataSig" do
-
-  let(:key) {Tapyrus::Key.new(priv_key: '0000000000000000000000000000000000000000000000000000000000000001', compressed: false)}
-  let(:key_c) {Tapyrus::Key.new(priv_key: '0000000000000000000000000000000000000000000000000000000000000001')}
+describe 'Tapyrus::Script::CheckDataSig' do
+  let(:key) do
+    Tapyrus::Key.new(priv_key: '0000000000000000000000000000000000000000000000000000000000000001', compressed: false)
+  end
+  let(:key_c) { Tapyrus::Key.new(priv_key: '0000000000000000000000000000000000000000000000000000000000000001') }
 
   describe 'checkdatasig test' do
     it 'should check data sig' do
       check(Tapyrus::Script.new, Tapyrus::Script.new << OP_CHECKDATASIG, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
-      check(Tapyrus::Script.new << '00', Tapyrus::Script.new << OP_CHECKDATASIG, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
-      check(Tapyrus::Script.new << '00' << '00', Tapyrus::Script.new << OP_CHECKDATASIG, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
-      check(Tapyrus::Script.new, Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
-      check(Tapyrus::Script.new << '00', Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
-      check(Tapyrus::Script.new << '00' << '00', Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION)
+      check(
+        Tapyrus::Script.new << '00',
+        Tapyrus::Script.new << OP_CHECKDATASIG,
+        Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION
+      )
+      check(
+        Tapyrus::Script.new << '00' << '00',
+        Tapyrus::Script.new << OP_CHECKDATASIG,
+        Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION
+      )
+      check(
+        Tapyrus::Script.new,
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION
+      )
+      check(
+        Tapyrus::Script.new << '00',
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION
+      )
+      check(
+        Tapyrus::Script.new << '00' << '00',
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_INVALID_STACK_OPERATION
+      )
 
-      message = ""
+      message = ''
       digest = Tapyrus.sha256(message)
       pubkey = key.pubkey
       pubkey_c = key_c.pubkey
@@ -23,10 +44,26 @@ describe "Tapyrus::Script::CheckDataSig" do
       pubkey_h[64] = (pubkey_h[64].bti & 1).itb
       pubkey_h = pubkey_h.bth
 
-      check(Tapyrus::Script.new << "" << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIG, Tapyrus::SCRIPT_ERR_OK)
-      check(Tapyrus::Script.new << "" << message << pubkey_c, Tapyrus::Script.new << OP_CHECKDATASIG, Tapyrus::SCRIPT_ERR_OK)
-      check(Tapyrus::Script.new << "" << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_CHECKDATASIGVERIFY)
-      check(Tapyrus::Script.new << "" << message << pubkey_c, Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_CHECKDATASIGVERIFY)
+      check(
+        Tapyrus::Script.new << '' << message << pubkey,
+        Tapyrus::Script.new << OP_CHECKDATASIG,
+        Tapyrus::SCRIPT_ERR_OK
+      )
+      check(
+        Tapyrus::Script.new << '' << message << pubkey_c,
+        Tapyrus::Script.new << OP_CHECKDATASIG,
+        Tapyrus::SCRIPT_ERR_OK
+      )
+      check(
+        Tapyrus::Script.new << '' << message << pubkey,
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_CHECKDATASIGVERIFY
+      )
+      check(
+        Tapyrus::Script.new << '' << message << pubkey_c,
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_CHECKDATASIGVERIFY
+      )
 
       sig_ecdsa = key.sign(digest)
       sig_schnorr = key.sign(digest, algo: :schnorr)
@@ -34,17 +71,27 @@ describe "Tapyrus::Script::CheckDataSig" do
       expect(sig_schnorr.bytesize).to eq(64)
 
       check(Tapyrus::Script.new << sig_ecdsa << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIG, ['01'])
-      check(Tapyrus::Script.new << sig_ecdsa << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_OK)
+      check(
+        Tapyrus::Script.new << sig_ecdsa << message << pubkey,
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_OK
+      )
 
       check(Tapyrus::Script.new << sig_schnorr << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIG, ['01'])
-      check(Tapyrus::Script.new << sig_schnorr << message << pubkey, Tapyrus::Script.new << OP_CHECKDATASIGVERIFY, Tapyrus::SCRIPT_ERR_OK)
+      check(
+        Tapyrus::Script.new << sig_schnorr << message << pubkey,
+        Tapyrus::Script.new << OP_CHECKDATASIGVERIFY,
+        Tapyrus::SCRIPT_ERR_OK
+      )
 
       minimal_sig = '3006020101020101'
       non_der_sig = '308006020101020101'
-      high_s_sig = '304502203e4516da7253cf068effec6b95c41221c0cf3a8e6ccb8cbf1725b562e9afde2c022100ab1e3da73d67e32045a20e0b999e049978ea8d6ee5480d485fcf2ce0d03b2ef0'
+      high_s_sig =
+        '304502203e4516da7253cf068effec6b95c41221c0cf3a8e6ccb8cbf1725b562e9afde2c022100ab1e3da73d67e32045a20e0b999e049978ea8d6ee5480d485fcf2ce0d03b2ef0'
 
       script = Tapyrus::Script.new << OP_CHECKDATASIG << OP_NOT << OP_VERIFY
       script_verify = Tapyrus::Script.new << OP_CHECKDATASIGVERIFY
+
       # When strict encoding is enforced, hybrid key are invalid.
       check(Tapyrus::Script.new << '' << message << pubkey_h, script, Tapyrus::SCRIPT_ERR_PUBKEYTYPE)
       check(Tapyrus::Script.new << '' << message << pubkey_h, script_verify, Tapyrus::SCRIPT_ERR_PUBKEYTYPE)

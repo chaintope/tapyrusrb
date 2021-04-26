@@ -1,6 +1,5 @@
 module Tapyrus
   class TxChecker
-
     attr_reader :tx
     attr_reader :input_index
     attr_reader :amount
@@ -22,8 +21,8 @@ module Tapyrus
       script_sig = script_sig.htb
       hash_type = script_sig[-1].unpack('C').first
       sig = script_sig[0..-2]
-      sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type,
-                                     amount: amount, sig_version: sig_version)
+      sighash =
+        tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount, sig_version: sig_version)
       verify_sig(sig.bth, pubkey, sighash)
     end
 
@@ -33,7 +32,8 @@ module Tapyrus
     # @param [String] digest a message digest with binary format to be verified.
     # @return [Boolean] if check is passed return true, otherwise false.
     def verify_sig(sig, pubkey, digest, allow_hybrid: false)
-      key_type = pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
+      key_type =
+        pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
       sig = sig.htb
       algo = sig.bytesize == 64 ? :schnorr : :ecdsa
       begin
@@ -49,8 +49,10 @@ module Tapyrus
       # distinguished by whether nLockTime < LOCKTIME_THRESHOLD.
 
       # We want to compare apples to apples, so fail the script unless the type of nLockTime being tested is the same as the nLockTime in the transaction.
-      unless ((tx.lock_time < LOCKTIME_THRESHOLD && locktime < LOCKTIME_THRESHOLD) ||
-          (tx.lock_time >= LOCKTIME_THRESHOLD && locktime >= LOCKTIME_THRESHOLD))
+      unless (
+               (tx.lock_time < LOCKTIME_THRESHOLD && locktime < LOCKTIME_THRESHOLD) ||
+                 (tx.lock_time >= LOCKTIME_THRESHOLD && locktime >= LOCKTIME_THRESHOLD)
+             )
         return false
       end
 
@@ -68,6 +70,7 @@ module Tapyrus
 
     def check_sequence(sequence)
       tx_sequence = tx.inputs[input_index].sequence
+
       # Fail if the transaction's version number is not set high enough to trigger BIP 68 rules.
       return false if tx.features < 2
 
@@ -84,14 +87,21 @@ module Tapyrus
       # distinguished by whether sequence_masked < TxIn#SEQUENCE_LOCKTIME_TYPE_FLAG.
       # We want to compare apples to apples, so fail the script
       # unless the type of nSequenceMasked being tested is the same as the nSequenceMasked in the transaction.
-      unless ((tx_sequence_masked < TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG && sequence_masked < TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
-          (tx_sequence_masked >= TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG && sequence_masked >= TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG))
+      unless (
+               (
+                 tx_sequence_masked < TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG &&
+                   sequence_masked < TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG
+               ) ||
+                 (
+                   tx_sequence_masked >= TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG &&
+                     sequence_masked >= TxIn::SEQUENCE_LOCKTIME_TYPE_FLAG
+                 )
+             )
         return false
       end
 
       # Now that we know we're comparing apples-to-apples, the comparison is a simple numeric one.
       sequence_masked <= tx_sequence_masked
     end
-
   end
 end

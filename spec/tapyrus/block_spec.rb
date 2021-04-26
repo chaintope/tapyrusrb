@@ -1,11 +1,10 @@
 require 'spec_helper'
 
 describe Tapyrus::Block do
-
-  subject {
+  subject do
     payload = load_block('896574bee055370c047e911212f8472e7e77a1337d666e2a83da739d04f8de2a').htb
     Tapyrus::Message::Block.parse_from_payload(payload).to_block
-  }
+  end
 
   describe '#valid_merkle_root?' do
     context 'valid' do
@@ -15,10 +14,10 @@ describe Tapyrus::Block do
     end
 
     context 'block has two transactions.' do
-      subject {
+      subject do
         payload = load_block('75be7b3b19e07f2c3644523016132db7e7e67063b3f5abbaa420cafc8a44557f').htb
         Tapyrus::Message::Block.parse_from_payload(payload).to_block
-      }
+      end
       it 'should be true' do
         expect(subject.valid_merkle_root?).to be true
       end
@@ -36,8 +35,7 @@ describe Tapyrus::Block do
 
   describe '#height' do
     it 'stored in coinbase tx.' do
-      expect(subject.height).to eq(18870)
+      expect(subject.height).to eq(18_870)
     end
   end
-
 end

@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe Tapyrus::Message::FilterLoad do
-
   describe 'parse from payload' do
-    subject {
-      Tapyrus::Message::FilterLoad.parse_from_payload('02b50f0b0000000000000000'.htb)
-    }
+    subject { Tapyrus::Message::FilterLoad.parse_from_payload('02b50f0b0000000000000000'.htb) }
     it 'should be parsed' do
       expect(subject.filter.filter.size).to eq(2)
       expect(subject.filter.filter).to eq('b50f'.htb.unpack('CC'))
@@ -16,13 +13,12 @@ describe Tapyrus::Message::FilterLoad do
   end
 
   describe 'to_pkt' do
-    subject {
+    subject do
       filter = Tapyrus::BloomFilter.new([181, 15], 11, 0)
       Tapyrus::Message::FilterLoad.new(filter, 0).to_pkt
-    }
+    end
     it 'should be generate' do
       expect(subject).to eq('0b11090766696c7465726c6f616400000c0000008b7f507b02b50f0b0000000000000000'.htb)
     end
   end
-
 end

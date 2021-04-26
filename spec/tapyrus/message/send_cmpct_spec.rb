@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe Tapyrus::Message::SendCmpct do
-
   describe 'parse from payload' do
-    subject {
-      Tapyrus::Message::SendCmpct.parse_from_payload('000100000000000000'.htb)
-    }
+    subject { Tapyrus::Message::SendCmpct.parse_from_payload('000100000000000000'.htb) }
     it 'should be parsed' do
       expect(subject.high?).to be false
       expect(subject.low?).to be true
@@ -14,12 +11,9 @@ describe Tapyrus::Message::SendCmpct do
   end
 
   describe 'to_pkt' do
-    subject {
-      Tapyrus::Message::SendCmpct.new(Tapyrus::Message::SendCmpct::MODE_LOW, 1).to_pkt
-    }
+    subject { Tapyrus::Message::SendCmpct.new(Tapyrus::Message::SendCmpct::MODE_LOW, 1).to_pkt }
     it 'should be generate' do
       expect(subject).to eq('0b11090773656e64636d70637400000009000000ccfe104a000100000000000000'.htb)
     end
   end
-
 end

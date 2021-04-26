@@ -2,10 +2,8 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 module Tapyrus
-
   # transaction input
   class TxIn
-
     attr_accessor :out_point
     attr_accessor :script_sig
     attr_accessor :sequence
@@ -58,11 +56,10 @@ module Tapyrus
       p
     end
 
-
     def to_h
       sig = script_sig.to_h
       sig.delete(:type)
-      h = {txid: out_point.txid, vout: out_point.index,  script_sig: sig }
+      h = { txid: out_point.txid, vout: out_point.index, script_sig: sig }
       h[:sequence] = sequence
       h
     end
@@ -76,7 +73,5 @@ module Tapyrus
       return nil unless out_point
       out_point.tx_hash
     end
-
   end
-
 end

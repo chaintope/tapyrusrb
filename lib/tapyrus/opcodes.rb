@@ -1,8 +1,6 @@
 module Tapyrus
-
   # https://bitcoin.org/en/developer-reference#opcodes
   module Opcodes
-
     module_function
 
     # https://en.bitcoin.it/wiki/Script#Constants
@@ -111,7 +109,7 @@ module Tapyrus
     OP_HASH256 = 0xaa
     OP_CODESEPARATOR = 0xab
     OP_CHECKSIG = 0xac
-    OP_CHECKSIGVERIFY= 0xad
+    OP_CHECKSIGVERIFY = 0xad
     OP_CHECKMULTISIG = 0xae
     OP_CHECKMULTISIGVERIFY = 0xaf
 
@@ -124,7 +122,7 @@ module Tapyrus
     OP_VER = 0x62
     OP_VERIF = 0x65
     OP_VERNOTIF = 0x66
-    OP_RESERVED1= 0x89
+    OP_RESERVED1 = 0x89
     OP_RESERVED2 = 0x8a
 
     OP_NOP1 = 0xb0
@@ -147,7 +145,12 @@ module Tapyrus
     OP_COLOR = 0xbc
 
     DUPLICATE_KEY = [:OP_NOP2, :OP_NOP3]
-    OPCODES_MAP = Hash[*(constants.grep(/^OP_/) - [:OP_NOP2, :OP_NOP3, :OP_CHECKLOCKTIMEVERIFY, :OP_CHECKSEQUENCEVERIFY]).map { |c| [const_get(c), c.to_s] }.flatten]
+    OPCODES_MAP =
+      Hash[
+        *(constants.grep(/^OP_/) - [:OP_NOP2, :OP_NOP3, :OP_CHECKLOCKTIMEVERIFY, :OP_CHECKSEQUENCEVERIFY]).map do |c|
+          [const_get(c), c.to_s]
+        end.flatten
+      ]
     NAME_MAP = Hash[*constants.grep(/^OP_/).map { |c| [c.to_s, const_get(c)] }.flatten]
 
     def opcode_to_name(opcode)
@@ -178,6 +181,5 @@ module Tapyrus
       return opcode - (OP_1 - 1) if opcode >= OP_1 && opcode <= OP_16
       nil
     end
-
   end
 end

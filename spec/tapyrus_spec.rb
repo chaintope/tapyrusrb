@@ -2,7 +2,6 @@ require 'spec_helper'
 include Tapyrus::Opcodes
 
 describe Tapyrus do
-
   it 'has a version number' do
     expect(Tapyrus::VERSION).not_to be nil
   end
@@ -39,11 +38,11 @@ describe Tapyrus do
     context 'different character code' do
       it 'should be return same opcode' do
         expect(OP_1.chr.opcode).to eq(OP_1)
-        expect(OP_1.chr.force_encoding("US-ASCII").opcode).to eq(OP_1)
-        expect(OP_1.chr.force_encoding("UTF-8").opcode).to eq(OP_1)
+        expect(OP_1.chr.force_encoding('US-ASCII').opcode).to eq(OP_1)
+        expect(OP_1.chr.force_encoding('UTF-8').opcode).to eq(OP_1)
         expect(OP_SIZE.chr.opcode).to eq(OP_SIZE)
-        expect(OP_SIZE.chr.force_encoding("US-ASCII").opcode).to eq(OP_SIZE)
-        expect(OP_SIZE.chr.force_encoding("UTF-8").opcode).to eq(OP_SIZE)
+        expect(OP_SIZE.chr.force_encoding('US-ASCII').opcode).to eq(OP_SIZE)
+        expect(OP_SIZE.chr.force_encoding('UTF-8').opcode).to eq(OP_SIZE)
       end
     end
   end
@@ -64,12 +63,12 @@ describe Tapyrus do
 
   class Test
     def initialize
-      @foo = ["bar"]
+      @foo = ['bar']
     end
   end
   describe '#build_json' do
     it 'should handle string in array' do
-      expect(["a", "b", "c"].build_json).to eq "[\"a\",\"b\",\"c\"]"
+      expect(['a', 'b', 'c'].build_json).to eq "[\"a\",\"b\",\"c\"]"
       expect(Test.new.build_json).to eq "{\"foo\":[\"bar\"]}"
     end
   end

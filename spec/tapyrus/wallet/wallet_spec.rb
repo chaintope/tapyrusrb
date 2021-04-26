@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Tapyrus::Wallet do
-
   describe '#default_path_prefix' do
     context 'dev', network: :dev do
       subject { Tapyrus::Wallet::Base.default_path_prefix }
@@ -16,12 +15,11 @@ describe Tapyrus::Wallet do
         expect(Tapyrus::Wallet::Base.default_path_prefix).to eq "#{Dir.home}/.tapyrusrb/dev/db/wallet/"
       end
     end
-
   end
 
   describe '#load' do
     context 'existing wallet' do
-      subject { Tapyrus::Wallet::Base.load(1, TEST_WALLET_PATH)}
+      subject { Tapyrus::Wallet::Base.load(1, TEST_WALLET_PATH) }
 
       before do
         wallet = create_test_wallet
@@ -38,28 +36,28 @@ describe Tapyrus::Wallet do
 
     context 'dose not exist wallet' do
       it 'should raise error' do
-        expect{Tapyrus::Wallet::Base.load(2, TEST_WALLET_PATH)}.to raise_error(ArgumentError)
+        expect { Tapyrus::Wallet::Base.load(2, TEST_WALLET_PATH) }.to raise_error(ArgumentError)
       end
     end
   end
 
   describe '#create' do
     context 'should create new wallet' do
-      subject {Tapyrus::Wallet::Base.create(2, TEST_WALLET_PATH)}
+      subject { Tapyrus::Wallet::Base.create(2, TEST_WALLET_PATH) }
       it 'should be create' do
         expect(subject.wallet_id).to eq(2)
         expect(subject.master_key.mnemonic.size).to eq(24)
         expect(subject.version).to eq(Tapyrus::Wallet::Base::VERSION)
       end
-      after{
+      after do
         subject.close
         FileUtils.rm_r(test_wallet_path(2))
-      }
+      end
     end
 
     context 'same wallet_id already exist' do
       it 'should raise error' do
-        expect{Tapyrus::Wallet::Base.create(1, TEST_WALLET_PATH)}.to raise_error(ArgumentError)
+        expect { Tapyrus::Wallet::Base.create(1, TEST_WALLET_PATH) }.to raise_error(ArgumentError)
       end
     end
   end
@@ -72,12 +70,12 @@ describe Tapyrus::Wallet do
   end
 
   describe '#create_account', network: :prod do
-    subject {
+    subject do
       allow(Tapyrus::Wallet::MasterKey).to receive(:generate).and_return(test_master_key)
       wallet = create_test_wallet(3)
       wallet.create_account('hoge')
       wallet
-    }
+    end
     it 'should be created' do
       accounts = subject.accounts
       expect(accounts.size).to eq(2)
@@ -99,18 +97,18 @@ describe Tapyrus::Wallet do
       expect(accounts[1].index).to eq(1)
 
       # Account with same name can not be registered
-      expect{subject.create_account('hoge')}.to raise_error(ArgumentError)
+      expect { subject.create_account('hoge') }.to raise_error(ArgumentError)
     end
   end
 
   describe '#accounts' do
-    subject {
+    subject do
       wallet = create_test_wallet(4)
       wallet.create_account('native segwit1')
       wallet.create_account(Tapyrus::Wallet::Account::PURPOSE_TYPE[:legacy], 'legacy')
       wallet.create_account('native segwit2')
       wallet
-    }
+    end
     it 'should return target accounts' do
       expect(subject.accounts.size).to eq(4)
       expect(subject.accounts(Tapyrus::Wallet::Account::PURPOSE_TYPE[:legacy]).size).to eq(1)
@@ -119,20 +117,21 @@ describe Tapyrus::Wallet do
   end
 
   describe '#generate_new_address' do
-    subject {
+    subject do
       allow(Tapyrus::Wallet::MasterKey).to receive(:generate).and_return(test_master_key)
       create_test_wallet(5)
-    }
+    end
     it 'should return new address' do
       expect(subject.generate_new_address('Default')).to eq('n2jNRE6oXFTrfAaRGmLCw7S2aF5bNmCGWU')
       expect(subject.generate_new_address('Default')).to eq('mmsVvX2JAAQMmrmozmfFe1WzvhiQJiWhY6')
+
       # account name does not exist.
-      expect{subject.generate_new_address('hoge')}.to raise_error(ArgumentError)
+      expect { subject.generate_new_address('hoge') }.to raise_error(ArgumentError)
     end
   end
 
   describe '#watch_targets' do
-    subject {
+    subject do
       # TODO add utxo outpoints data
       allow(Tapyrus::Wallet::MasterKey).to receive(:generate).and_return(test_master_key)
       wallet = create_test_wallet(6)
@@ -141,7 +140,7 @@ describe Tapyrus::Wallet do
       account1.create_receive
       account1.create_change
       wallet.watch_targets
-    }
+    end
     it 'should return pubkey hash in the wallet.' do
       expect(subject.size).to eq(7)
       expect(subject[0]).to eq('cbf383806d7e735acde8756addba679657f20341') # m/84'/1'/0'/0/0 default
@@ -152,16 +151,15 @@ describe Tapyrus::Wallet do
   end
 
   describe '#current_wallet' do
-    subject {
+    subject do
       if Tapyrus::Wallet::Base.wallet_paths(TEST_WALLET_PATH).empty?
         wallet = create_test_wallet
         wallet.close
       end
       Tapyrus::Wallet::Base.current_wallet(TEST_WALLET_PATH)
-    }
+    end
     it 'should return wallet' do
       expect(subject.path).to start_with TEST_WALLET_PATH
     end
   end
-
 end

@@ -1,8 +1,6 @@
 module Tapyrus
-
   # parse script spec data (script_test.json data).
   module TestScriptParser
-
     include Tapyrus::Opcodes
 
     module_function
@@ -14,11 +12,13 @@ module Tapyrus
         next if w.empty?
         latest_chunk = script.chunks.last
         if sufficient_length?(latest_chunk)
-          if w =~ /^-?\d+$/ # when integer
+          if w =~ /^-?\d+$/
+            # when integer
             num = w.to_i
-            data = (num >= -1 && num <= 16) ? num : Tapyrus::Script.encode_number( num)
+            data = (num >= -1 && num <= 16) ? num : Tapyrus::Script.encode_number(num)
             script << data
-          elsif w.start_with?('0x') && w[2..-1].length > 0 && hex?(w[2..-1]) # when hex
+          elsif w.start_with?('0x') && w[2..-1].length > 0 && hex?(w[2..-1])
+            # when hex
             data = w[2..-1].htb
             buf = StringIO.new(data)
             if data[0].pushdata?
@@ -29,9 +29,7 @@ module Tapyrus
                 script.chunks << data
               end
             else
-              until buf.eof?
-                script.chunks << buf.read(1)
-              end
+              script.chunks << buf.read(1) until buf.eof?
             end
           elsif w.size >= 2 && w.start_with?("'") && w.end_with?("'")
             script << w[1..-2].bth
@@ -60,9 +58,7 @@ module Tapyrus
     end
 
     def hex?(str)
-      str.scan(/.{1, 3}/).each do |s|
-        return false if s.hex == 0
-      end
+      str.scan(/.{1, 3}/).each { |s| return false if s.hex == 0 }
       !str.empty? && str.length % 2 == 0
     end
 
@@ -82,16 +78,15 @@ module Tapyrus
 
     def read_length(opcode, buf)
       case opcode
-        when OP_PUSHDATA1
-          buf.read(1).unpack('C').first
-        when OP_PUSHDATA2
-          buf.read(2).unpack('v').first
-        when OP_PUSHDATA4
-          buf.read(4).unpack('V').first
-        else
-          opcode if opcode < OP_PUSHDATA1
+      when OP_PUSHDATA1
+        buf.read(1).unpack('C').first
+      when OP_PUSHDATA2
+        buf.read(2).unpack('v').first
+      when OP_PUSHDATA4
+        buf.read(4).unpack('V').first
+      else
+        opcode if opcode < OP_PUSHDATA1
       end
     end
-
   end
 end

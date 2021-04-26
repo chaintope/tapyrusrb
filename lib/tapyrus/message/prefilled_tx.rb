@@ -1,10 +1,8 @@
 module Tapyrus
   module Message
-
     # A PrefilledTransaction structure is used in HeaderAndShortIDs to provide a list of a few transactions explicitly.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class PrefilledTx
-
       attr_accessor :index
       attr_accessor :tx
 
@@ -22,8 +20,6 @@ module Tapyrus
       def to_payload
         Tapyrus.pack_var_int(index) << tx.to_payload
       end
-
     end
-
   end
 end
