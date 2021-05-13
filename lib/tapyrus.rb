@@ -49,6 +49,7 @@ module Tapyrus
   autoload :Color, 'tapyrus/script/color'
   autoload :Errors, 'tapyrus/errors'
   autoload :TxBuilder, 'tapyrus/tx_builder'
+  autoload :BIP175, 'tapyrus/bip175'
 
   require_relative 'tapyrus/constants'
   require_relative 'tapyrus/ext/ecdsa'
