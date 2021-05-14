@@ -53,12 +53,19 @@ describe 'Tapyrus::BIP175' do
   describe '#addr' do
     subject { key.addr }
 
-    before do
-      key << document1
-      key << document2
-    end
     let(:key) { Tapyrus::BIP175.from_ext_key(master) }
 
-    it { is_expected.to eq '1C7f322izqMqLzZzfzkPAjxBzprxDi47Yf' }
+    it do
+      key << document1
+      key << document2
+      expect(subject).to eq '1C7f322izqMqLzZzfzkPAjxBzprxDi47Yf'
+    end
+
+    context 'diffrent contracts' do
+      it 'generates different address' do
+        key << 'baz'
+        expect(subject).to eq '1QGe5LaDMAmHeibJbZBmZqhQDZSp7QCqSs'
+      end
+    end
   end
 end
