@@ -21,7 +21,7 @@ describe 'Tapyrus::BIP175' do
   describe '.from_private_key' do
     subject { key.payment_base.to_base58 }
 
-    let(:key) { Tapyrus::BIP175.from_private_key(master) }
+    let(:key) { Tapyrus::BIP175.from_ext_key(master) }
 
     it do
       is_expected.to eq 'xpub6B3JSEWjqm5GgfzcjPwBixxLPzi15pFM3jq4E4yCzXXUFS5MFdXiSdw7b5dbdPGHuc7c1V4zXbbFRtc9G1njMUt9ZvMdGVGYQSQsurD6HAW'
@@ -31,7 +31,7 @@ describe 'Tapyrus::BIP175' do
   describe '.from_public_key' do
     subject { key.payment_base.to_base58 }
 
-    let(:key) { Tapyrus::BIP175.from_public_key(payment_base) }
+    let(:key) { Tapyrus::BIP175.from_ext_pubkey(payment_base) }
 
     it do
       is_expected.to eq 'xpub6B3JSEWjqm5GgfzcjPwBixxLPzi15pFM3jq4E4yCzXXUFS5MFdXiSdw7b5dbdPGHuc7c1V4zXbbFRtc9G1njMUt9ZvMdGVGYQSQsurD6HAW'
@@ -45,7 +45,7 @@ describe 'Tapyrus::BIP175' do
       key << document1
       key << document2
     end
-    let(:key) { Tapyrus::BIP175.from_private_key(master) }
+    let(:key) { Tapyrus::BIP175.from_ext_key(master) }
 
     it { is_expected.to eq '310057788c6073640dc222466d003411cd5c1cc0bf2803fc6ebbfae03ceb4451' }
   end
@@ -57,7 +57,7 @@ describe 'Tapyrus::BIP175' do
       key << document1
       key << document2
     end
-    let(:key) { Tapyrus::BIP175.from_private_key(master) }
+    let(:key) { Tapyrus::BIP175.from_ext_key(master) }
 
     it { is_expected.to eq '1C7f322izqMqLzZzfzkPAjxBzprxDi47Yf' }
   end
