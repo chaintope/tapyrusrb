@@ -21,7 +21,7 @@ module Tapyrus
     end
 
     # @param key [Tapyrus::ExtKey] master private extended key
-    def self.from_private_key(key)
+    def self.from_ext_key(key)
       new.tap do |bip175|
         bip175.payment_base =
           key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true).ext_pubkey
@@ -29,7 +29,7 @@ module Tapyrus
     end
 
     # @param key [Tapyrus::ExtPubkey] contract base public key
-    def self.from_public_key(key)
+    def self.from_ext_pubkey(key)
       new.tap { |bip175| bip175.payment_base = key }
     end
 
