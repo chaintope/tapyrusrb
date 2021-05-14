@@ -18,7 +18,7 @@ describe 'Tapyrus::BIP175' do
   let(:document2) { 'bar' }
 
   # contract base public extended key:
-  describe '.from_private_key' do
+  describe '.from_ext_key' do
     subject { key.payment_base.to_base58 }
 
     let(:key) { Tapyrus::BIP175.from_ext_key(master) }
@@ -26,15 +26,33 @@ describe 'Tapyrus::BIP175' do
     it do
       is_expected.to eq 'xpub6B3JSEWjqm5GgfzcjPwBixxLPzi15pFM3jq4E4yCzXXUFS5MFdXiSdw7b5dbdPGHuc7c1V4zXbbFRtc9G1njMUt9ZvMdGVGYQSQsurD6HAW'
     end
+
+    context 'key is not ExtKey' do
+      let(:master) do
+        Tapyrus::ExtPubkey.from_base58(
+          'xpub6B3JSEWjqm5GgfzcjPwBixxLPzi15pFM3jq4E4yCzXXUFS5MFdXiSdw7b5dbdPGHuc7c1V4zXbbFRtc9G1njMUt9ZvMdGVGYQSQsurD6HAW'
+        )
+      end
+      it { expect { subject }.to raise_error(ArgumentError, 'key should be Tapyrus::ExtKey') }
+    end
   end
 
-  describe '.from_public_key' do
+  describe '.from_ext_pubkey' do
     subject { key.payment_base.to_base58 }
 
     let(:key) { Tapyrus::BIP175.from_ext_pubkey(payment_base) }
 
     it do
       is_expected.to eq 'xpub6B3JSEWjqm5GgfzcjPwBixxLPzi15pFM3jq4E4yCzXXUFS5MFdXiSdw7b5dbdPGHuc7c1V4zXbbFRtc9G1njMUt9ZvMdGVGYQSQsurD6HAW'
+    end
+
+    context 'key is not ExtPubkey' do
+      let(:payment_base) do
+        Tapyrus::ExtKey.from_base58(
+          'xprv9s21ZrQH143K2JF8RafpqtKiTbsbaxEeUaMnNHsm5o6wCW3z8ySyH4UxFVSfZ8n7ESu7fgir8imbZKLYVBxFPND1pniTZ81vKfd45EHKX73'
+        )
+      end
+      it { expect { subject }.to raise_error(ArgumentError, 'key should be Tapyrus::ExtPubkey') }
     end
   end
 
