@@ -1,5 +1,6 @@
 module Schnorr
   autoload :Signature, 'schnorr/signature'
+  autoload :SignToContract, 'schnorr/sign_to_contract'
 
   module_function
 
@@ -16,12 +17,7 @@ module Schnorr
     raise 'private_key is zero or over the curve order.' if private_key == 0 || private_key >= GROUP.order
 
     p = GROUP.new_point(private_key)
-    secret = ECDSA::Format::IntegerOctetString.encode(private_key, GROUP.byte_length)
-    secret = secret + message + ALGO16
-    nonce = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(secret, '')
-
-    k0 = nonce % GROUP.order
-    raise 'Creation of signature failed. k is zero' if k0.zero?
+    k0 = deterministic_nonce(message, private_key)
 
     r = GROUP.new_point(k0)
     k = ECDSA::PrimeField.jacobi(r.y, GROUP.field.prime) == 1 ? k0 : GROUP.order - k0
@@ -29,6 +25,16 @@ module Schnorr
     e = create_challenge(r.x, p, message)
 
     Schnorr::Signature.new(r.x, (k + e * private_key) % GROUP.order)
+  end
+
+  def deterministic_nonce(message, private_key)
+    secret = ECDSA::Format::IntegerOctetString.encode(private_key, GROUP.byte_length)
+    secret = secret + message + ALGO16
+    nonce = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(secret, '')
+
+    k0 = nonce % GROUP.order
+    raise 'Creation of signature failed. k is zero' if k0.zero?
+    k0
   end
 
   # Verifies the given {Signature} and returns true if it is valid.
