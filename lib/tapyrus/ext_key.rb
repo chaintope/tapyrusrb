@@ -196,6 +196,10 @@ module Tapyrus
         Tapyrus.chain_params.extended_pubkey_version
       end
     end
+
+    def master?
+      depth == 0
+    end
   end
 
   # BIP-32 Extended public key
@@ -355,6 +359,10 @@ module Tapyrus
     def self.support_version?(version)
       p = Tapyrus.chain_params
       [p.bip49_pubkey_p2wpkh_p2sh_version, p.bip84_pubkey_p2wpkh_version, p.extended_pubkey_version].include?(version)
+    end
+
+    def master?
+      depth == 0
     end
   end
 end

@@ -25,6 +25,8 @@ describe Tapyrus::ExtKey, network: :prod do
       expect(@master_key.ext_pubkey.hash160).to eq('2f636ca97f1ad03e871f03094c1f3cc7d50d3ad9')
       expect(@master_key.ext_pubkey.addr).to eq('15KZs9dFye8LCr423QvLpnCeCrypgWwFXc')
       expect(@master_key.key_type).to eq(Tapyrus::Key::TYPES[:compressed])
+      expect(@master_key.master?).to be_truthy
+      expect(@master_key.ext_pubkey.master?).to be_truthy
     end
 
     it 'Chain m/0H' do
@@ -43,6 +45,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub68EhZDqWT94RZzyAw4Y4KQNikUjA8TKCy8irQW3fA3BqjAbDKf9DWStGTAq9yngbomLc1kWLcTsif1Q3K81CAtajweZiJgzYoBf3ok5siog'
       )
       expect(key.ext_pubkey.hardened?).to be true
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0H/1' do
@@ -67,6 +71,8 @@ describe Tapyrus::ExtKey, network: :prod do
       )
       expect(key.ext_pubkey.hardened?).to be false
       expect(ext_pubkey.key_type).to eq(Tapyrus::Key::TYPES[:compressed])
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0H/1/2H' do
@@ -84,6 +90,8 @@ describe Tapyrus::ExtKey, network: :prod do
       )
       expect(key.ext_pubkey.hardened?).to be true
       expect(key.key_type).to eq(Tapyrus::Key::TYPES[:compressed])
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0H/1/2H/2' do
@@ -116,6 +124,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub6G8vMKjmKeQiuGWXt91bU119waCLGfovMckEa9WRmRyMc2wAszbx7rSDT6tmshb7WRQsuEbYPCdGsUrCKDxAdoPv59neBYeAaEMGQPeAgNy'
       )
       expect(key.ext_pubkey.hardened?).to be false
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
   end
 
@@ -136,6 +146,8 @@ describe Tapyrus::ExtKey, network: :prod do
       expect(@master_key.ext_pubkey.to_base58).to eq(
         'xpub661MyMwAqRbcFiEyzbnft7GHcyQ2waxi67s9vGY1ZYGSufVPZhQh12V6mTVtGMVZVNZ6pUA1sJjkPQzcSp3Yy1KrbKbYB2j2prTCLQ5q5xU'
       )
+      expect(@master_key.master?).to be_truthy
+      expect(@master_key.ext_pubkey.master?).to be_truthy
     end
 
     it 'Chain m/0' do
@@ -150,6 +162,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub68ND3obW6Muq3SzSy5JLPwTJUDTiEoiGfqev2yGbUBeezwtSwFxELxLj8e9T4N92dNmfcdheGw29NPGe4i3rYeAecJxMmMgKoV6JfDCwDYu'
       )
       expect(key.ext_pubkey.hardened?).to be false
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0/2147483647H' do
@@ -164,6 +178,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub6B9X72s3YZ4JHDUeudPktbEuTMX6JKKah8gDwA8A7fdmhnGqVFScPnYr5CXoV7gbJyQSKU9pZhqjnA4gUHpGba1T2gBphsQi76NJBtePzrE'
       )
       expect(key.ext_pubkey.hardened?).to be true
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0/2147483647H/1' do
@@ -178,6 +194,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub6Bs446CD3TDqpkNyrPneEf5BS7MjQVx16Mcfzt3vo2HoRem4seJfBZPioQ2JE3KjLYBxxu3ezCbCg5nv1JJeBNKPXgPBZQLBQxcHC9bdg8a'
       )
       expect(key.ext_pubkey.hardened?).to be false
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0/2147483647H/1/2147483646H' do
@@ -192,6 +210,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub6E67a6A2VvaddQUBJztbwwj5xJVtc3xFthgRHDhecYdgcHCS7cCUoXE5HRhPgSDx4H1Y6qLbT5PtTjxomcvadXe2seaj4uzQG5kRs1o2Unb'
       )
       expect(key.ext_pubkey.hardened?).to be true
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
 
     it 'Chain m/0/2147483647H/1/2147483646H/2' do
@@ -211,6 +231,8 @@ describe Tapyrus::ExtKey, network: :prod do
         'xpub6Gm4ZoEgAPL6LHPmFUDmmmR2DGcN1B7LLhjTmC8WrsKPLcPtsFrQntthobzSvu7t8uiBD1GkK6jek6Life3QvWygRYkAegjuFNTK1v1F858'
       )
       expect(key.ext_pubkey.hardened?).to be false
+      expect(key.master?).to be_falsy
+      expect(key.ext_pubkey.master?).to be_falsy
     end
   end
 

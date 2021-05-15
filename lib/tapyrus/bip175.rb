@@ -23,6 +23,7 @@ module Tapyrus
     # @param key [Tapyrus::ExtKey] master private extended key
     def self.from_ext_key(key)
       raise ArgumentError, 'key should be Tapyrus::ExtKey' unless key.is_a?(Tapyrus::ExtKey)
+      raise ArgumentError, 'key should be master private extended key' unless key.master?
       new.tap do |bip175|
         bip175.payment_base =
           key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true).ext_pubkey
