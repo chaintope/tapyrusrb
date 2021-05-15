@@ -35,6 +35,16 @@ describe 'Tapyrus::BIP175' do
       end
       it { expect { subject }.to raise_error(ArgumentError, 'key should be Tapyrus::ExtKey') }
     end
+
+    context 'key is not master ExtKey' do
+      let(:master) do
+        # m/1
+        Tapyrus::ExtKey.from_base58(
+          'xprv9tzRNW1ZnrURGVu66TgodMCdZfYms8dVapp4q24RswKY7hChXwrdnbyEFpfz26yVJh5h4zgBWiJ2nD8Qj3oGjjVNtyTFZFUrWQiYwwAfYdg'
+        )
+      end
+      it { expect { subject }.to raise_error(ArgumentError, 'key should be master private extended key') }
+    end
   end
 
   describe '.from_ext_pubkey' do
