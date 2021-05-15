@@ -32,4 +32,27 @@ describe 'Schnorr::SignToContract' do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe 'sign tx with sign-to-signature' do
+    it do
+      tx =
+        Tapyrus::Tx.parse_from_payload(
+          '01000000018594c5bdcaec8f06b78b596f31cd292a294fd031e24eec716f43dac91ea7494d0000000000ffffffff01a0860100000000001976a9145834479edbbe0539b31ffd3a8f8ebadc2165ed0188ac00000000'
+            .htb
+        )
+      script = Tapyrus::Script.parse_from_payload('76a914bb42ade3ce0fbeafa5947116e1707b053147993788ac'.htb)
+      sighash = tx.sighash_for_input(0, script)
+      signature, r = Schnorr::SignToContract.sign(sighash, key.priv_key.to_i(16), contract)
+      sig = signature.encode + [Tapyrus::SIGHASH_TYPE[:all]].pack('C')
+
+      expect(key.verify(signature.encode, sighash, algo: :schnorr)).to be_truthy
+
+      tx.in[0].script_sig = Tapyrus::Script.new << sig << key.pubkey.htb
+
+      checker = Tapyrus::TxChecker.new(tx: tx, input_index: 0)
+      expect(checker.verify_sig(signature.encode.bth, key.pubkey, sighash)).to be_truthy
+
+      expect(tx.verify_input_sig(0, script)).to be_truthy
+    end
+  end
 end
