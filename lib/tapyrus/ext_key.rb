@@ -198,7 +198,7 @@ module Tapyrus
     end
 
     def master?
-      depth == 0
+      depth == 0 && number == 0 && parent_fingerprint == '00000000'
     end
   end
 
@@ -362,7 +362,7 @@ module Tapyrus
     end
 
     def master?
-      depth == 0
+      depth == 0 && number == 0 && parent_fingerprint == '00000000'
     end
   end
 end
