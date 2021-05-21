@@ -16,22 +16,25 @@ module Tapyrus
     #   end
     # end
     class Error < StandardError
-      attr_reader :message
+      attr_reader :response_code, :response_msg, :rpc_error
 
-      def initialize(response)
-        raise ArgumentError, 'Must set response as cause.' unless response
+      def initialize(response_code, response_msg, rpc_error)
+        @response_code = response_code
+        @response_msg = response_msg
+        @rpc_error = rpc_error
+      end
 
-        # set message from response body or status code.
-        @message = { response_code: response&.code, response_msg: response&.msg }
-        begin
-          @message.merge!({ rpc_error: Tapyrus::RPC.response_body2json(response.body)['error'] })
-        rescue JSON::ParserError => _
-          # if RPC server don't send error message.
-        end
+      def message
+        @message ||=
+          begin
+            m = { response_code: response_code, response_msg: response_msg }
+            m.merge!(rpc_error: rpc_error) if rpc_error
+            m
+          end
       end
 
       def to_s
-        @message.to_s
+        message.to_s
       end
     end
 
@@ -83,9 +86,20 @@ module Tapyrus
         request.content_type = 'application/json'
         request.body = data.to_json
         response = http.request(request)
-        raise Error.new(response) unless response.is_a? Net::HTTPOK
+        raise error!(response) unless response.is_a? Net::HTTPOK
         response = Tapyrus::RPC.response_body2json(response.body)
         response['result']
+      end
+
+      def error!(response)
+        rpc_error =
+          begin
+            Tapyrus::RPC.response_body2json(response.body)['error']
+          rescue JSON::ParserError => _
+            # if RPC server don't send error message.
+          end
+
+        raise Error.new(response.code, response.msg, rpc_error)
       end
     end
 
