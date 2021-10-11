@@ -26,14 +26,17 @@ module Tapyrus
 
       def find_from_dns_seeds
         logger.debug 'discover peer address from DNS seeds.'
-        dns_seeds.map do |seed|
-          begin
-            Socket.getaddrinfo(seed, Tapyrus.chain_params.default_port).map { |a| a[2] }.uniq
-          rescue SocketError => e
-            logger.error "SocketError occurred when load DNS seed: #{seed}, error: #{e.message}"
-            nil
+        dns_seeds
+          .map do |seed|
+            begin
+              Socket.getaddrinfo(seed, Tapyrus.chain_params.default_port).map { |a| a[2] }.uniq
+            rescue SocketError => e
+              logger.error "SocketError occurred when load DNS seed: #{seed}, error: #{e.message}"
+              nil
+            end
           end
-        end.flatten.compact
+          .flatten
+          .compact
       end
     end
   end

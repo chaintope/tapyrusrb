@@ -281,10 +281,12 @@ module Tapyrus
     # get public keys in the stack.
     # @return[Array[String]] an array of the pubkeys with hex format.
     def get_pubkeys
-      chunks.select do |c|
-        c.pushdata? && [33, 65].include?(c.pushed_data.bytesize) &&
-          [2, 3, 4, 6, 7].include?(c.pushed_data[0].bth.to_i(16))
-      end.map { |c| c.pushed_data.bth }
+      chunks
+        .select do |c|
+          c.pushdata? && [33, 65].include?(c.pushed_data.bytesize) &&
+            [2, 3, 4, 6, 7].include?(c.pushed_data[0].bth.to_i(16))
+        end
+        .map { |c| c.pushed_data.bth }
     end
 
     # returns the self payload. ScriptInterpreter does not use this.
@@ -349,30 +351,32 @@ module Tapyrus
     end
 
     def to_s
-      chunks.map do |c|
-        case c
-        when Integer
-          opcode_to_name(c)
-        when String
-          return c if c.empty?
-          if c.pushdata?
-            v = Opcodes.opcode_to_small_int(c.ord)
-            if v
-              v
-            else
-              data = c.pushed_data
-              if data.bytesize <= 4
-                Script.decode_number(data.bth) # for scriptnum
+      chunks
+        .map do |c|
+          case c
+          when Integer
+            opcode_to_name(c)
+          when String
+            return c if c.empty?
+            if c.pushdata?
+              v = Opcodes.opcode_to_small_int(c.ord)
+              if v
+                v
               else
-                data.bth
+                data = c.pushed_data
+                if data.bytesize <= 4
+                  Script.decode_number(data.bth) # for scriptnum
+                else
+                  data.bth
+                end
               end
+            else
+              opcode = Opcodes.opcode_to_name(c.ord)
+              opcode ? opcode : 'OP_UNKNOWN [error]'
             end
-          else
-            opcode = Opcodes.opcode_to_name(c.ord)
-            opcode ? opcode : 'OP_UNKNOWN [error]'
           end
         end
-      end.join(' ')
+        .join(' ')
     end
 
     # generate sha-256 hash for payload
