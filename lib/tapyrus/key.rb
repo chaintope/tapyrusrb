@@ -31,7 +31,10 @@ module Tapyrus
     # @return [Tapyrus::Key] a key object.
     def initialize(priv_key: nil, pubkey: nil, key_type: nil, compressed: true, allow_hybrid: false)
       if key_type.nil? && !compressed.nil? && pubkey.nil?
-        puts '[Warning] Use key_type parameter instead of compressed. compressed parameter removed in the future.'
+        warn(
+          'Use key_type parameter instead of compressed. compressed parameter removed in the future.',
+          category: :deprecated
+        )
       end
       if key_type
         @key_type = key_type
