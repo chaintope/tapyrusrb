@@ -16,11 +16,14 @@ module Tapyrus
         nodes = [Node.new(txids.first)]
       else
         nodes =
-          txids.each_slice(2).map do |m|
-            left = Node.new(m[0])
-            right = Node.new(m[1] ? m[1] : m[0])
-            [left, right]
-          end.flatten
+          txids
+            .each_slice(2)
+            .map do |m|
+              left = Node.new(m[0])
+              right = Node.new(m[1] ? m[1] : m[0])
+              [left, right]
+            end
+            .flatten
       end
       new(build_initial_tree(nodes))
     end

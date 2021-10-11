@@ -190,9 +190,15 @@ module Tapyrus
         shares.each do |share|
           log_basis_eval = (log_prod - LOG_TABLE[share[0] ^ x] - shares.sum { |s| LOG_TABLE[share[0] ^ s[0]] }) % 255
           result =
-            share[1].htb.bytes.each.map.with_index do |v, i|
-              (result[i].bti ^ (v == 0 ? 0 : (EXP_TABLE[(LOG_TABLE[v] + log_basis_eval) % 255]))).itb
-            end.join
+            share[1]
+              .htb
+              .bytes
+              .each
+              .map
+              .with_index do |v, i|
+                (result[i].bti ^ (v == 0 ? 0 : (EXP_TABLE[(LOG_TABLE[v] + log_basis_eval) % 255]))).itb
+              end
+              .join
         end
         result.bth
       end

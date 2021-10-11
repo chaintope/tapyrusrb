@@ -149,9 +149,10 @@ describe Tapyrus::Tx do
           amount = prevout_script_values[i.out_point.to_payload]
           amount |= 0
           flags =
-            json[2].split(',').map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }.inject(
-              Tapyrus::SCRIPT_VERIFY_NONE
-            ) { |flags, f| flags |= f }
+            json[2]
+              .split(',')
+              .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
+              .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
           checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
           script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]
 
@@ -192,9 +193,10 @@ describe Tapyrus::Tx do
             amount = prevout_script_values[i.out_point.to_payload]
             amount |= 0
             flags =
-              json[2].split(',').map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }.inject(
-                Tapyrus::SCRIPT_VERIFY_NONE
-              ) { |flags, f| flags |= f }
+              json[2]
+                .split(',')
+                .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
+                .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
             checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
             interpreter = Tapyrus::ScriptInterpreter.new(flags: flags, checker: checker)
             script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]

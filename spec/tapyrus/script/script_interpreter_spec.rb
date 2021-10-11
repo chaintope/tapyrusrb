@@ -20,9 +20,10 @@ describe Tapyrus::ScriptInterpreter do
         credit_tx = build_credit_tx(script_pubkey, amount)
         tx = build_spending_tx(script_sig, credit_tx, amount)
         script_flags =
-          flags.split(',').map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }.inject(
-            Tapyrus::SCRIPT_VERIFY_NONE
-          ) { |flags, f| flags |= f }
+          flags
+            .split(',')
+            .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
+            .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
         expected_err_code = find_error_code(error_code)
         i =
           Tapyrus::ScriptInterpreter.new(
