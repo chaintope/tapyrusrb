@@ -53,6 +53,8 @@ module Tapyrus
       Tapyrus.sha256(concatenated_hash)
     end
 
+    # Return pay-to-contract extended private key
+    # @return [Tapyrus::ExtKey] extended private key
     def priv_key
       key = master_ext_key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true)
 
