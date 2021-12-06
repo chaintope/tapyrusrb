@@ -55,6 +55,7 @@ module Tapyrus
 
     def priv_key
       key = master_ext_key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true)
+
       # Split every 2 bytes
       paths = combined_hash.unpack('S>*')
       paths.inject(key) { |key, p| key.derive(p) }
