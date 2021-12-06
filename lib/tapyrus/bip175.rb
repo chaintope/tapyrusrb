@@ -14,7 +14,7 @@ module Tapyrus
   class BIP175
     PURPOSE_TYPE = 175
 
-    attr_accessor :payment_base
+    attr_accessor :master_ext_key, :payment_base
 
     def initialize
       @contracts = []
@@ -25,6 +25,7 @@ module Tapyrus
       raise ArgumentError, 'key should be Tapyrus::ExtKey' unless key.is_a?(Tapyrus::ExtKey)
       raise ArgumentError, 'key should be master private extended key' unless key.master?
       new.tap do |bip175|
+        bip175.master_ext_key = key
         bip175.payment_base =
           key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true).ext_pubkey
       end
@@ -50,6 +51,13 @@ module Tapyrus
       hashes = @contracts.map { |c| c.bth }.sort
       concatenated_hash = [payment_base.to_base58].concat(hashes).join
       Tapyrus.sha256(concatenated_hash)
+    end
+
+    def priv_key
+      key = master_ext_key.derive(PURPOSE_TYPE, true).derive(Tapyrus.chain_params.bip44_coin_type, true)
+      # Split every 2 bytes
+      paths = combined_hash.unpack('S>*')
+      paths.inject(key) { |key, p| key.derive(p) }
     end
 
     # Return pay-to-contract extended public key
