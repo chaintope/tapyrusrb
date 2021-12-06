@@ -78,6 +78,18 @@ describe 'Tapyrus::BIP175' do
     it { is_expected.to eq '310057788c6073640dc222466d003411cd5c1cc0bf2803fc6ebbfae03ceb4451' }
   end
 
+  describe '#priv_key' do
+    subject { key.priv_key }
+
+    let(:key) { Tapyrus::BIP175.from_ext_key(master) }
+
+    it do
+      key << document1
+      key << document2
+      expect(subject.addr).to eq '1C7f322izqMqLzZzfzkPAjxBzprxDi47Yf'
+    end
+  end
+
   describe '#addr' do
     subject { key.addr }
 
