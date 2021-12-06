@@ -212,14 +212,10 @@ module Tapyrus
         l, r = ems[0...(ems.length / 2)].htb, ems[(ems.length / 2)..-1].htb
         salt = get_salt(id)
         e = (Tapyrus::SLIP39::BASE_ITERATION_COUNT << exp) / Tapyrus::SLIP39::ROUND_COUNT
-        Tapyrus::SLIP39::ROUND_COUNT
-          .times
-          .to_a
-          .reverse
-          .each do |i|
-            f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
-            l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
-          end
+        Tapyrus::SLIP39::ROUND_COUNT.times.to_a.reverse.each do |i|
+          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
+          l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
+        end
         (r + l).bth
       end
 
@@ -234,13 +230,10 @@ module Tapyrus
         l, r = s[0...(s.bytesize / 2)], s[(s.bytesize / 2)..-1]
         salt = get_salt(id)
         e = (Tapyrus::SLIP39::BASE_ITERATION_COUNT << exp) / Tapyrus::SLIP39::ROUND_COUNT
-        Tapyrus::SLIP39::ROUND_COUNT
-          .times
-          .to_a
-          .each do |i|
-            f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
-            l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
-          end
+        Tapyrus::SLIP39::ROUND_COUNT.times.to_a.each do |i|
+          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
+          l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
+        end
         (r + l).bth
       end
 
