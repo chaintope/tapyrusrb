@@ -31,7 +31,7 @@ module Tapyrus
   #     .build
   #
   class TxBuilder
-    attr_reader :outputs
+    attr_reader :outputs, :utxos
 
     def initialize
       @utxos = []
