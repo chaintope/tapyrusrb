@@ -4,3 +4,5 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'parallel_tests'
+
+gem 'eventmachine', git: 'https://github.com/eventmachine/eventmachine', branch: 'master'
