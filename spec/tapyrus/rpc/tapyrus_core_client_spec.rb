@@ -39,7 +39,7 @@ describe Tapyrus::RPC::TapyrusCoreClient do
           body: JSON.generate({ 'error': { 'code': '-1', 'message': 'RPC ERROR' } })
         )
         expect { client.rpc_command }.to raise_error do |e|
-          expect(e.message[:rpc_error]).to eq({ 'code' => '-1', 'message' => 'RPC ERROR' })
+          expect(e.response[:rpc_error]).to eq({ 'code' => '-1', 'message' => 'RPC ERROR' })
         end
       end
     end
