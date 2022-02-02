@@ -41,11 +41,11 @@ module Tapyrus
       # Return string that represents error message.
       # @return [String] error message
       def message
-        response.to_s
+        response.to_json
       end
 
       def to_s
-        message.to_s
+        message
       end
     end
 
