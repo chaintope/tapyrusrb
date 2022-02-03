@@ -24,8 +24,13 @@ module Tapyrus
         @rpc_error = rpc_error
       end
 
-      def message
-        @message ||=
+      # Return response object as Hash
+      # @return [Hash] response
+      # @option response_code [Integer] HTTP status code
+      # @option response_msg [String] HTTP response body
+      # @option rpc_error [String] error message received from Tapyrus Core
+      def response
+        @response ||=
           begin
             m = { response_code: response_code, response_msg: response_msg }
             m.merge!(rpc_error: rpc_error) if rpc_error
@@ -33,8 +38,14 @@ module Tapyrus
           end
       end
 
+      # Return string that represents error message.
+      # @return [String] error message
+      def message
+        response.to_json
+      end
+
       def to_s
-        message.to_s
+        message
       end
     end
 
