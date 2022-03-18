@@ -388,7 +388,7 @@ describe Tapyrus::Script do
     context 'for op_return' do
       let(:script) { Tapyrus::Script.new << OP_RETURN }
 
-      it { expect { subject }.to raise_error }
+      it { expect { subject }.to raise_error RuntimeError }
     end
 
     context 'when color identifier is not specified' do
@@ -438,7 +438,7 @@ describe Tapyrus::Script do
     context 'for op_return' do
       let(:script) { Tapyrus::Script.new << OP_RETURN }
 
-      it { expect { subject }.to raise_error }
+      it { expect { subject }.to raise_error RuntimeError }
     end
   end
 
@@ -674,12 +674,14 @@ describe Tapyrus::Script do
 
     context 'invalid address' do
       it 'should raise error' do
-        expect { Tapyrus::Script.parse_from_addr('191arn68nSLRiNJXD8srnmw4bRykBkVv6o') }.to raise_error
-        expect { Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F2') }.to raise_error
-        expect { Tapyrus::Script.parse_from_addr('bc1q2lw52zhd202wxhf42k3y4e7m70sg578ver73dn') }.to raise_error
+        expect { Tapyrus::Script.parse_from_addr('191arn68nSLRiNJXD8srnmw4bRykBkVv6o') }.to raise_error RuntimeError
+        expect { Tapyrus::Script.parse_from_addr('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F2') }.to raise_error RuntimeError
+        expect {
+          Tapyrus::Script.parse_from_addr('bc1q2lw52zhd202wxhf42k3y4e7m70sg578ver73dn')
+        }.to raise_error ArgumentError
         expect {
           Tapyrus::Script.parse_from_addr('tb1q8nsuwycru4jyxrsv2ushyaee9yqyvvp2je60r4n6yjw06t88607sajrpy0')
-        }.to raise_error
+        }.to raise_error ArgumentError
       end
     end
   end
