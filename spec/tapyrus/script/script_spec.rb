@@ -260,17 +260,13 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.colored?).to be true
       expect(subject.color_id).to eq color
-      expect(subject.to_addr).to eq(
-        '22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd'
-      )
+      expect(subject.to_addr).to eq('22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd')
       expect(subject.get_pubkeys).to eq([])
     end
 
     context 'prod', network: :prod do
       it do
-        expect(subject.to_addr).to eq(
-          'w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC'
-        )
+        expect(subject.to_addr).to eq('w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC')
       end
     end
 
@@ -311,17 +307,13 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.colored?).to be true
       expect(subject.color_id).to eq color
-      expect(subject.to_addr).to eq(
-        '2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW'
-      )
+      expect(subject.to_addr).to eq('2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW')
       expect(subject.get_pubkeys).to eq([])
     end
 
     context 'prod', network: :prod do
       it do
-        expect(subject.to_addr).to eq(
-          '4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB'
-        )
+        expect(subject.to_addr).to eq('4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB')
       end
     end
 
