@@ -65,14 +65,14 @@ describe Tapyrus::Script do
         expect(subject.standard?).to be true
         expect(subject.colored?).to be false
         expect(subject.color_id).to be_nil
-        expect(subject.addresses.first).to eq('17T9tBC2dSpusL1rhT4T4AV4if963Tpfym')
+        expect(subject.to_addr).to eq('17T9tBC2dSpusL1rhT4T4AV4if963Tpfym')
         expect(subject.get_pubkeys).to eq([])
       end
     end
 
     context 'dev' do
       it 'should be generate P2PKH script' do
-        expect(subject.addresses.first).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
+        expect(subject.to_addr).to eq('mmy7BEH1SUGAeSVUR22pt5hPaejo2645F1')
       end
     end
 
@@ -81,7 +81,7 @@ describe Tapyrus::Script do
 
       it 'should not be treated as P2PKH' do
         expect(subject.p2pkh?).to be false
-        expect(subject.addresses).to be_empty
+        expect(subject.to_addr).to be nil
       end
     end
   end
@@ -128,7 +128,7 @@ describe Tapyrus::Script do
 
       it 'should not be treated as P2SH' do
         expect(subject.p2sh?).to be_falsy
-        expect(subject.addresses).to be_empty
+        expect(subject.to_addr).to be nil
       end
     end
   end
@@ -147,7 +147,7 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be true
       expect(subject.colored?).to be false
       expect(subject.color_id).to be_nil
-      expect(subject.addresses).to eq(['n4jKJN5UMLsAejL1M5CTzQ8npeWoLBLCAH', 'mvqSumyieKezeESrga7dGBmgm7cfuATBvf'])
+      expect(subject.to_addr).to be nil
       expect(subject.get_pubkeys).to eq(
         [
           '021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9',
@@ -260,7 +260,7 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.colored?).to be true
       expect(subject.color_id).to eq color
-      expect(subject.addresses.first).to eq(
+      expect(subject.to_addr).to eq(
         '22VdQ5VjWcF9zgsnPQodFBS1PBQPaAQEXSofkyMv2D9zV1MLp3JfScV6TMVaUQ42xeTfjieWssAaefMd'
       )
       expect(subject.get_pubkeys).to eq([])
@@ -268,7 +268,7 @@ describe Tapyrus::Script do
 
     context 'prod', network: :prod do
       it do
-        expect(subject.addresses.first).to eq(
+        expect(subject.to_addr).to eq(
           'w26x2EaheVBsceNf9RufpmmZ1i1qLBux1UMKMs16dkcZxTP8FBRDXGQ3Cim71aJ1gtoFNttSPNfLsC'
         )
       end
@@ -311,7 +311,7 @@ describe Tapyrus::Script do
       expect(subject.standard?).to be false
       expect(subject.colored?).to be true
       expect(subject.color_id).to eq color
-      expect(subject.addresses.first).to eq(
+      expect(subject.to_addr).to eq(
         '2oLdn5UKgY7DayDDLL6LKfrNnHKp7iFK8zGAMHVGd2USnCxi3XmHdMBjrPdXXsoJUCn3R4J1RfbFP2aW'
       )
       expect(subject.get_pubkeys).to eq([])
@@ -319,7 +319,7 @@ describe Tapyrus::Script do
 
     context 'prod', network: :prod do
       it do
-        expect(subject.addresses.first).to eq(
+        expect(subject.to_addr).to eq(
           '4a28F5ZehQNaMsSCEzBGQSKjVx2Wz2c4s32joimPciFTLzc7AUqsfg2xhoBq8NAjEpRNFNUrAZrpEHB'
         )
       end

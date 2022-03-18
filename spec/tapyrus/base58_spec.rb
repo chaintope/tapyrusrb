@@ -28,7 +28,7 @@ describe Tapyrus::Base58 do
           expect(key.compressed?).to eq(compressed)
         else
           script = Tapyrus::Script.parse_from_payload(payload.htb)
-          expect(script.addresses.first).to eq(base58_str)
+          expect(script.to_addr).to eq(base58_str)
         end
       end
     end

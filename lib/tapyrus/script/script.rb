@@ -180,6 +180,17 @@ module Tapyrus
       chunks.size == 0
     end
 
+    # Returns the address corresponding to this script. Return nil if there is no corresponding address.
+    # @return [String] address
+    def to_addr
+      return p2pkh_addr if p2pkh?
+      return p2sh_addr if p2sh?
+      return cp2pkh_addr if cp2pkh?
+      return cp2sh_addr if cp2sh?
+      nil
+    end
+
+    # @deprecated use #to_addr method.
     def addresses
       return [p2pkh_addr] if p2pkh?
       return [p2sh_addr] if p2sh?
