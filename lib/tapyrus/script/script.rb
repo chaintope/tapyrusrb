@@ -118,26 +118,18 @@ module Tapyrus
     # @param [String] addr address.
     # @return [Tapyrus::Script] parsed script.
     def self.parse_from_addr(addr)
-      begin
-        segwit_addr = Bech32::SegwitAddr.new(addr)
-        raise 'Invalid hrp.' unless Tapyrus.chain_params.bech32_hrp == segwit_addr.hrp
-        Tapyrus::Script.parse_from_payload(segwit_addr.to_script_pubkey.htb)
-      rescue Exception => e
-        hex, addr_version = Tapyrus.decode_base58_address(addr)
-        case addr_version
-        when Tapyrus.chain_params.address_version
-          Tapyrus::Script.to_p2pkh(hex)
-        when Tapyrus.chain_params.p2sh_version
-          Tapyrus::Script.to_p2sh(hex)
-        when Tapyrus.chain_params.cp2pkh_version
-          color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
-          Tapyrus::Script.to_cp2pkh(color, hex[66..-1])
-        when Tapyrus.chain_params.cp2sh_version
-          color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
-          Tapyrus::Script.to_cp2sh(color, hex[66..-1])
-        else
-          throw e
-        end
+      hex, addr_version = Tapyrus.decode_base58_address(addr)
+      case addr_version
+      when Tapyrus.chain_params.address_version
+        Tapyrus::Script.to_p2pkh(hex)
+      when Tapyrus.chain_params.p2sh_version
+        Tapyrus::Script.to_p2sh(hex)
+      when Tapyrus.chain_params.cp2pkh_version
+        color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
+        Tapyrus::Script.to_cp2pkh(color, hex[66..-1])
+      when Tapyrus.chain_params.cp2sh_version
+        color = Tapyrus::Color::ColorIdentifier.parse_from_payload(hex[0..65].htb)
+        Tapyrus::Script.to_cp2sh(color, hex[66..-1])
       end
     end
 
