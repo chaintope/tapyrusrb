@@ -61,7 +61,7 @@ module Tapyrus
     end
 
     # Add color identifier to existing p2pkh or p2sh
-    # @param [ColorIdentifier] color identifier
+    # @param [ColorIdentifier] color_id color identifier
     # @return [Script] CP2PKH or CP2SH script
     # @raise [ArgumentError] if color_id is nil or invalid
     # @raise [RuntimeError] if script is neither p2pkh nor p2sh
@@ -75,7 +75,6 @@ module Tapyrus
     end
 
     # Remove color identifier from cp2pkh or cp2sh
-    # @param [ColorIdentifier] color identifier
     # @return [Script] P2PKH or P2SH script
     # @raise [RuntimeError] if script is neither cp2pkh nor cp2sh
     def remove_color
