@@ -2,7 +2,6 @@ module Tapyrus
   module Network
     # P2P message handler used by peer connection class.
     module MessageHandler
-
       using Tapyrus::Ext
 
       # handle p2p message.

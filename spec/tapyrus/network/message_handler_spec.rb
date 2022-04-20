@@ -86,8 +86,11 @@ describe Tapyrus::Network::MessageHandler do
 
     context 'message has content' do
       it 'output json log without error' do
-        addr = Tapyrus::Message::Addr.parse_from_payload('01c04933b2010000000000000000000000000000000000ffff5ca99c52479d'.htb)
-        expect{subject.on_addr(addr)}.not_to raise_error
+        addr =
+          Tapyrus::Message::Addr.parse_from_payload(
+            '01c04933b2010000000000000000000000000000000000ffff5ca99c52479d'.htb
+          )
+        expect { subject.on_addr(addr) }.not_to raise_error
       end
     end
   end
