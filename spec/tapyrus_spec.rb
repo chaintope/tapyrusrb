@@ -2,6 +2,8 @@ require 'spec_helper'
 include Tapyrus::Opcodes
 
 describe Tapyrus do
+  using Tapyrus::Ext
+
   it 'has a version number' do
     expect(Tapyrus::VERSION).not_to be nil
   end
