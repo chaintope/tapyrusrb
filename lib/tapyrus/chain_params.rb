@@ -54,7 +54,8 @@ module Tapyrus
     end
 
     def self.init(name)
-      i = YAML.load(File.open("#{__dir__}/chainparams/#{name}.yml"))
+      yaml = File.open("#{__dir__}/chainparams/#{name}.yml")
+      i = YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(yaml) : YAML.load(yaml)
       i.dust_relay_fee ||= Tapyrus::DUST_RELAY_TX_FEE
       i
     end
