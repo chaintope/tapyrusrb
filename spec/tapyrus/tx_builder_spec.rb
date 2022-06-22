@@ -98,6 +98,20 @@ describe 'Tapyrus::TxBuilder' do
       it { expect(tx.outputs[1].script_pubkey.to_hex).to eq '76a914078eb33618f15d0a1ce400f91074485d37dd987a88ac' }
     end
 
+    context 'includes dust output' do
+      subject(:tx) do
+        txb.add_utxo(utxo1).pay(address, 546).pay(address, 545).change_address(change_address).fee(1_909).build
+      end
+
+      it 'should remove dust output' do
+        # 1. output with 545 should be removed from tx.
+        # 2. change output with 545 = 3_000(input) - 546 - 1_909(fee) should be removed.
+        expect(tx.standard?).to be_truthy
+        expect(tx.outputs.size).to eq 1
+        expect(tx.outputs[0].value).to eq 546 # not dust
+      end
+    end
+
     context 'send colored coin' do
       subject(:tx) do
         txb.add_utxo(utxo1).add_utxo(utxo2).change_address(change_address).pay(address, 1_000, color_id).build

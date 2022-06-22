@@ -89,9 +89,11 @@ module Tapyrus
         script_pubkey = script_pubkey.add_color(color_id)
       end
 
+      output = Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
+      return self if color_id.default? && output.dust?
       @outgoings[color_id] ||= 0
       @outgoings[color_id] += value
-      @outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
+      @outputs << output
       self
     end
 
@@ -136,13 +138,16 @@ module Tapyrus
     def add_change(tx)
       @incomings.each do |color_id, in_amount|
         out_amount = @outgoings[color_id] || 0
-        change, script_pubkey =
+        output =
           if color_id.default?
-            [in_amount - out_amount - estimated_fee, @change_script_pubkey]
+            change = in_amount - out_amount - estimated_fee
+            change_output = Tapyrus::TxOut.new(script_pubkey: @change_script_pubkey, value: change)
+            change_output unless change_output.dust?
           else
-            [in_amount - out_amount, @change_script_pubkey.add_color(color_id)]
+            change = in_amount - out_amount
+            Tapyrus::TxOut.new(script_pubkey: @change_script_pubkey.add_color(color_id), value: change) if change > 0
           end
-        tx.outputs << Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: change) if change > 0
+        tx.outputs << output if output
       end
     end
 
