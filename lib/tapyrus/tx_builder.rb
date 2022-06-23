@@ -90,7 +90,7 @@ module Tapyrus
       end
 
       output = Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
-      return self if color_id.default? && output.dust?
+      raise ArgumentError, 'The transaction amount is too small' if color_id.default? && output.dust?
       @outgoings[color_id] ||= 0
       @outgoings[color_id] += value
       @outputs << output

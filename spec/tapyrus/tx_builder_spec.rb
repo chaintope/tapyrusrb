@@ -98,17 +98,11 @@ describe 'Tapyrus::TxBuilder' do
       it { expect(tx.outputs[1].script_pubkey.to_hex).to eq '76a914078eb33618f15d0a1ce400f91074485d37dd987a88ac' }
     end
 
-    context 'includes dust output' do
-      subject(:tx) do
-        txb.add_utxo(utxo1).pay(address, 546).pay(address, 545).change_address(change_address).fee(1_909).build
-      end
+    context 'amount is too small' do
+      subject(:tx) { txb.add_utxo(utxo1).pay(address, 545).build }
 
-      it 'should remove dust output' do
-        # 1. output with 545 should be removed from tx.
-        # 2. change output with 545 = 3_000(input) - 546 - 1_909(fee) should be removed.
-        expect(tx.standard?).to be_truthy
-        expect(tx.outputs.size).to eq 1
-        expect(tx.outputs[0].value).to eq 546 # not dust
+      it 'should raise error' do
+        expect { subject }.to raise_error(ArgumentError, 'The transaction amount is too small')
       end
     end
 
@@ -244,6 +238,16 @@ describe 'Tapyrus::TxBuilder' do
           another = txb.build.to_hex
           expect(one).to eq another
         end
+      end
+    end
+
+    context 'change is too small' do
+      subject(:tx) { txb.add_utxo(utxo1).pay(address, 2_000).change_address(change_address).fee(455).build }
+
+      it 'should remove change output' do
+        expect(tx.standard?).to be_truthy
+        expect(tx.outputs.size).to eq 1
+        expect(tx.outputs[0].value).to eq 2_000
       end
     end
   end
