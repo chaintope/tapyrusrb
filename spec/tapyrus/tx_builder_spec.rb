@@ -98,6 +98,14 @@ describe 'Tapyrus::TxBuilder' do
       it { expect(tx.outputs[1].script_pubkey.to_hex).to eq '76a914078eb33618f15d0a1ce400f91074485d37dd987a88ac' }
     end
 
+    context 'amount is too small' do
+      subject(:tx) { txb.add_utxo(utxo1).pay(address, 545).build }
+
+      it 'should raise error' do
+        expect { subject }.to raise_error(ArgumentError, 'The transaction amount is too small')
+      end
+    end
+
     context 'send colored coin' do
       subject(:tx) do
         txb.add_utxo(utxo1).add_utxo(utxo2).change_address(change_address).pay(address, 1_000, color_id).build
@@ -230,6 +238,16 @@ describe 'Tapyrus::TxBuilder' do
           another = txb.build.to_hex
           expect(one).to eq another
         end
+      end
+    end
+
+    context 'change is too small' do
+      subject(:tx) { txb.add_utxo(utxo1).pay(address, 2_000).change_address(change_address).fee(455).build }
+
+      it 'should remove change output' do
+        expect(tx.standard?).to be_truthy
+        expect(tx.outputs.size).to eq 1
+        expect(tx.outputs[0].value).to eq 2_000
       end
     end
   end
