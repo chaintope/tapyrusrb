@@ -104,7 +104,7 @@ module Tapyrus
       end
     end
 
-    # Check this header contains upgrade aggregated publiec key.
+    # Check this header contains upgrade aggregated public key.
     # @return [Boolean] if contains return true, otherwise false.
     def upgrade_agg_pubkey?
       x_field_type == X_FILED_TYPES[:aggregate_pubkey]
