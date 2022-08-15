@@ -207,7 +207,9 @@ module Tapyrus
       checker = Tapyrus::TxChecker.new(tx: self, input_index: input_index)
       interpreter = Tapyrus::ScriptInterpreter.new(checker: checker, flags: flags)
 
-      interpreter.verify_script(script_sig, script_pubkey)
+      result = interpreter.verify_script(script_sig, script_pubkey)
+      warn("Verify failed. Cause: #{interpreter.error}") unless result
+      result
     end
   end
 end
