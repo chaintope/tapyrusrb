@@ -2,11 +2,9 @@ module Tapyrus
   class TxChecker
     attr_accessor :tx
     attr_accessor :input_index
-    attr_accessor :amount
 
-    def initialize(tx: nil, amount: 0, input_index: nil)
+    def initialize(tx: nil, input_index: nil)
       @tx = tx
-      @amount = amount
       @input_index = input_index
     end
 
@@ -20,7 +18,7 @@ module Tapyrus
       script_sig = script_sig.htb
       hash_type = script_sig[-1].unpack('C').first
       sig = script_sig[0..-2]
-      sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount)
+      sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type)
       verify_sig(sig.bth, pubkey, sighash)
     end
 

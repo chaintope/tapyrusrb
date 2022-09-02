@@ -107,16 +107,9 @@ module Tapyrus
     # @param [Integer] input_index input index.
     # @param [Integer] hash_type signature hash type
     # @param [Tapyrus::Script] output_script script pubkey or script code. if script pubkey is P2WSH, set witness script to this.
-    # @param [Integer] amount tapyrus amount locked in input. required for witness input only.
     # @param [Integer] skip_separator_index If output_script is P2WSH and output_script contains any OP_CODESEPARATOR,
     # the script code needs  is the witnessScript but removing everything up to and including the last executed OP_CODESEPARATOR before the signature checking opcode being executed.
-    def sighash_for_input(
-      input_index,
-      output_script,
-      hash_type: SIGHASH_TYPE[:all],
-      amount: nil,
-      skip_separator_index: 0
-    )
+    def sighash_for_input(input_index, output_script, hash_type: SIGHASH_TYPE[:all], skip_separator_index: 0)
       raise ArgumentError, 'input_index must be specified.' unless input_index
       raise ArgumentError, 'does not exist input corresponding to input_index.' if input_index >= inputs.size
       raise ArgumentError, 'script_pubkey must be specified.' unless output_script
@@ -126,9 +119,8 @@ module Tapyrus
     # verify input signature.
     # @param [Integer] input_index
     # @param [Tapyrus::Script] script_pubkey the script pubkey for target input.
-    # @param [Integer] amount the amount of tapyrus, require for witness program only.
     # @param [Array] flags the flags used when execute script interpreter.
-    def verify_input_sig(input_index, script_pubkey, amount: nil, flags: STANDARD_SCRIPT_VERIFY_FLAGS)
+    def verify_input_sig(input_index, script_pubkey, flags: STANDARD_SCRIPT_VERIFY_FLAGS)
       flags << SCRIPT_VERIFY_P2SH if script_pubkey.p2sh?
       verify_input_sig_for_legacy(input_index, script_pubkey, flags)
     end

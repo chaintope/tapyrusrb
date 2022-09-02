@@ -25,11 +25,7 @@ describe Tapyrus::ScriptInterpreter do
             .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
             .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
         expected_err_code = find_error_code(error_code)
-        i =
-          Tapyrus::ScriptInterpreter.new(
-            flags: script_flags,
-            checker: Tapyrus::TxChecker.new(tx: tx, input_index: 0, amount: amount)
-          )
+        i = Tapyrus::ScriptInterpreter.new(flags: script_flags, checker: Tapyrus::TxChecker.new(tx: tx, input_index: 0))
         result = i.verify_script(script_sig, script_pubkey)
         expect(result).to be expected_err_code == Tapyrus::SCRIPT_ERR_OK
         expect(i.error.code).to eq(expected_err_code) unless result
@@ -43,7 +39,7 @@ describe Tapyrus::ScriptInterpreter do
           i =
             Tapyrus::ScriptInterpreter.new(
               flags: combined_flags,
-              checker: Tapyrus::TxChecker.new(tx: tx, input_index: 0, amount: amount)
+              checker: Tapyrus::TxChecker.new(tx: tx, input_index: 0)
             )
           extra_result = i.verify_script(script_sig, script_pubkey)
           expect(extra_result).to be expected_err_code == Tapyrus::SCRIPT_ERR_OK

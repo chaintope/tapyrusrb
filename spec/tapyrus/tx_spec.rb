@@ -146,14 +146,12 @@ describe Tapyrus::Tx do
         expect(tx.valid?).to be true
 
         tx.inputs.each_with_index do |i, index|
-          amount = prevout_script_values[i.out_point.to_payload]
-          amount |= 0
           flags =
             json[2]
               .split(',')
               .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
               .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
-          checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
+          checker = Tapyrus::TxChecker.new(tx: tx, input_index: index)
           script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]
 
           use_ecdsa_gem
@@ -190,14 +188,12 @@ describe Tapyrus::Tx do
 
         if valid
           tx.inputs.each_with_index do |i, index|
-            amount = prevout_script_values[i.out_point.to_payload]
-            amount |= 0
             flags =
               json[2]
                 .split(',')
                 .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
                 .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
-            checker = Tapyrus::TxChecker.new(tx: tx, input_index: index, amount: amount)
+            checker = Tapyrus::TxChecker.new(tx: tx, input_index: index)
             interpreter = Tapyrus::ScriptInterpreter.new(flags: flags, checker: checker)
             script_pubkey = prevout_script_pubkeys[i.out_point.to_payload]
             valid = interpreter.verify_script(i.script_sig, script_pubkey)
