@@ -116,8 +116,8 @@ describe 'Tapyrus::Script::CheckDataSig' do
 
   def check(original_stack, script, expected, flags = Tapyrus::STANDARD_SCRIPT_VERIFY_FLAGS)
     i = Tapyrus::ScriptInterpreter.new(flags: flags)
-    i.eval_script(original_stack, :base, false)
-    result = i.eval_script(script, :base, false)
+    i.eval_script(original_stack, false)
+    result = i.eval_script(script, false)
 
     if result
       expect(i.stack).to eq(expected) unless expected == Tapyrus::SCRIPT_ERR_OK

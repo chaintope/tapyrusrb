@@ -114,14 +114,12 @@ module Tapyrus
       input_index,
       output_script,
       hash_type: SIGHASH_TYPE[:all],
-      sig_version: :base,
       amount: nil,
       skip_separator_index: 0
     )
       raise ArgumentError, 'input_index must be specified.' unless input_index
       raise ArgumentError, 'does not exist input corresponding to input_index.' if input_index >= inputs.size
       raise ArgumentError, 'script_pubkey must be specified.' unless output_script
-      raise ArgumentError, 'unsupported sig version specified.' unless SIG_VERSION.include?(sig_version)
       sighash_for_legacy(input_index, output_script, hash_type)
     end
 

@@ -51,11 +51,11 @@ module Tapyrus
 
       stack_copy = nil
 
-      return false unless eval_script(script_sig, :base, false)
+      return false unless eval_script(script_sig, false)
 
       stack_copy = stack.dup if flag?(SCRIPT_VERIFY_P2SH)
 
-      return false unless eval_script(script_pubkey, :base, false)
+      return false unless eval_script(script_pubkey, false)
 
       return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last.htb)
 
@@ -70,7 +70,7 @@ module Tapyrus
         rescue Exception => e
           return set_error(SCRIPT_ERR_BAD_OPCODE, "Failed to parse serialized redeem script for P2SH. #{e.message}")
         end
-        return false unless eval_script(redeem_script, :base, true)
+        return false unless eval_script(redeem_script, true)
         return set_error(SCRIPT_ERR_EVAL_FALSE) if stack.empty? || !cast_to_bool(stack.last)
       end
 
@@ -92,7 +92,7 @@ module Tapyrus
       false
     end
 
-    def eval_script(script, sig_version, is_redeem_script)
+    def eval_script(script, is_redeem_script)
       return set_error(SCRIPT_ERR_SCRIPT_SIZE) if script.size > MAX_SCRIPT_SIZE
       begin
         flow_stack = []
@@ -117,7 +117,7 @@ module Tapyrus
               return set_error(SCRIPT_ERR_OP_COUNT)
             end
             return set_error(SCRIPT_ERR_DISABLED_OPCODE) if DISABLE_OPCODES.include?(opcode)
-            if opcode == OP_CODESEPARATOR && sig_version == :base && flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE)
+            if opcode == OP_CODESEPARATOR && flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE)
               return set_error(SCRIPT_ERR_OP_CODESEPARATOR)
             end
             next unless (need_exec || (OP_IF <= opcode && opcode <= OP_ENDIF))
@@ -360,13 +360,12 @@ module Tapyrus
                 sig, pubkey = pop_string(2)
 
                 subscript = script.subscript(last_code_separator_index..-1)
-                if sig_version == :base
-                  tmp = subscript.find_and_delete(Script.new << sig)
-                  if flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE) && tmp != subscript
-                    return set_error(SCRIPT_ERR_SIG_FINDANDDELETE)
-                  end
-                  subscript = tmp
+                tmp = subscript.find_and_delete(Script.new << sig)
+                if flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE) && tmp != subscript
+                  return set_error(SCRIPT_ERR_SIG_FINDANDDELETE)
                 end
+                subscript = tmp
+
                 if (
                      if sig.htb.bytesize == Tapyrus::Key::COMPACT_SIGNATURE_SIZE
                        !check_schnorr_signature_encoding(sig)
@@ -377,7 +376,7 @@ module Tapyrus
                   return false
                 end
 
-                success = checker.check_sig(sig, pubkey, subscript, sig_version)
+                success = checker.check_sig(sig, pubkey, subscript)
 
                 # https://github.com/bitcoin/bips/blob/master/bip-0146.mediawiki#NULLFAIL
                 if !success && flag?(SCRIPT_VERIFY_NULLFAIL) && sig.bytesize > 0
@@ -438,14 +437,12 @@ module Tapyrus
 
                 subscript = script.subscript(last_code_separator_index..-1)
 
-                if sig_version == :base
-                  sigs.each do |sig|
-                    tmp = subscript.find_and_delete(Script.new << sig)
-                    if flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE) && tmp != subscript
-                      return set_error(SCRIPT_ERR_SIG_FINDANDDELETE)
-                    end
-                    subscript = tmp
+                sigs.each do |sig|
+                  tmp = subscript.find_and_delete(Script.new << sig)
+                  if flag?(SCRIPT_VERIFY_CONST_SCRIPTCODE) && tmp != subscript
+                    return set_error(SCRIPT_ERR_SIG_FINDANDDELETE)
                   end
+                  subscript = tmp
                 end
 
                 success = true
@@ -468,7 +465,7 @@ module Tapyrus
 
                   return set_error(SCRIPT_ERR_MIXED_SCHEME_MULTISIG) unless sig_scheme == current_sig_scheme
 
-                  ok = checker.check_sig(sig, pubkey, subscript, sig_version)
+                  ok = checker.check_sig(sig, pubkey, subscript)
                   if ok
                     sig_count -= 1
                   else

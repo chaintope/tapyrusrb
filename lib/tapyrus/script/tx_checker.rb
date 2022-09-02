@@ -1,8 +1,8 @@
 module Tapyrus
   class TxChecker
-    attr_reader :tx
-    attr_reader :input_index
-    attr_reader :amount
+    attr_accessor :tx
+    attr_accessor :input_index
+    attr_accessor :amount
 
     def initialize(tx: nil, amount: 0, input_index: nil)
       @tx = tx
@@ -14,15 +14,14 @@ module Tapyrus
     # @param [String] script_sig a signature with hex format.
     # @param [String] pubkey a public key with hex format.
     # @param [Tapyrus::Script] script_code
-    # @param [Integer] sig_version
     # @return [Boolean] if check is passed return true, otherwise false.
-    def check_sig(script_sig, pubkey, script_code, sig_version)
+    def check_sig(script_sig, pubkey, script_code)
       return false if script_sig.empty?
       script_sig = script_sig.htb
       hash_type = script_sig[-1].unpack('C').first
       sig = script_sig[0..-2]
       sighash =
-        tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount, sig_version: sig_version)
+        tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount)
       verify_sig(sig.bth, pubkey, sighash)
     end
 
