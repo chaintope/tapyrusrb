@@ -20,8 +20,7 @@ module Tapyrus
       script_sig = script_sig.htb
       hash_type = script_sig[-1].unpack('C').first
       sig = script_sig[0..-2]
-      sighash =
-        tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount)
+      sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type, amount: amount)
       verify_sig(sig.bth, pubkey, sighash)
     end
 
