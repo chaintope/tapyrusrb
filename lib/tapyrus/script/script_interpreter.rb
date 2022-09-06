@@ -2,7 +2,7 @@ module Tapyrus
   class ScriptInterpreter
     include Tapyrus::Opcodes
 
-    attr_reader :stack
+    attr_accessor :stack
     attr_reader :debug
     attr_reader :flags
     attr_accessor :error
@@ -554,6 +554,19 @@ module Tapyrus
       @color_id = nil
     end
 
+    # see https://github.com/bitcoin/bitcoin/blob/master/src/script/interpreter.cpp#L36-L49
+    def cast_to_bool(v)
+      case v
+      when Numeric
+        return v != 0
+      when String
+        v.each_byte.with_index { |b, i| return !(i == (v.bytesize - 1) && b == 0x80) unless b == 0 }
+        false
+      else
+        false
+      end
+    end
+
     private
 
     def flag?(flag)
@@ -602,19 +615,6 @@ module Tapyrus
     # pop the item with the boolean value from the stack.
     def pop_bool
       cast_to_bool(pop_string.htb)
-    end
-
-    # see https://github.com/bitcoin/bitcoin/blob/master/src/script/interpreter.cpp#L36-L49
-    def cast_to_bool(v)
-      case v
-      when Numeric
-        return v != 0
-      when String
-        v.each_byte.with_index { |b, i| return !(i == (v.bytesize - 1) && b == 0x80) unless b == 0 }
-        false
-      else
-        false
-      end
     end
 
     def check_ecdsa_signature_encoding(sig, data_sig = false)

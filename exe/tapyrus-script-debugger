@@ -58,7 +58,12 @@ else
   print "Enter index of the input: "
   input_index = gets.chomp
   tx_checker = Tapyrus::TxChecker.new
+  begin
   tx_checker.tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
+  rescue StandardError
+    warn "Invalid tx data."
+    exit
+  end
   if input_index.empty?
     warn "Index of input missing."
     exit
@@ -78,6 +83,7 @@ interpreter.reset_params
 chunks = target_script.chunks.each
 chunk_index = 0
 chunks_size = target_script.chunks.length
+stack_copy = nil
 
 puts "The Script is ready to be executed; you can step execution it by putting the Enter key."
 print "> "
@@ -85,12 +91,33 @@ while cmd = gets.chomp
   if cmd.length == 0
     if chunks_size == chunk_index
       if target_script == script_sig
+        stack_copy = interpreter.stack.dup
         target_script = script_pubkey
         interpreter.reset_params
         chunks = target_script.chunks.each
         chunk_index = 0
         chunks_size = target_script.chunks.length
       elsif target_script == script_pubkey
+        if interpreter.stack.empty? || !interpreter.cast_to_bool(interpreter.stack.last.htb)
+          warn "Script evaluated without error but finished with a false/empty top stack element"
+          exit
+        end
+        if script_pubkey.p2sh?
+          interpreter.stack = stack_copy
+          redeem_script = Tapyrus::Script.parse_from_payload(interpreter.stack.pop.htb)
+          puts "APPLY P2SH: #{redeem_script}"
+          rows = interpreter.stack.map{|s|[s]}.reverse
+          table = Terminal::Table.new(title: 'Current Stack', rows: rows )
+          puts table
+          target_script = redeem_script
+          chunks = target_script.chunks.each
+          chunk_index = 0
+          chunks_size = target_script.chunks.length
+        else
+          puts "Execution finished."
+          exit
+        end
+      else
         puts "Execution finished."
         exit
       end
