@@ -103,13 +103,12 @@ module Tapyrus
       to_payload.bytesize
     end
 
-    # get signature hash
+    # Generate signature hash
     # @param [Integer] input_index input index.
     # @param [Integer] hash_type signature hash type
-    # @param [Tapyrus::Script] output_script script pubkey or script code. if script pubkey is P2WSH, set witness script to this.
-    # @param [Integer] skip_separator_index If output_script is P2WSH and output_script contains any OP_CODESEPARATOR,
-    # the script code needs  is the witnessScript but removing everything up to and including the last executed OP_CODESEPARATOR before the signature checking opcode being executed.
-    def sighash_for_input(input_index, output_script, hash_type: SIGHASH_TYPE[:all], skip_separator_index: 0)
+    # @param [Tapyrus::Script] output_script script pubkey or script code. if script pubkey is P2SH, set redeem script to this.
+    # @return [String] sighash
+    def sighash_for_input(input_index, output_script, hash_type: SIGHASH_TYPE[:all])
       raise ArgumentError, 'input_index must be specified.' unless input_index
       raise ArgumentError, 'does not exist input corresponding to input_index.' if input_index >= inputs.size
       raise ArgumentError, 'script_pubkey must be specified.' unless output_script
