@@ -3,32 +3,6 @@
 require 'tapyrus'
 require 'terminal-table'
 
-class EmptyTxChecker
-  def check_sig(script_sig, pubkey, script_code)
-    warn "Signature verification failed. You need to enter tx and input index."
-    exit
-  end
-  def verify_sig(sig, pubkey, digest, allow_hybrid: false)
-    warn "Signature verification failed. You need to enter tx and input index."
-    exit
-  end
-end
-
-def run_step(interpreter, script, chunk, index, is_redeem_script)
-  if chunk.pushdata?
-    puts "PUSH #{chunk.pushed_data.bth}"
-  else
-    puts "APPLY #{Tapyrus::Opcodes.opcode_to_name(chunk.opcode)}"
-  end
-  result = interpreter.next_step(script, chunk, index, is_redeem_script)
-  if result.is_a?(FalseClass)
-    warn "script failed. Reason: #{interpreter.error}"
-    exit
-  end
-  rows = interpreter.stack.map{|s|[s]}.reverse
-  table = Terminal::Table.new(title: 'Current Stack', rows: rows )
-  puts table
-end
 
 print "Enter scriptPubkey: "
 script_pubkey_hex = gets.chomp
@@ -52,14 +26,13 @@ end
 
 print "Enter tx: "
 tx_hex = gets.chomp
-if tx_hex.length == 0
-  tx_checker = EmptyTxChecker.new
-else
+tx = nil
+input_index = nil
+unless tx_hex.length == 0
   print "Enter index of the input: "
   input_index = gets.chomp
-  tx_checker = Tapyrus::TxChecker.new
   begin
-  tx_checker.tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
+  tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
   rescue StandardError
     warn "Invalid tx data."
     exit
@@ -68,64 +41,31 @@ else
     warn "Index of input missing."
     exit
   end
-  tx_checker.input_index = input_index.to_i
-  if (tx_checker.tx.in.size - 1) < tx_checker.input_index
-    warn "Tx does not have #{tx_checker.input_index}-th input."
-    exit
-  end
+  input_index = input_index.to_i
 end
 
-interpreter = Tapyrus::ScriptInterpreter.new(checker: tx_checker)
-
-target_script = script_sig
-is_redeem = false
-interpreter.reset_params
-chunks = target_script.chunks.each
-chunk_index = 0
-chunks_size = target_script.chunks.length
-stack_copy = nil
+begin
+debugger = Tapyrus::ScriptDebugger.new(script_pubkey: script_pubkey, script_sig: script_sig, tx: tx, index: input_index)
+rescue ArgumentError => e
+  warn e.message
+  exit
+end
 
 puts "The Script is ready to be executed; you can step execution it by putting the Enter key."
 print "> "
 while cmd = gets.chomp
   if cmd.length == 0
-    if chunks_size == chunk_index
-      if target_script == script_sig
-        stack_copy = interpreter.stack.dup
-        target_script = script_pubkey
-        interpreter.reset_params
-        chunks = target_script.chunks.each
-        chunk_index = 0
-        chunks_size = target_script.chunks.length
-      elsif target_script == script_pubkey
-        if interpreter.stack.empty? || !interpreter.cast_to_bool(interpreter.stack.last.htb)
-          warn "Script evaluated without error but finished with a false/empty top stack element"
-          exit
-        end
-        if script_pubkey.p2sh?
-          interpreter.stack = stack_copy
-          redeem_script = Tapyrus::Script.parse_from_payload(interpreter.stack.pop.htb)
-          puts "APPLY P2SH: #{redeem_script}"
-          rows = interpreter.stack.map{|s|[s]}.reverse
-          table = Terminal::Table.new(title: 'Current Stack', rows: rows )
-          puts table
-          target_script = redeem_script
-          chunks = target_script.chunks.each
-          chunk_index = 0
-          chunks_size = target_script.chunks.length
-        else
-          puts "Execution finished."
-          exit
-        end
-      else
-        puts "Execution finished."
-        exit
-      end
+    result = debugger.step
+    if result.halt?
+      puts result.message if result.message
+      warn result.error
+      exit
+    elsif result.finished?
+      puts "Execution finished."
+      exit
+    else
+      result.print_result
     end
-    run_step(interpreter, target_script, chunks.next, chunk_index, is_redeem)
-    chunk_index += 1
-  else
-    puts "Put enter key to step execution or Ctrl+D to exit."
   end
   print "> "
 end

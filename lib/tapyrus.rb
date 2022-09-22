@@ -24,6 +24,7 @@ module Tapyrus
   autoload :Script, 'tapyrus/script/script'
   autoload :Multisig, 'tapyrus/script/multisig'
   autoload :ScriptInterpreter, 'tapyrus/script/script_interpreter'
+  autoload :ScriptDebugger, 'tapyrus/script/debugger'
   autoload :ScriptError, 'tapyrus/script/script_error'
   autoload :TxChecker, 'tapyrus/script/tx_checker'
   autoload :TxIn, 'tapyrus/tx_in'
@@ -50,6 +51,7 @@ module Tapyrus
   autoload :Errors, 'tapyrus/errors'
   autoload :TxBuilder, 'tapyrus/tx_builder'
   autoload :BIP175, 'tapyrus/bip175'
+  autoload :Contract, 'tapyrus/contract'
 
   require_relative 'tapyrus/constants'
   require_relative 'tapyrus/ext/ecdsa'
