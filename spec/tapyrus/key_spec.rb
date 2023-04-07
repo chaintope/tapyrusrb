@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Tapyrus::Key do
-
   describe '#from_wif' do
     context 'mainnet', network: :prod do
       subject { Tapyrus::Key.from_wif('KxJkzWsRQmr2bdU9TdWDFhXxg9nsELSEQojEQFZMFqJsHTBSXpP9') }
@@ -169,24 +168,27 @@ describe Tapyrus::Key do
   describe 'private key range check' do
     context 'on curve' do
       it 'not raise error' do
-        expect { Tapyrus::Key.new(
-          priv_key: '0000000000000000000000000000000000000000000000000000000000000001',
-          key_type: Tapyrus::Key::TYPES[:compressed]
-          ) }.not_to raise_error
+        expect {
+          Tapyrus::Key.new(
+            priv_key: '0000000000000000000000000000000000000000000000000000000000000001',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          )
+        }.not_to raise_error
         expect(
           Tapyrus::Key.new(
             priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140',
-            key_type: Tapyrus::Key::TYPES[:compressed])
-            .fully_valid_pubkey?
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          ).fully_valid_pubkey?
         ).to be true
       end
     end
 
     context 'not on curve' do
       it 'raise error' do
-        expect {
-          Tapyrus::Key.new(priv_key: '00', key_type: Tapyrus::Key::TYPES[:compressed])
-        }.to raise_error(ArgumentError, Tapyrus::Errors::Messages::INVALID_PRIV_KEY)
+        expect { Tapyrus::Key.new(priv_key: '00', key_type: Tapyrus::Key::TYPES[:compressed]) }.to raise_error(
+          ArgumentError,
+          Tapyrus::Errors::Messages::INVALID_PRIV_KEY
+        )
         expect {
           Tapyrus::Key.new(
             priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
@@ -198,10 +200,12 @@ describe Tapyrus::Key do
 
     context 'low-digit private key' do
       it do
-        expect{described_class.new(
-          priv_key: '6f3acb5b7ac66dacf87910bb0b04bed78284b9b50c0d061705a44447a947ff',
-          key_type: Tapyrus::Key::TYPES[:compressed]
-        )}.to raise_error(ArgumentError, Tapyrus::Errors::Messages::INVALID_PRIV_LENGTH)
+        expect {
+          described_class.new(
+            priv_key: '6f3acb5b7ac66dacf87910bb0b04bed78284b9b50c0d061705a44447a947ff',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          )
+        }.to raise_error(ArgumentError, Tapyrus::Errors::Messages::INVALID_PRIV_LENGTH)
       end
     end
   end
