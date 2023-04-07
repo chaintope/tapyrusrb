@@ -168,23 +168,44 @@ describe Tapyrus::Key do
   describe 'private key range check' do
     context 'on curve' do
       it 'not raise error' do
-        expect { Tapyrus::Key.new(priv_key: '01') }.not_to raise_error
         expect {
-          Tapyrus::Key.new(priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140')
+          Tapyrus::Key.new(
+            priv_key: '0000000000000000000000000000000000000000000000000000000000000001',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          )
         }.not_to raise_error
         expect(
-          Tapyrus::Key.new(priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140')
-            .fully_valid_pubkey?
+          Tapyrus::Key.new(
+            priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          ).fully_valid_pubkey?
         ).to be true
       end
     end
 
     context 'not on curve' do
       it 'raise error' do
-        expect { Tapyrus::Key.new(priv_key: '00') }.to raise_error(ArgumentError)
+        expect { Tapyrus::Key.new(priv_key: '00', key_type: Tapyrus::Key::TYPES[:compressed]) }.to raise_error(
+          ArgumentError,
+          Tapyrus::Errors::Messages::INVALID_PRIV_KEY
+        )
         expect {
-          Tapyrus::Key.new(priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')
-        }.to raise_error(ArgumentError)
+          Tapyrus::Key.new(
+            priv_key: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          )
+        }.to raise_error(ArgumentError, Tapyrus::Errors::Messages::INVALID_PRIV_KEY)
+      end
+    end
+
+    context 'low-digit private key' do
+      it do
+        expect {
+          described_class.new(
+            priv_key: '6f3acb5b7ac66dacf87910bb0b04bed78284b9b50c0d061705a44447a947ff',
+            key_type: Tapyrus::Key::TYPES[:compressed]
+          )
+        }.to raise_error(ArgumentError, Tapyrus::Errors::Messages::INVALID_PRIV_LENGTH)
       end
     end
   end

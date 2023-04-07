@@ -10,6 +10,7 @@ module Tapyrus
 
       INVALID_PRIV_KEY = 'Private key is not in range [1..n-1].'
       INVALID_CHECKSUM = 'Invalid checksum.'
+      INVALID_PRIV_LENGTH = 'Private key must be 32 bytes.'
     end
   end
 end
