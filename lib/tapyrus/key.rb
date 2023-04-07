@@ -41,7 +41,11 @@ module Tapyrus
       end
       @secp256k1_module = Tapyrus.secp_impl
       @priv_key = priv_key
-      raise ArgumentError, Errors::Messages::INVALID_PRIV_KEY unless validate_private_key_range(@priv_key) if @priv_key
+
+      if @priv_key
+        raise ArgumentError, Errors::Messages::INVALID_PRIV_KEY unless validate_private_key_range(@priv_key)
+        raise ArgumentError, Errors::Messages::INVALID_PRIV_LENGTH unless @priv_key.htb.bytesize == 32
+      end
       if pubkey
         @pubkey = pubkey
       else
