@@ -25,7 +25,8 @@ module Tapyrus
       l = Tapyrus.hmac_sha512('Tapyrus seed', seed.htb)
       left = l[0..31].bth.to_i(16)
       raise 'invalid key' if left >= CURVE_ORDER || left == 0
-      ext_key.key = Tapyrus::Key.new(priv_key: l[0..31].bth, key_type: Tapyrus::Key::TYPES[:compressed])
+      l_priv = ECDSA::Format::IntegerOctetString.encode(left, 32)
+      ext_key.key = Tapyrus::Key.new(priv_key: l_priv.bth, key_type: Tapyrus::Key::TYPES[:compressed])
       ext_key.chain_code = l[32..-1]
       ext_key
     end
@@ -107,7 +108,8 @@ module Tapyrus
       raise 'invalid key' if left >= CURVE_ORDER
       child_priv = (left + key.priv_key.to_i(16)) % CURVE_ORDER
       raise 'invalid key ' if child_priv >= CURVE_ORDER
-      new_key.key = Tapyrus::Key.new(priv_key: child_priv.to_even_length_hex.rjust(64, '0'), key_type: key_type)
+      child_priv = ECDSA::Format::IntegerOctetString.encode(child_priv, 32)
+      new_key.key = Tapyrus::Key.new(priv_key: child_priv.bth, key_type: key_type)
       new_key.chain_code = l[32..-1]
       new_key.ver = version
       new_key
@@ -275,7 +277,8 @@ module Tapyrus
       l = Tapyrus.hmac_sha512(chain_code, data)
       left = l[0..31].bth.to_i(16)
       raise 'invalid key' if left >= CURVE_ORDER
-      p1 = Tapyrus::Key.new(priv_key: left.to_s(16), key_type: Tapyrus::Key::TYPES[:uncompressed]).to_point
+      l_priv = ECDSA::Format::IntegerOctetString.encode(left, 32)
+      p1 = Tapyrus::Key.new(priv_key: l_priv.bth, key_type: Tapyrus::Key::TYPES[:uncompressed]).to_point
       p2 = Tapyrus::Key.new(pubkey: pubkey, key_type: key_type).to_point
       new_key.pubkey = (p1 + p2).to_hex
       new_key.chain_code = l[32..-1]
