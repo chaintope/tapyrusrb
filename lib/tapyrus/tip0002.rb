@@ -8,8 +8,10 @@ module Tapyrus
     # @param script_pubkey [Tapyrus::Script] script pubkey in transaction output
     # @param address [String] Tapyrus address for transaction output
     # @param data [String] hexdecimal string
-    def sign_message(key, txid:, index:, color_id:, value:, script_pubkey:, address:, data: nil)
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
+    def sign_message(key, txid:, index:, color_id:, value:, script_pubkey:, address:, data: nil, client: nil)
       validate_payload!(txid:, index:, color_id:, value:, script_pubkey:, address:, data:)
+      validate_on_blockchain!(client:, txid:, index:, color_id:, value:, script_pubkey:)
       data = {
         txid:,index:, color_id: color_id&.to_hex, value:, script_pubkey: script_pubkey&.to_hex, address:, data:
       }
@@ -18,8 +20,9 @@ module Tapyrus
 
     # @param jws [String] JWT Web Token
     # @param key [Tapyrus::Key] public key
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
     # @return decoded JSON Object
-    def verify_message(jws, key)
+    def verify_message(jws, key, client: nil)
       JWS.decode(jws, key.pubkey).tap do |decoded|
         payload = decoded[0]
         color_id = begin
@@ -34,6 +37,7 @@ module Tapyrus
         end
 
         validate_payload!(txid: payload["txid"], index: payload["index"], color_id: color_id, value: payload["value"], script_pubkey: script_pubkey, address: payload["address"], data: payload["data"])
+        validate_on_blockchain!(client:, txid: payload["txid"], index: payload["index"], color_id: color_id, value: payload["value"], script_pubkey: script_pubkey) if client
       end
     end
 
@@ -66,6 +70,27 @@ module Tapyrus
 
       if data && !/^([0-9a-fA-F]{2})+$/.match(data)
         raise RuntimeError, "data is invalid" 
+      end
+    end
+
+    def validate_on_blockchain!(client:, txid:, index:, color_id:, value:, script_pubkey:)
+      raw_tx = client.getrawtransaction(txid)
+      tx = Tapyrus::Tx.parse_from_payload(raw_tx.htb)
+      output = tx.outputs[index]
+      unless output
+        raise RuntimeError, "output not found in blockchain"
+      end
+
+      if color_id != output.color_id
+        raise RuntimeError, "color_id of transaction in blockchain is not match to one in the signed message"
+      end
+
+      if value != output.value
+        raise RuntimeError, "value of transaction in blockchain is not match to one in the signed message"
+      end
+
+      if script_pubkey != output.script_pubkey
+        raise RuntimeError, "script_pubkey of transaction in blockchain is not match to one in the signed message"
       end
     end
   end
