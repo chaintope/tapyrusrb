@@ -1,5 +1,5 @@
 module Tapyrus
-  module TIP0002
+  module TIP0137
     # @param key [Tapyrus::Key] private key
     # @param txid [String] txid
     # @param index [Integer] index of transaction output

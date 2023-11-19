@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Tapyrus::TIP0002 do
+describe Tapyrus::TIP0137 do
   class Stub
-    include Tapyrus::TIP0002
+    include Tapyrus::TIP0137
   end
 
   let(:txid) { '01' * 32 }

@@ -53,7 +53,7 @@ module Tapyrus
   autoload :TxBuilder, 'tapyrus/tx_builder'
   autoload :BIP175, 'tapyrus/bip175'
   autoload :Contract, 'tapyrus/contract'
-  autoload :TIP0002, 'tapyrus/tip0002'
+  autoload :TIP0137, 'tapyrus/tip0137'
   autoload :JWS, 'tapyrus/jws'
 
   require_relative 'tapyrus/constants'
