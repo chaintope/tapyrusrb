@@ -131,7 +131,7 @@ module Tapyrus
         raise ArgumentError, 'color_id is invalid'
       end
       raise ArgumentError, 'value is invalid' if !value || !/^\d+$/.match(value.to_s) || value < 0 || value >= 2**64
-      if !script_pubkey || !script_pubkey.is_a?(Tapyrus::Script)
+      if !script_pubkey || !script_pubkey.is_a?(Tapyrus::Script) || !(script_pubkey.p2pkh? || script_pubkey.cp2pkh?)
         raise ArgumentError, 'script_pubkey is invalid'
       end
       begin

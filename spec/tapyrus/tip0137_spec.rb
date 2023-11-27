@@ -126,10 +126,24 @@ describe Tapyrus::TIP0137 do
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
 
-    context 'address is nil' do
-      let(:address) { nil }
+    context 'script_pubkey is p2sh' do
+      let(:script_pubkey) {  Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6') }
 
+      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
+
+    context 'script_pubkey is cp2sh' do
+      let(:script_pubkey) {  Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6').add_color(color_id) }
+
+      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+    end
+
+    context 'script_pubkey is op_return' do
+      let(:script_pubkey) {  Tapyrus::Script.new << Tapyrus::Script::OP_RETURN }
+
+      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+    end
+
     context 'address is invalid' do
       let(:address) { 'invalid address' }
 
@@ -272,6 +286,14 @@ describe Tapyrus::TIP0137 do
     context 'script_pubkey is invalid' do
       let(:jws) do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiJleGFtcGxlLmNvbSIsInR4aWQiOiIwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxIiwiaW5kZXgiOjEsImNvbG9yX2lkIjoiYzNlYzJmZDgwNjcwMWEzZjU1ODA4Y2JlYzM5MjJjMzhkYWZhYTMwNzBjNDhjODAzZTkwNDNlZTM2NDJjNjYwYjQ2IiwidmFsdWUiOjEsInNjcmlwdF9wdWJrZXkiOm51bGwsImFkZHJlc3MiOiIyMlZkUTVWaldjRjl6Z3NuUFFvZEZCUzFQQlFQYUFRRVhTb2ZreU12MkQ5elYxTWROaGVhQXk3c3JvVGc1Mm13VzVhcE5oeFBxQjZYNFlSRyIsImRhdGEiOiIwMTAyMDMwNDA1MDYwNzA4MDkwYTBiMGMwZDBlMGYifQ.7dpSE4n10SXIJAAnv1m0uARajzSCqNKf-f9icl_247zqCl7IZX9oSNWiY0m9KlxHi3hXFMs2VKNwTjoRjz08lw'
+      end
+
+      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+    end
+
+    context 'script_pubkey is not p2pkh either cp2pkh' do
+      let(:jws) do
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiYTkxNDc2MjBhNzllODY1N2QwNjZjZmYxMGUyMTIyOGJmOTgzY2Y1NDZhYzY4NyIsImFkZHJlc3MiOiIyMlZkUTVWaldjRjl6Z3NuUFFvZEZCUzFQQlFQYUFRRVhTb2ZreU12MkQ5elYxTWROaGVhQXk3c3JvVGc1Mm13VzVhcE5oeFBxQjZYNFlSRyIsIm1lc3NhZ2UiOiIwMTAyMDMwNDA1MDYwNzA4MDkwYTBiMGMwZDBlMGYifQ.BJA-TPrt-eDPEBY1ydjZjtmDgic-SnoOPnNB5_j7Ci-gE2uQVMocjCdVynV9gR57BqDqS0bWiduZQBE0uxODig'
       end
 
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
