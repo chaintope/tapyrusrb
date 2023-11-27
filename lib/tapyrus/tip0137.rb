@@ -17,13 +17,13 @@ module Tapyrus
     # @raise [ArgumentError] raise if script_pubkey is an invalid Tapyrus::Script object
     # @raise [ArgumentError] raise if address is an invalid Tapyrus address
     # @raise [ArgumentError] raise if message is not a hexdecimal string
-    # @raise [ArgumentError] raise if transaction is not found with txid and index in blockchain 
+    # @raise [ArgumentError] raise if transaction is not found with txid and index in blockchain
     # @raise [ArgumentError] raise if script and value is not equal to ones in blockchain
     def sign_message!(
       key,
       txid:,
       index:,
-      value: ,
+      value:,
       script_pubkey:,
       color_id: nil,
       address: nil,
@@ -72,7 +72,7 @@ module Tapyrus
     # @raise [ArgumentError] raise if decoded script_pubkey is an invalid Tapyrus::Script object
     # @raise [ArgumentError] raise if decoded address is an invalid Tapyrus address
     # @raise [ArgumentError] raise if decoded message is not a hexdecimal string
-    # @raise [ArgumentError] raise if transaction is not found with decoded txid and index in blockchain 
+    # @raise [ArgumentError] raise if transaction is not found with decoded txid and index in blockchain
     # @raise [ArgumentError] raise if decoded script and value is not equal to ones in blockchain
     def verify_message!(jws, key, client: nil)
       JWS

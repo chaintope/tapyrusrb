@@ -127,19 +127,19 @@ describe Tapyrus::TIP0137 do
     end
 
     context 'script_pubkey is p2sh' do
-      let(:script_pubkey) {  Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6') }
+      let(:script_pubkey) { Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6') }
 
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
 
     context 'script_pubkey is cp2sh' do
-      let(:script_pubkey) {  Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6').add_color(color_id) }
+      let(:script_pubkey) { Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6').add_color(color_id) }
 
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
 
     context 'script_pubkey is op_return' do
-      let(:script_pubkey) {  Tapyrus::Script.new << Tapyrus::Script::OP_RETURN }
+      let(:script_pubkey) { Tapyrus::Script.new << Tapyrus::Script::OP_RETURN }
 
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
@@ -254,7 +254,7 @@ describe Tapyrus::TIP0137 do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6bnVsbCwidmFsdWUiOjEsInNjcmlwdF9wdWJrZXkiOiIyMWMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NmJjNzZhOTE0ZmM3MjUwYTIxMWRlZGRjNzBlZTVhMjczOGRlNWYwNzgxNzM1MWNlZjg4YWMiLCJhZGRyZXNzIjoiMjJWZFE1VmpXY0Y5emdzblBRb2RGQlMxUEJRUGFBUUVYU29ma3lNdjJEOXpWMU1kTmhlYUF5N3Nyb1RnNTJtd1c1YXBOaHhQcUI2WDRZUkciLCJtZXNzYWdlIjoiMDEwMjAzMDQwNTA2MDcwODA5MGEwYjBjMGQwZTBmIn0.aWLtOGxFjHB_V2z0VrU034PWHXheCl8OTXDnuEmShtRq2RHRNqPTKZnRt2SIrDuhLjz9TlaiPMr3JkCPXKPvMA'
       end
 
-      it { expect(subject[0]["color_id"]).to be_nil }
+      it { expect(subject[0]['color_id']).to be_nil }
     end
 
     context 'color_id is invalid(too long)' do
@@ -289,13 +289,12 @@ describe Tapyrus::TIP0137 do
       it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
     end
 
-
     context 'address is nil' do
       let(:jws) do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiMjFjM2VjMmZkODA2NzAxYTNmNTU4MDhjYmVjMzkyMmMzOGRhZmFhMzA3MGM0OGM4MDNlOTA0M2VlMzY0MmM2NjBiNDZiYzc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6bnVsbCwibWVzc2FnZSI6IjAxMDIwMzA0MDUwNjA3MDgwOTBhMGIwYzBkMGUwZiJ9.ZFKG3aoIAydKHFmf3ddMFSQJoYWeCwgw_OgucszQzPOwlHtskeHsR2bXAWiWS3uh9C0wJm24CaaEwJGTCm4F3Q'
       end
 
-      it { expect(subject[0]["address"]).to be_nil }
+      it { expect(subject[0]['address']).to be_nil }
     end
 
     context 'address is invalid' do
@@ -311,7 +310,7 @@ describe Tapyrus::TIP0137 do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiMjFjM2VjMmZkODA2NzAxYTNmNTU4MDhjYmVjMzkyMmMzOGRhZmFhMzA3MGM0OGM4MDNlOTA0M2VlMzY0MmM2NjBiNDZiYzc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6IjIyVmRRNVZqV2NGOXpnc25QUW9kRkJTMVBCUVBhQVFFWFNvZmt5TXYyRDl6VjFNZE5oZWFBeTdzcm9UZzUybXdXNWFwTmh4UHFCNlg0WVJHIiwibWVzc2FnZSI6bnVsbH0.4PdrfgMfAX-wZIHe_C721kw7AG_nYG0jdV7mWH4xAKQdo1-i39lK9Lb04DHtzf19CIRv1nC9CHy1-xs2P6cjrA'
       end
 
-      it { expect(subject[0]["message"]).to be_nil }
+      it { expect(subject[0]['message']).to be_nil }
     end
 
     context 'message is invalid' do
