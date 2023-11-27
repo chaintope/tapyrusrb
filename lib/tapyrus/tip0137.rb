@@ -132,14 +132,17 @@ module Tapyrus
       end
       raise ArgumentError, 'value is invalid' if !value || !/^\d+$/.match(value.to_s) || value < 0 || value >= 2**64
       if !script_pubkey || !script_pubkey.is_a?(Tapyrus::Script) || !(script_pubkey.p2pkh? || script_pubkey.cp2pkh?)
-        raise ArgumentError, 'script_pubkey is invalid'
+        raise ArgumentError,
+              'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
       end
       begin
         address && Base58.decode(address)
       rescue ArgumentError => e
         raise ArgumentError, 'address is invalid'
       end
-      raise ArgumentError, 'message is invalid' if message && !/^([0-9a-fA-F]{2})+$/.match(message)
+      if message && !/^([0-9a-fA-F]{2})+$/.match(message)
+        raise ArgumentError, 'message is invalid. message must be a hex string'
+      end
     end
 
     def validate_on_blockchain!(client: nil, txid: nil, index: nil, color_id: nil, value: nil, script_pubkey: nil)

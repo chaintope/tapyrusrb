@@ -123,25 +123,45 @@ describe Tapyrus::TIP0137 do
     context 'script_pubkey is invalid' do
       let(:script_pubkey) { 'invalid script_pubkey' }
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'script_pubkey is p2sh' do
       let(:script_pubkey) { Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6') }
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'script_pubkey is cp2sh' do
       let(:script_pubkey) { Tapyrus::Script.to_p2sh('7620a79e8657d066cff10e21228bf983cf546ac6').add_color(color_id) }
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'script_pubkey is op_return' do
       let(:script_pubkey) { Tapyrus::Script.new << Tapyrus::Script::OP_RETURN }
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'address is invalid' do
@@ -153,7 +173,7 @@ describe Tapyrus::TIP0137 do
     context 'message is invalid' do
       let(:message) { 'invalid message' }
 
-      it { expect { subject }.to raise_error(ArgumentError, 'message is invalid') }
+      it { expect { subject }.to raise_error(ArgumentError, 'message is invalid. message must be a hex string') }
     end
   end
 
@@ -278,7 +298,12 @@ describe Tapyrus::TIP0137 do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiaW52YWxpZCBzY3JpcHQiLCJhZGRyZXNzIjoiMjJWZFE1VmpXY0Y5emdzblBRb2RGQlMxUEJRUGFBUUVYU29ma3lNdjJEOXpWMU1kTmhlYUF5N3Nyb1RnNTJtd1c1YXBOaHhQcUI2WDRZUkciLCJtZXNzYWdlIjoiMDEwMjAzMDQwNTA2MDcwODA5MGEwYjBjMGQwZTBmIn0.5Q_MgE0t9DV3Zpp1QO9A8tgSc140mKONbMK569UsLrITxj5262LSBFsQ6FOw7l0veQUsvZPJZ2vG6nZv7alA0w'
       end
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'script_pubkey is not p2pkh either cp2pkh' do
@@ -286,7 +311,12 @@ describe Tapyrus::TIP0137 do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiYTkxNDc2MjBhNzllODY1N2QwNjZjZmYxMGUyMTIyOGJmOTgzY2Y1NDZhYzY4NyIsImFkZHJlc3MiOiIyMlZkUTVWaldjRjl6Z3NuUFFvZEZCUzFQQlFQYUFRRVhTb2ZreU12MkQ5elYxTWROaGVhQXk3c3JvVGc1Mm13VzVhcE5oeFBxQjZYNFlSRyIsIm1lc3NhZ2UiOiIwMTAyMDMwNDA1MDYwNzA4MDkwYTBiMGMwZDBlMGYifQ.BJA-TPrt-eDPEBY1ydjZjtmDgic-SnoOPnNB5_j7Ci-gE2uQVMocjCdVynV9gR57BqDqS0bWiduZQBE0uxODig'
       end
 
-      it { expect { subject }.to raise_error(ArgumentError, 'script_pubkey is invalid') }
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+        )
+      end
     end
 
     context 'address is nil' do
@@ -318,7 +348,7 @@ describe Tapyrus::TIP0137 do
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiMjFjM2VjMmZkODA2NzAxYTNmNTU4MDhjYmVjMzkyMmMzOGRhZmFhMzA3MGM0OGM4MDNlOTA0M2VlMzY0MmM2NjBiNDZiYzc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6IjIyVmRRNVZqV2NGOXpnc25QUW9kRkJTMVBCUVBhQVFFWFNvZmt5TXYyRDl6VjFNZE5oZWFBeTdzcm9UZzUybXdXNWFwTmh4UHFCNlg0WVJHIiwibWVzc2FnZSI6ImludmFsaWQgbWVzc2FnZSJ9.wjkRggCMdmCfwzu6DRUm8snNXUHw6oWjf4fxklpcvWWXJaDi1Ku9NROLLcdBreKpc4jW8u9NavAMbO9zkIklEA'
       end
 
-      it { expect { subject }.to raise_error(ArgumentError, 'message is invalid') }
+      it { expect { subject }.to raise_error(ArgumentError, 'message is invalid. message must be a hex string') }
     end
 
     context 'client specified' do
