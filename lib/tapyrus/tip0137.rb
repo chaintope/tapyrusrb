@@ -7,7 +7,7 @@ module Tapyrus
     # @param value [Integer] non-negative integer less than 2^64
     # @param script_pubkey [Tapyrus::Script] script pubkey in transaction output
     # @param address [String] Tapyrus address for transaction output
-    # @param data [String] hexdecimal string
+    # @param message [String] hexdecimal string
     # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
     # @return [String] Signed message with JWS Format
     # @raise [ArgumentError] raise if txid is not a 64-character hexadecimal string
@@ -16,7 +16,7 @@ module Tapyrus
     # @raise [ArgumentError] raise if value is not a non-negative integer less than 2^64
     # @raise [ArgumentError] raise if script_pubkey is an invalid Tapyrus::Script object
     # @raise [ArgumentError] raise if address is an invalid Tapyrus address
-    # @raise [ArgumentError] raise if data is not a hexdecimal string
+    # @raise [ArgumentError] raise if message is not a hexdecimal string
     # @raise [ArgumentError] raise if transaction is not found with txid and index in blockchain 
     # @raise [ArgumentError] raise if script and value is not equal to ones in blockchain
     def sign_message!(
@@ -27,7 +27,7 @@ module Tapyrus
       script_pubkey:,
       color_id: nil,
       address: nil,
-      data: nil,
+      message: nil,
       client: nil
     )
       validate_payload!(
@@ -37,7 +37,7 @@ module Tapyrus
         value: value,
         script_pubkey: script_pubkey,
         address: address,
-        data: data
+        message: message
       )
       if client
         validate_on_blockchain!(
@@ -56,7 +56,7 @@ module Tapyrus
         value: value,
         script_pubkey: script_pubkey&.to_hex,
         address: address,
-        data: data
+        message: message
       }
       JWS.encode(data, key.priv_key)
     end
@@ -71,7 +71,7 @@ module Tapyrus
     # @raise [ArgumentError] raise if decoded value is not a non-negative integer less than 2^64
     # @raise [ArgumentError] raise if decoded script_pubkey is an invalid Tapyrus::Script object
     # @raise [ArgumentError] raise if decoded address is an invalid Tapyrus address
-    # @raise [ArgumentError] raise if decoded data is not a hexdecimal string
+    # @raise [ArgumentError] raise if decoded message is not a hexdecimal string
     # @raise [ArgumentError] raise if transaction is not found with decoded txid and index in blockchain 
     # @raise [ArgumentError] raise if decoded script and value is not equal to ones in blockchain
     def verify_message!(jws, key, client: nil)
@@ -98,7 +98,7 @@ module Tapyrus
             value: payload['value'],
             script_pubkey: script_pubkey,
             address: payload['address'],
-            data: payload['data']
+            message: payload['message']
           )
           if client
             validate_on_blockchain!(
@@ -139,7 +139,7 @@ module Tapyrus
       rescue ArgumentError => e
         raise ArgumentError, 'address is invalid'
       end
-      raise ArgumentError, 'data is invalid' if data && !/^([0-9a-fA-F]{2})+$/.match(data)
+      raise ArgumentError, 'message is invalid' if message && !/^([0-9a-fA-F]{2})+$/.match(message)
     end
 
     def validate_on_blockchain!(client: nil, txid: nil, index: nil, color_id: nil, value: nil, script_pubkey: nil)
