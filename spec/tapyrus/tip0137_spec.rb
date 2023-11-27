@@ -378,4 +378,34 @@ describe Tapyrus::TIP0137 do
       end
     end
   end
+
+  describe '#verify_message' do
+    subject { Stub.new.verify_message(jws, key, client: client) }
+
+    let(:key) { Tapyrus::Key.new(pubkey: '034f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa') }
+
+    let(:jws) do
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMSIsImluZGV4IjoxLCJjb2xvcl9pZCI6ImMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMzOTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUzNjQyYzY2MGI0NiIsInZhbHVlIjoxLCJzY3JpcHRfcHVia2V5IjoiMjFjM2VjMmZkODA2NzAxYTNmNTU4MDhjYmVjMzkyMmMzOGRhZmFhMzA3MGM0OGM4MDNlOTA0M2VlMzY0MmM2NjBiNDZiYzc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6IjIyVmRRNVZqV2NGOXpnc25QUW9kRkJTMVBCUVBhQVFFWFNvZmt5TXYyRDl6VjFNZE5oZWFBeTdzcm9UZzUybXdXNWFwTmh4UHFCNlg0WVJHIiwibWVzc2FnZSI6IjAxMDIwMzA0MDUwNjA3MDgwOTBhMGIwYzBkMGUwZiJ9.jyDfXwow8xqflxqrIb0t8dpI9iO1QaXHF2Ca_olal8yOu61ON3KDG-k-Nz0AVUzFXTQQ89yOz3FBMC0su9V0Eg'
+    end
+
+    let(:client) { nil }
+
+    it { expect(subject).to eq true }
+
+    context 'invalid signature' do
+      let(:jws) do
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.' + 'eyJpc3MiOiJleGFtcGxlLmNvbSIsInR4aWQiOiIw' +
+          'MTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEw' + 'MTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEwMTAxMDEw' +
+          'MTAxIiwiaW5kZXgiOjEsImNvbG9yX2lkIjoiYzNl' + 'YzJmZDgwNjcwMWEzZjU1ODA4Y2JlYzM5MjJjMzhk' +
+          'YWZhYTMwNzBjNDhjODAzZTkwNDNlZTM2NDJjNjYw' + 'YjQ2IiwidmFsdWUiOjEsInNjcmlwdF9wdWJrZXki' +
+          'OiIyMWMzZWMyZmQ4MDY3MDFhM2Y1NTgwOGNiZWMz' + 'OTIyYzM4ZGFmYWEzMDcwYzQ4YzgwM2U5MDQzZWUz' +
+          'NjQyYzY2MGI0NmJjNzZhOTE0ZmM3MjUwYTIxMWRl' + 'ZGRjNzBlZTVhMjczOGRlNWYwNzgxNzM1MWNlZjg4' +
+          'YWMiLCJhZGRyZXNzIjoiMjJWZFE1VmpXY0Y5emdz' + 'blBRb2RGQlMxUEJRUGFBUUVYU29ma3lNdjJEOXpW' +
+          'MU1kTmhlYUF5N3Nyb1RnNTJtd1c1YXBOaHhQcUI2' + 'WDRZUkciLCJkYXRhIjoiMDEwMjAzMDQwNTA2MDcw' +
+          'ODA5MGEwYjBjMGQwZTBmIn0.AAAAAAAAAAAAAAAA' + 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + 'AAAAAAAAA'
+      end
+
+      it { expect(subject).to eq false }
+    end
+  end
 end

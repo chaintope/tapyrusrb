@@ -113,7 +113,18 @@ module Tapyrus
         end
     end
 
-    def validate_payload!(txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, data: nil)
+    # @param jws [String] JWT Web Token
+    # @param key [Tapyrus::Key] public key
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
+    # @return [Boolean] true if JWT and decoded object is valid.
+    def verify_message(jws, key, client: nil)
+      verify_message!(jws, key, client: client)
+      true
+    rescue ArgumentError, JWT::VerificationError
+      return false
+    end
+
+    def validate_payload!(txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, message: nil)
       raise ArgumentError, 'txid is invalid' if !txid || !/^[0-9a-fA-F]{64}$/.match(txid)
       raise ArgumentError, 'index is invalid' if !index || !/^\d+$/.match(index.to_s) || index < 0 || index >= 2**32
       if color_id && (!color_id.is_a?(Tapyrus::Color::ColorIdentifier) || !color_id.valid?)
