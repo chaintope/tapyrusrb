@@ -58,11 +58,10 @@ module Tapyrus
         address: address,
         message: message
       }
-      JWS.encode(data, key.priv_key)
+      Tapyrus::JWS.encode(data, key.priv_key)
     end
 
     # @param jws [String] JWT Web Token
-    # @param key [Tapyrus::Key] public key
     # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
     # @return decoded JSON Object
     # @raise [ArgumentError] raise if decoded txid is not a 64-character hexadecimal string
@@ -74,10 +73,14 @@ module Tapyrus
     # @raise [ArgumentError] raise if decoded message is not a hexdecimal string
     # @raise [ArgumentError] raise if transaction is not found with decoded txid and index in blockchain
     # @raise [ArgumentError] raise if decoded script and value is not equal to ones in blockchain
-    def verify_message!(jws, key, client: nil)
-      JWS
-        .decode(jws, key.pubkey)
+    # @raise [JWT::DecodeError] raise if jwk key is invalid
+    # @raise [JWT::VerificationError] raise if verification signature failed
+    def verify_message!(jws, client: nil)
+      Tapyrus::JWS
+        .decode(jws)
         .tap do |decoded|
+          header = decoded[1]
+          validate_header!(header)
           payload = decoded[0]
           color_id =
             begin
@@ -117,24 +120,38 @@ module Tapyrus
     # @param key [Tapyrus::Key] public key
     # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
     # @return [Boolean] true if JWT and decoded object is valid.
-    def verify_message(jws, key, client: nil)
-      verify_message!(jws, key, client: client)
+    def verify_message(jws, client: nil)
+      verify_message!(jws, client: client)
       true
-    rescue ArgumentError, JWT::VerificationError
+    rescue ArgumentError, JWT::DecodeError, JWT::VerificationError
       return false
+    end
+
+    def validate_header!(header)
+      raise ArgumentError, 'type must be "JWT"' if header['typ'] && header['typ'] != 'JWT'
+      raise ArgumentError, 'alg must be "ES256K"' if header['alg'] && header['alg'] != Tapyrus::JWS::ALGO
     end
 
     def validate_payload!(txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, message: nil)
       raise ArgumentError, 'txid is invalid' if !txid || !/^[0-9a-fA-F]{64}$/.match(txid)
       raise ArgumentError, 'index is invalid' if !index || !/^\d+$/.match(index.to_s) || index < 0 || index >= 2**32
-      if color_id && (!color_id.is_a?(Tapyrus::Color::ColorIdentifier) || !color_id.valid?)
-        raise ArgumentError, 'color_id is invalid'
-      end
+
       raise ArgumentError, 'value is invalid' if !value || !/^\d+$/.match(value.to_s) || value < 0 || value >= 2**64
       if !script_pubkey || !script_pubkey.is_a?(Tapyrus::Script) || !(script_pubkey.p2pkh? || script_pubkey.cp2pkh?)
         raise ArgumentError,
               'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
       end
+
+      if color_id
+        if !color_id.is_a?(Tapyrus::Color::ColorIdentifier) || !color_id.valid?
+          raise ArgumentError, 'color_id is invalid'
+        end
+
+        if color_id != script_pubkey.color_id
+          raise ArgumentError, 'color_id should be equal to colorId in scriptPubkey'
+        end
+      end
+
       begin
         address && Base58.decode(address)
       rescue ArgumentError => e
