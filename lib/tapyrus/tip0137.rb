@@ -147,9 +147,7 @@ module Tapyrus
           raise ArgumentError, 'color_id is invalid'
         end
 
-        if color_id != script_pubkey.color_id
-          raise ArgumentError, 'color_id should be equal to colorId in scriptPubkey'
-        end
+        raise ArgumentError, 'color_id should be equal to colorId in scriptPubkey' if color_id != script_pubkey.color_id
       end
 
       begin
