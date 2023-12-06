@@ -12,6 +12,7 @@ require 'tmpdir'
 require_relative 'openassets'
 require_relative 'schnorr'
 
+
 module Tapyrus
   autoload :Ext, 'tapyrus/ext'
   autoload :Util, 'tapyrus/util'
