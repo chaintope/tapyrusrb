@@ -30,7 +30,5 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - name: Run prettier
-        run: bundle exec rbprettier --check .
       - name: Run tests
         run: bundle exec rake
