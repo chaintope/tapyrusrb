@@ -31,6 +31,7 @@ module Tapyrus
       client: nil
     )
       validate_payload!(
+        key: key,
         txid: txid,
         index: index,
         color_id: color_id,
@@ -81,6 +82,8 @@ module Tapyrus
         .tap do |decoded|
           header = decoded[1]
           validate_header!(header)
+          jwk = header.dig('jwk', 'keys', 0)
+          key = to_tapyrus_key(jwk)
           payload = decoded[0]
           color_id =
             begin
@@ -95,6 +98,7 @@ module Tapyrus
               raise ArgumentError, 'script_pubkey is invalid'
             end
           validate_payload!(
+            key: key,
             txid: payload['txid'],
             index: payload['index'],
             color_id: color_id,
@@ -132,7 +136,7 @@ module Tapyrus
       raise ArgumentError, 'alg must be "ES256K"' if header['alg'] && header['alg'] != Tapyrus::JWS::ALGO
     end
 
-    def validate_payload!(txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, message: nil)
+    def validate_payload!(key:, txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, message: nil)
       raise ArgumentError, 'txid is invalid' if !txid || !/^[0-9a-fA-F]{64}$/.match(txid)
       raise ArgumentError, 'index is invalid' if !index || !/^\d+$/.match(index.to_s) || index < 0 || index >= 2**32
 
@@ -155,6 +159,16 @@ module Tapyrus
       rescue ArgumentError => e
         raise ArgumentError, 'address is invalid'
       end
+
+      if address && script_pubkey.to_addr != address
+        raise ArgumentError, 'address is invalid. An address should be derived from scriptPubkey'
+      end
+
+      if (script_pubkey.p2pkh? && key.to_p2pkh != script_pubkey.to_addr) ||
+           (script_pubkey.cp2pkh? && key.to_p2pkh != script_pubkey.remove_color.to_addr)
+        raise ArgumentError, 'key is invalid'
+      end
+
       if message && !/^([0-9a-fA-F]{2})+$/.match(message)
         raise ArgumentError, 'message is invalid. message must be a hex string'
       end
@@ -174,6 +188,12 @@ module Tapyrus
       if script_pubkey != output.script_pubkey
         raise ArgumentError, 'script_pubkey of transaction in blockchain is not match to one in the signed message'
       end
+    end
+
+    def to_tapyrus_key(jwk)
+      vefiry_key = JWT::JWK.new(jwk).verify_key
+      pubkey = vefiry_key.public_key.to_octet_string(:compressed)
+      Tapyrus::Key.new(pubkey: pubkey.bth)
     end
   end
 end

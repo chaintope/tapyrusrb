@@ -175,6 +175,23 @@ describe Tapyrus::TIP0137 do
 
       it { expect { subject }.to raise_error(ArgumentError, 'message is invalid. message must be a hex string') }
     end
+
+    context 'address is not derived from scriptPubkey' do
+      let(:address) { 'mo6CPsdW8EsnWdmSSCrQ6225VVDtpMBTug' }
+
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'address is invalid. An address should be derived from scriptPubkey'
+        )
+      end
+    end
+
+    context 'key is invalid' do
+      let(:key) { Tapyrus::Key.new(priv_key: '22' * 32) }
+
+      it { expect { subject }.to raise_error(ArgumentError, 'key is invalid') }
+    end
   end
 
   describe '#verify_message!' do
@@ -381,6 +398,27 @@ describe Tapyrus::TIP0137 do
       end
 
       it { expect { subject }.to raise_error(ArgumentError, 'address is invalid') }
+    end
+
+    context 'address is not derived from scriptPubkey' do
+      let(:jws) do
+        'eyJ0eXAiOiJKV1QiLCJhbGdvIjoiRVMyNTZLIiwiandrIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTZLIiwieCI6IlR6VmIzTGZNQ3Zjbzd6ek91V0Zka0doTHRiTEtYNFdhc1BDM0JBZFljYW8iLCJ5IjoiT0Z0ckc0NnRnSnltZEZUWmFEX1BLNkEwVnRiLUxFcS1Ld2Z3LTl1eThjRSIsInVzZSI6InNpZyIsImFsZyI6IkVTMjU2SyIsImtpZCI6ImU3NWQ0Y2EyNzc4NzM3YzE0MDRmNTM0ZDE0NjVlMmNkNDZiYjFmNzFkZjg2YzYxZDdjOTQxM2U1Y2ExYWE2OTAifV19LCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMzU1MWNkN2VkODRjOWRiZTc3YmMxNGY5OTQyODI5ZDI5MmU5NzkxMDM5ZGM2ZmM3YTY0YmFhN2I4MTkwZmMwYyIsImluZGV4IjowLCJjb2xvcl9pZCI6bnVsbCwidmFsdWUiOjYwMCwic2NyaXB0X3B1YmtleSI6Ijc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6Im1vNkNQc2RXOEVzbldkbVNTQ3JRNjIyNVZWRHRwTUJUdWciLCJtZXNzYWdlIjoiMDEwMjAzMDQwNTA2MDcwODA5MGEwYjBjMGQwZTBmIn0.LwaSb013UUFykd81t2vUx1dfA2si_yZCIw8KSkR5Os8n0Q9uw_iCFGUHo28louXjpv0ZgeCw_xIXdW4MwOpDjw'
+      end
+
+      it do
+        expect { subject }.to raise_error(
+          ArgumentError,
+          'address is invalid. An address should be derived from scriptPubkey'
+        )
+      end
+    end
+
+    context 'key is invalid' do
+      let(:jws) do
+        'eyJ0eXAiOiJKV1QiLCJhbGdvIjoiRVMyNTZLIiwiandrIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTZLIiwieCI6IlJtMV95dVZqNWNzSm9OR0hDN1dBTkVnRVlYaDVvVWxKenlJb1h4dXVQeWMiLCJ5IjoiWnlnWGJEeGtNZmp1MmtVNDNEZklaZUo0VHpxZWQ5QkU4ejVBZDVmaEo0byIsInVzZSI6InNpZyIsImFsZyI6IkVTMjU2SyIsImtpZCI6IjYxNmIwM2FjM2U0ODllZGQzN2RlZGEzYzFkOTgxNTYwYzllZmVlYWE1ZTA2ZTlkOTJiOWUwOGExNmJiYTQ0NDYifV19LCJhbGciOiJFUzI1NksifQ.eyJ0eGlkIjoiMzU1MWNkN2VkODRjOWRiZTc3YmMxNGY5OTQyODI5ZDI5MmU5NzkxMDM5ZGM2ZmM3YTY0YmFhN2I4MTkwZmMwYyIsImluZGV4IjowLCJjb2xvcl9pZCI6bnVsbCwidmFsdWUiOjYwMCwic2NyaXB0X3B1YmtleSI6Ijc2YTkxNGZjNzI1MGEyMTFkZWRkYzcwZWU1YTI3MzhkZTVmMDc4MTczNTFjZWY4OGFjIiwiYWRkcmVzcyI6Im40WG1YOTFONUZmY2NZNjc4dmFHMUVMTnRYaDZza1ZFUzciLCJtZXNzYWdlIjoiMDEwMjAzMDQwNTA2MDcwODA5MGEwYjBjMGQwZTBmIn0.9p9DikAcQ1ZWRGWrqRnhiyFtjETfSdJvB1fLf97GdaRDre1AvjXspf4sWV2sLLEXuuafxW_uev-rr7vCauMW0g'
+      end
+
+      it { expect { subject }.to raise_error(ArgumentError, 'key is invalid') }
     end
 
     context 'message is nil' do
