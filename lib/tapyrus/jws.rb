@@ -33,7 +33,7 @@ module Tapyrus
 
     # Decode JWS to JSON object
     #
-    # @param data [Object] The data to be decoded
+    # @param jws [String] The JWS formatted data to be decoded
     # @return [Array[JSON]] JSON objects representing JWS header and payload.
     # @raise [JWT::VerificationError] raise if verification signature failed
     # @raise [JWT::DecodeError] raise if no jwk key found in header
@@ -41,13 +41,13 @@ module Tapyrus
     # @raise [JWT::DecodeError] raise if jwk crv header is not P-256K
     # @raise [JWT::DecodeError] raise if jwk use header is not sig
     # @raise [JWT::DecodeError] raise if jwk alg header is not ES256K
-    def decode(data)
-      jwt_claims, header = JWT.decode(data, nil, false, { algorithm: ALGO })
+    def decode(jws)
+      jwt_claims, header = JWT.decode(jws, nil, false, { algorithm: ALGO })
       jwks_hash = header.dig('jwk', 'keys')
       raise JWT::DecodeError, 'No jwk key found in header' unless jwks_hash
       validate_header!(jwks_hash)
       jwks = JWT::JWK::Set.new(jwks_hash)
-      JWT.decode(data, nil, true, { algorithm: ALGO, jwks: jwks, allow_nil_kid: true })
+      JWT.decode(jws, nil, true, { algorithm: ALGO, jwks: jwks, allow_nil_kid: true })
     end
 
     def validate_header!(jwks)
