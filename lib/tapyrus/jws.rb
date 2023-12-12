@@ -7,10 +7,10 @@ module Tapyrus
 
     # Encode data as JWS format.
     #
-    # @param data [Object] The data to be encoded as JWS.
+    # @param payload [Object] The data to be encoded as JWS.
     # @param private_key_hex [String] private key as hex string
     # @return [String] JWS signed with the specified private key
-    def encode(data, private_key_hex)
+    def encode(payload, private_key_hex)
       parameters = { use: 'sig', alg: ALGO }
       sequence =
         OpenSSL::ASN1.Sequence(
@@ -28,7 +28,7 @@ module Tapyrus
       ec_key = OpenSSL::PKey::EC.new(sequence.to_der)
       jwk = JWT::JWK.new(ec_key, parameters)
       jwks_hash = JWT::JWK::Set.new(jwk).export(include_private: false)
-      JWT.encode(data, jwk.signing_key, jwk[:alg], { typ: 'JWT', algo: ALGO, jwk: jwks_hash })
+      JWT.encode(payload, jwk.signing_key, jwk[:alg], { typ: 'JWT', algo: ALGO, jwk: jwks_hash })
     end
 
     # Decode JWS to JSON object
