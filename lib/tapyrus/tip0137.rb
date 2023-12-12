@@ -1,24 +1,24 @@
 module Tapyrus
   module TIP0137
-    # @param key [Tapyrus::Key] private key
-    # @param txid [String] txid
-    # @param index [Integer] index of transaction output
-    # @param color_id [Tapyrus::Color::ColorIdentifier] a valid color id
-    # @param value [Integer] non-negative integer less than 2^64
-    # @param script_pubkey [Tapyrus::Script] script pubkey in transaction output
-    # @param address [String] Tapyrus address for transaction output
-    # @param message [String] hexdecimal string
-    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
-    # @return [String] Signed message with JWS Format
-    # @raise [ArgumentError] raise if txid is not a 64-character hexadecimal string
-    # @raise [ArgumentError] raise if index is not a non-negative integer less than 2^32
-    # @raise [ArgumentError] raise if color_id is an invalid Tapyrus::Color::ColorIdentifier object
-    # @raise [ArgumentError] raise if value is not a non-negative integer less than 2^64
-    # @raise [ArgumentError] raise if script_pubkey is an invalid Tapyrus::Script object
-    # @raise [ArgumentError] raise if address is an invalid Tapyrus address
-    # @raise [ArgumentError] raise if message is not a hexdecimal string
-    # @raise [ArgumentError] raise if transaction is not found with txid and index in blockchain
-    # @raise [ArgumentError] raise if script and value is not equal to ones in blockchain
+    # @param key [Tapyrus::Key] A private key
+    # @param txid [String] A transaction id string in hexadecimal format (64 characters long)
+    # @param index [Integer] Index of the transaction output, a non-negative integer less than 2^32
+    # @param color_id [Tapyrus::Color::ColorIdentifier] A valid instance of Tapyrus::Color::ColorIdentifier
+    # @param value [Integer] A non-negative integer less than 2^64 representing the value of the transaction output
+    # @param script_pubkey [Tapyrus::Script] A script pubkey in the transaction output
+    # @param address [String] A valid Tapyrus address string for the transaction output
+    # @param message [String] A hexadecimal formatted string
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance
+    # @return [String] Returns the message signed in JWS Format
+    # @raise [ArgumentError] If the txid is not a 64-character hexadecimal string
+    # @raise [ArgumentError] If the index is not a non-negative integer less than 2^32
+    # @raise [ArgumentError] If the color_id is not a valid Tapyrus::Color::ColorIdentifier object
+    # @raise [ArgumentError] If the value is not a non-negative integer less than 2^64
+    # @raise [ArgumentError] If the script_pubkey is not a valid Tapyrus::Script object
+    # @raise [ArgumentError] If the provided Tapyrus address is invalid
+    # @raise [ArgumentError] If the message is not a hexadecimal string
+    # @raise [ArgumentError] If the transaction with the given txid and index is not found in the blockchain
+    # @raise [ArgumentError] If the script and value do not correspond with those in the blockchain
     def sign_message!(
       key,
       txid:,
@@ -62,20 +62,20 @@ module Tapyrus
       Tapyrus::JWS.encode(data, key.priv_key)
     end
 
-    # @param jws [String] JWT Web Token
-    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
-    # @return decoded JSON Object
-    # @raise [ArgumentError] raise if decoded txid is not a 64-character hexadecimal string
-    # @raise [ArgumentError] raise if decoded index is not a non-negative integer less than 2^32
-    # @raise [ArgumentError] raise if decoded color_id is an invalid Tapyrus::Color::ColorIdentifier object
-    # @raise [ArgumentError] raise if decoded value is not a non-negative integer less than 2^64
-    # @raise [ArgumentError] raise if decoded script_pubkey is an invalid Tapyrus::Script object
-    # @raise [ArgumentError] raise if decoded address is an invalid Tapyrus address
-    # @raise [ArgumentError] raise if decoded message is not a hexdecimal string
-    # @raise [ArgumentError] raise if transaction is not found with decoded txid and index in blockchain
-    # @raise [ArgumentError] raise if decoded script and value is not equal to ones in blockchain
-    # @raise [JWT::DecodeError] raise if jwk key is invalid
-    # @raise [JWT::VerificationError] raise if verification signature failed
+    # @param jws [String] JWS (JSON Web Signature)
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance
+    # @return A decoded JSON Object
+    # @raise [ArgumentError] if the decoded txid is not a 64-character hexadecimal string
+    # @raise [ArgumentError] if the decoded index is not a non-negative integer less than 2^32
+    # @raise [ArgumentError] if the decoded color_id is an invalid Tapyrus::Color::ColorIdentifier object
+    # @raise [ArgumentError] if the decoded value is not a non-negative integer less than 2^64
+    # @raise [ArgumentError] if the decoded script_pubkey is an invalid Tapyrus::Script object
+    # @raise [ArgumentError] if the decoded address is an invalid Tapyrus address
+    # @raise [ArgumentError] if the decoded message is not a hexadecimal string
+    # @raise [ArgumentError] if a transaction is not found with the decoded txid and index in the blockchain
+    # @raise [ArgumentError] if the decoded script and value do not match the ones in the blockchain
+    # @raise [JWT::DecodeError] if the JWK key is invalid
+    # @raise [JWT::VerificationError] if the verification of the signature fails
     def verify_message!(jws, client: nil)
       Tapyrus::JWS
         .decode(jws)
@@ -120,9 +120,8 @@ module Tapyrus
         end
     end
 
-    # @param jws [String] JWT Web Token
-    # @param key [Tapyrus::Key] public key
-    # @param client [Tapyrus::RPC::TapyrusCoreClient] rpc client
+    # @param jws [String] JWS (JSON Web Signature)
+    # @param client [Tapyrus::RPC::TapyrusCoreClient]  The RPC client instance
     # @return [Boolean] true if JWT and decoded object is valid.
     def verify_message(jws, client: nil)
       verify_message!(jws, client: client)
