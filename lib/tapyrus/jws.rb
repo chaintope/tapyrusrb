@@ -64,9 +64,7 @@ module Tapyrus
     # @param r_hex [String] r value as hex string
     # @return [ECDSA::Point] The point that represents r * G
     def point_for(r_hex)
-      r = ECDSA::Format::IntegerOctetString.decode([r_hex].pack('H*'))
-      g = ECDSA::Group::Secp256k1.generator
-      g * r
+      Tapyrus::Key.new(priv_key: r_hex).to_point
     end
   end
 end
