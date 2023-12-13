@@ -44,6 +44,26 @@ describe Tapyrus::TIP0137 do
       )
     end
 
+    it 'can be decoded to original payload' do
+      json = Tapyrus::JWS.decode(subject)
+      expect(json[0]).to eq(
+        {
+          'txid' => txid,
+          'index' => index,
+          'color_id' => color_id.to_hex,
+          'value' => value,
+          'script_pubkey' => script_pubkey.to_hex,
+          'address' => address,
+          'message' => message
+        }
+      )
+      expect(json[1]['typ']).to eq 'JWT'
+      expect(json[1]['alg']).to eq 'ES256K'
+      expect(json[1]['jwk']['keys'][0]['kty']).to eq 'EC'
+      expect(json[1]['jwk']['keys'][0]['crv']).to eq 'P-256K'
+      expect(json[1]['jwk']['keys'][0]['alg']).to eq 'ES256K'
+    end
+
     context 'txid is invalid' do
       let(:txid) { '00' * 31 }
 
