@@ -8,7 +8,7 @@ module Tapyrus
     # @param script_pubkey [Tapyrus::Script] A script pubkey in the transaction output
     # @param address [String] A valid Tapyrus address string for the transaction output
     # @param message [String] A hexadecimal formatted string
-    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance. If the client is specified, verify that the transaction associated with the txid and index exists on the blockchain and that a valid script_pubkey exists in the transaction.
     # @return [String] Returns the message signed in JWS Format
     # @raise [ArgumentError] If the txid is not a 64-character hexadecimal string
     # @raise [ArgumentError] If the index is not a non-negative integer less than 2^32
@@ -63,7 +63,7 @@ module Tapyrus
     end
 
     # @param jws [String] JWS (JSON Web Signature)
-    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance
+    # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance. If the client is specified, verify that the transaction associated with the txid and index exists on the blockchain and that a valid script_pubkey exists in the transaction.
     # @return A decoded JSON Object
     # @raise [ArgumentError] if the decoded txid is not a 64-character hexadecimal string
     # @raise [ArgumentError] if the decoded index is not a non-negative integer less than 2^32
