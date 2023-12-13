@@ -19,6 +19,7 @@ module Tapyrus
     # @raise [ArgumentError] If the message is not a hexadecimal string
     # @raise [ArgumentError] If the transaction with the given txid and index is not found in the blockchain
     # @raise [ArgumentError] If the script and value do not correspond with those in the blockchain
+    # @raise [Tapyrus::RPC::Error] If RPC access fails
     def sign_message!(
       key,
       txid:,
@@ -77,6 +78,7 @@ module Tapyrus
     # @raise [JWT::DecodeError] If JWS decoding fails
     # @raise [Tapyus::JWS::DecodeError] If the JWK key is invalid
     # @raise [JWT::VerificationError] If the verification of the signature fails
+    # @raise [Tapyrus::RPC::Error] If RPC access fails
     def verify_message!(jws, client: nil)
       Tapyrus::JWS
         .decode(jws)

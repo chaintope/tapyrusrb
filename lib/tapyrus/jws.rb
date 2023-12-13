@@ -2,8 +2,9 @@ module Tapyrus
   module JWS
     module_function
 
-    class DecodeError < StandardError; end
-    
+    class DecodeError < StandardError
+    end
+
     ALGO = 'ES256K'
     CURVE_NAME = 'secp256k1'
 
@@ -14,6 +15,7 @@ module Tapyrus
     # @return [String] JWS signed with the specified private key
     def encode(payload, private_key_hex)
       parameters = { use: 'sig', alg: ALGO }
+
       # see https://github.com/nov/json-jwt/blob/413848c/lib/json/jwk.rb#L162-L172
       # see https://www.rfc-editor.org/rfc/rfc5915.html#page-6
       sequence =
