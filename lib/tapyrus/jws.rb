@@ -2,13 +2,15 @@ module Tapyrus
   module JWS
     module_function
 
+    class DecodeError < StandardError; end
+    
     ALGO = 'ES256K'
     CURVE_NAME = 'secp256k1'
 
     # Encode data as JWS format.
     #
     # @param payload [Object] The data to be encoded as JWS.
-    # @param private_key_hex [String] private key as hex string
+    # @param private_key_hex [String] The private key as hex string
     # @return [String] JWS signed with the specified private key
     def encode(payload, private_key_hex)
       parameters = { use: 'sig', alg: ALGO }
@@ -37,16 +39,16 @@ module Tapyrus
     #
     # @param jws [String] The JWS formatted data to be decoded
     # @return [Array[JSON]] JSON objects representing JWS header and payload.
-    # @raise [JWT::VerificationError] raise if verification signature failed
-    # @raise [JWT::DecodeError] raise if no jwk key found in header
-    # @raise [JWT::DecodeError] raise if jwk kty header is not EC
-    # @raise [JWT::DecodeError] raise if jwk crv header is not P-256K
-    # @raise [JWT::DecodeError] raise if jwk use header is not sig
-    # @raise [JWT::DecodeError] raise if jwk alg header is not ES256K
+    # @raise [JWT::VerificationError] If the verification of the signature fails
+    # @raise [Tapyrus::JWS::DecodeError] If no jwk key found in header
+    # @raise [Tapyrus::JWS::DecodeError] If jwk kty header is not EC
+    # @raise [Tapyrus::JWS::DecodeError] If jwk crv header is not P-256K
+    # @raise [Tapyrus::JWS::DecodeError] If jwk use header is not sig
+    # @raise [Tapyrus::JWS::DecodeError] If jwk alg header is not ES256K
     def decode(jws)
       jwt_claims, header = JWT.decode(jws, nil, false, { algorithm: ALGO })
       jwks_hash = header.dig('jwk', 'keys')
-      raise JWT::DecodeError, 'No jwk key found in header' unless jwks_hash
+      raise Tapyrus::JWS::DecodeError, 'No jwk key found in header' unless jwks_hash
       validate_header!(jwks_hash)
       jwks = JWT::JWK::Set.new(jwks_hash)
       JWT.decode(jws, nil, true, { algorithm: ALGO, jwks: jwks, allow_nil_kid: true })
@@ -54,11 +56,11 @@ module Tapyrus
 
     def validate_header!(jwks)
       jwk = jwks.first
-      raise JWT::DecodeError, 'No jwk key found in header' unless jwk
-      raise JWT::DecodeError, 'kty must be "EC"' if jwk['kty'] && jwk['kty'] != 'EC'
-      raise JWT::DecodeError, 'crv must be "P-256K"' if jwk['crv'] && jwk['crv'] != 'P-256K'
-      raise JWT::DecodeError, 'use must be "sig"' if jwk['use'] && jwk['use'] != 'sig'
-      raise JWT::DecodeError, 'alg must be "ES256K"' if jwk['alg'] && jwk['alg'] != 'ES256K'
+      raise Tapyrus::JWS::DecodeError, 'No jwk key found in header' unless jwk
+      raise Tapyrus::JWS::DecodeError, 'kty must be "EC"' if jwk['kty'] && jwk['kty'] != 'EC'
+      raise Tapyrus::JWS::DecodeError, 'crv must be "P-256K"' if jwk['crv'] && jwk['crv'] != 'P-256K'
+      raise Tapyrus::JWS::DecodeError, 'use must be "sig"' if jwk['use'] && jwk['use'] != 'sig'
+      raise Tapyrus::JWS::DecodeError, 'alg must be "ES256K"' if jwk['alg'] && jwk['alg'] != 'ES256K'
     end
 
     # Return point object that represents rG

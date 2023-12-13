@@ -65,17 +65,18 @@ module Tapyrus
     # @param jws [String] JWS (JSON Web Signature)
     # @param client [Tapyrus::RPC::TapyrusCoreClient] The RPC client instance. If the client is specified, verify that the transaction associated with the txid and index exists on the blockchain and that a valid script_pubkey exists in the transaction.
     # @return A decoded JSON Object
-    # @raise [ArgumentError] if the decoded txid is not a 64-character hexadecimal string
-    # @raise [ArgumentError] if the decoded index is not a non-negative integer less than 2^32
-    # @raise [ArgumentError] if the decoded color_id is an invalid Tapyrus::Color::ColorIdentifier object
-    # @raise [ArgumentError] if the decoded value is not a non-negative integer less than 2^64
-    # @raise [ArgumentError] if the decoded script_pubkey is an invalid Tapyrus::Script object
-    # @raise [ArgumentError] if the decoded address is an invalid Tapyrus address
-    # @raise [ArgumentError] if the decoded message is not a hexadecimal string
-    # @raise [ArgumentError] if a transaction is not found with the decoded txid and index in the blockchain
-    # @raise [ArgumentError] if the decoded script and value do not match the ones in the blockchain
-    # @raise [JWT::DecodeError] if the JWK key is invalid
-    # @raise [JWT::VerificationError] if the verification of the signature fails
+    # @raise [ArgumentError] If the decoded txid is not a 64-character hexadecimal string
+    # @raise [ArgumentError] If the decoded index is not a non-negative integer less than 2^32
+    # @raise [ArgumentError] If the decoded color_id is an invalid Tapyrus::Color::ColorIdentifier object
+    # @raise [ArgumentError] If the decoded value is not a non-negative integer less than 2^64
+    # @raise [ArgumentError] If the decoded script_pubkey is an invalid Tapyrus::Script object
+    # @raise [ArgumentError] If the decoded address is an invalid Tapyrus address
+    # @raise [ArgumentError] If the decoded message is not a hexadecimal string
+    # @raise [ArgumentError] If a transaction is not found with the decoded txid and index in the blockchain
+    # @raise [ArgumentError] If the decoded script and value do not match the ones in the blockchain
+    # @raise [JWT::DecodeError] If JWS decoding fails
+    # @raise [Tapyus::JWS::DecodeError] If the JWK key is invalid
+    # @raise [JWT::VerificationError] If the verification of the signature fails
     def verify_message!(jws, client: nil)
       Tapyrus::JWS
         .decode(jws)
