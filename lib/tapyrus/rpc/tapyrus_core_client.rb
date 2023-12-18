@@ -1,5 +1,5 @@
-require 'net/http'
-require 'json/pure'
+require "net/http"
+require "json/pure"
 
 module Tapyrus
   module RPC
@@ -71,7 +71,7 @@ module Tapyrus
           request(:help)
             .split("\n")
             .inject([]) do |memo_ary, line|
-              memo_ary << line.split(' ').first.to_sym if !line.empty? && !line.start_with?('==')
+              memo_ary << line.split(" ").first.to_sym if !line.empty? && !line.start_with?("==")
               memo_ary
             end
         TapyrusCoreClient.class_eval do
@@ -88,24 +88,24 @@ module Tapyrus
       end
 
       def request(command, *params)
-        data = { method: command, params: params, id: 'jsonrpc' }
+        data = { method: command, params: params, id: "jsonrpc" }
         uri = URI.parse(server_url)
         http = Net::HTTP.new(uri.hostname, uri.port)
-        http.use_ssl = uri.scheme === 'https'
-        request = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.path)
+        http.use_ssl = uri.scheme === "https"
+        request = Net::HTTP::Post.new(uri.path.empty? ? "/" : uri.path)
         request.basic_auth(uri.user, uri.password)
-        request.content_type = 'application/json'
+        request.content_type = "application/json"
         request.body = data.to_json
         response = http.request(request)
         raise error!(response) unless response.is_a? Net::HTTPOK
         response = Tapyrus::RPC.response_body2json(response.body)
-        response['result']
+        response["result"]
       end
 
       def error!(response)
         rpc_error =
           begin
-            Tapyrus::RPC.response_body2json(response.body)['error']
+            Tapyrus::RPC.response_body2json(response.body)["error"]
           rescue JSON::ParserError => _
             # if RPC server don't send error message.
           end
@@ -117,7 +117,7 @@ module Tapyrus
     def response_body2json(body)
       Tapyrus::Ext::JsonParser.new(
         body.gsub(/\\u([\da-fA-F]{4})/) do
-          [$1].pack('H*').unpack('n*').pack('U*').encode('ISO-8859-1').force_encoding('UTF-8')
+          [$1].pack("H*").unpack("n*").pack("U*").encode("ISO-8859-1").force_encoding("UTF-8")
         end
       ).parse
     end

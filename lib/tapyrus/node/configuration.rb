@@ -1,4 +1,4 @@
-require 'iniparse'
+require "iniparse"
 
 module Tapyrus
   module Node
@@ -13,7 +13,7 @@ module Tapyrus
 
         begin
           ini_file = IniParse.parse(File.read("#{Tapyrus.base_dir}/tapyrusrb.conf"))
-          @conf = Hash[ini_file.to_h['__anonymous__'].map { |k, v| [k.to_sym, v] }]
+          @conf = Hash[ini_file.to_h["__anonymous__"].map { |k, v| [k.to_sym, v] }]
         rescue => e
           @conf = {}
         end
@@ -21,7 +21,7 @@ module Tapyrus
       end
 
       def host
-        'localhost'
+        "localhost"
       end
 
       def port

@@ -6,7 +6,7 @@ module Tapyrus
       include InventoriesParser
       extend InventoriesParser
 
-      COMMAND = 'inv'
+      COMMAND = "inv"
 
       attr_reader :inventories
 

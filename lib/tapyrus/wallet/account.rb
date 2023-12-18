@@ -15,7 +15,7 @@ module Tapyrus
       attr_accessor :lookahead
       attr_accessor :wallet
 
-      def initialize(account_key, purpose = PURPOSE_TYPE[:native_segwit], index = 0, name = '')
+      def initialize(account_key, purpose = PURPOSE_TYPE[:native_segwit], index = 0, name = "")
         validate_params!(account_key, purpose, index)
         @purpose = purpose
         @index = index
@@ -31,8 +31,8 @@ module Tapyrus
         account_key = Tapyrus::ExtPubkey.parse_from_payload(buf.read(78))
         payload = buf.read
         name, payload = Tapyrus.unpack_var_string(payload)
-        name = name.force_encoding('utf-8')
-        purpose, index, receive_depth, change_depth, lookahead = payload.unpack('I*')
+        name = name.force_encoding("utf-8")
+        purpose, index, receive_depth, change_depth, lookahead = payload.unpack("I*")
         a = Account.new(account_key, purpose, index, name)
         a.receive_depth = receive_depth
         a.change_depth = change_depth
@@ -42,8 +42,8 @@ module Tapyrus
 
       def to_payload
         payload = account_key.to_payload
-        payload << Tapyrus.pack_var_string(name.unpack('H*').first.htb)
-        payload << [purpose, index, receive_depth, change_depth, lookahead].pack('I*')
+        payload << Tapyrus.pack_var_string(name.unpack("H*").first.htb)
+        payload << [purpose, index, receive_depth, change_depth, lookahead].pack("I*")
         payload
       end
 
@@ -98,13 +98,13 @@ module Tapyrus
       def type
         case purpose
         when PURPOSE_TYPE[:legacy]
-          'pubkeyhash'
+          "pubkeyhash"
         when PURPOSE_TYPE[:nested_witness]
-          'p2wpkh-p2sh'
+          "p2wpkh-p2sh"
         when PURPOSE_TYPE[:native_segwit]
-          'p2wpkh'
+          "p2wpkh"
         else
-          'unknown'
+          "unknown"
         end
       end
 
@@ -146,10 +146,10 @@ module Tapyrus
       end
 
       def validate_params!(account_key, purpose, index)
-        raise 'account_key must be an instance of Tapyrus::ExtPubkey.' unless account_key.is_a?(Tapyrus::ExtPubkey)
-        raise 'Account key and index does not match.' unless account_key.number == (index + Tapyrus::HARDENED_THRESHOLD)
+        raise "account_key must be an instance of Tapyrus::ExtPubkey." unless account_key.is_a?(Tapyrus::ExtPubkey)
+        raise "Account key and index does not match." unless account_key.number == (index + Tapyrus::HARDENED_THRESHOLD)
         version_bytes = Tapyrus::ExtPubkey.version_from_purpose(purpose + Tapyrus::HARDENED_THRESHOLD)
-        raise 'The purpose and the account key do not match.' unless account_key.version == version_bytes
+        raise "The purpose and the account key do not match." unless account_key.version == version_bytes
       end
     end
   end

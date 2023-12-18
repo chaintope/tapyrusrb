@@ -17,18 +17,18 @@ module Tapyrus
 
     def self.parse_from_payload(payload)
       buf = payload.is_a?(String) ? StringIO.new(payload) : payload
-      value = buf.read(8).unpack('q').first
+      value = buf.read(8).unpack("q").first
       script_size = Tapyrus.unpack_var_int_from_io(buf)
       new(value: value, script_pubkey: Script.parse_from_payload(buf.read(script_size)))
     end
 
     def to_payload
       s = script_pubkey.to_payload
-      [value].pack('Q') << Tapyrus.pack_var_int(s.length) << s
+      [value].pack("Q") << Tapyrus.pack_var_int(s.length) << s
     end
 
     def to_empty_payload
-      'ffffffffffffffff00'.htb
+      "ffffffffffffffff00".htb
     end
 
     # convert satoshi to btc

@@ -1,4 +1,4 @@
-require 'leveldb-native'
+require "leveldb-native"
 
 module Tapyrus
   module Store
@@ -134,7 +134,7 @@ module Tapyrus
             unless tip_block.block_hash == entry.prev_hash
               raise "entry(#{entry.block_hash}) does not reference current best block hash(#{tip_block.block_hash})"
             end
-            raise 'block height is small than current best block.' unless tip_block.height + 1 == entry.height
+            raise "block height is small than current best block." unless tip_block.height + 1 == entry.height
           end
           db.put(KEY_PREFIX[:best], entry.block_hash)
           db.put(KEY_PREFIX[:next] + entry.prev_hash, entry.block_hash)

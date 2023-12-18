@@ -3,7 +3,7 @@ module Tapyrus
     # headers message
     # https://bitcoin.org/en/developer-reference#headers
     class Headers < Base
-      COMMAND = 'headers'
+      COMMAND = "headers"
 
       # Array[Tapyrus::BlockHeader]
       attr_accessor :headers

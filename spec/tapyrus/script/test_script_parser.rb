@@ -7,7 +7,7 @@ module Tapyrus
 
     def parse_script(script_string)
       script = Tapyrus::Script.new
-      words = script_string.split(' ')
+      words = script_string.split(" ")
       words.each do |w|
         next if w.empty?
         latest_chunk = script.chunks.last
@@ -17,7 +17,7 @@ module Tapyrus
             num = w.to_i
             data = (num >= -1 && num <= 16) ? num : Tapyrus::Script.encode_number(num)
             script << data
-          elsif w.start_with?('0x') && w[2..-1].length > 0 && hex?(w[2..-1])
+          elsif w.start_with?("0x") && w[2..-1].length > 0 && hex?(w[2..-1])
             # when hex
             data = w[2..-1].htb
             buf = StringIO.new(data)
@@ -33,19 +33,19 @@ module Tapyrus
             end
           elsif w.size >= 2 && w.start_with?("'") && w.end_with?("'")
             script << w[1..-2].bth
-          elsif w.start_with?('OP_')
+          elsif w.start_with?("OP_")
             script << Tapyrus::Opcodes.name_to_opcode(w)
-          elsif Tapyrus::Opcodes.name_to_opcode('OP_' + w)
-            script << Tapyrus::Opcodes.name_to_opcode('OP_' + w)
+          elsif Tapyrus::Opcodes.name_to_opcode("OP_" + w)
+            script << Tapyrus::Opcodes.name_to_opcode("OP_" + w)
           else
-            raise 'script parse error'
+            raise "script parse error"
           end
         else
           # if last chunk does not has sufficient data.
-          if w.start_with?('0x') && w[2..-1].length > 0 && hex?(w[2..-1])
+          if w.start_with?("0x") && w[2..-1].length > 0 && hex?(w[2..-1])
             append_data = parse_hex(w[2..-1]).htb
-          elsif Tapyrus::Opcodes.name_to_opcode('OP_' + w)
-            append_data = Tapyrus::Opcodes.name_to_opcode('OP_' + w).to_s(16).htb
+          elsif Tapyrus::Opcodes.name_to_opcode("OP_" + w)
+            append_data = Tapyrus::Opcodes.name_to_opcode("OP_" + w).to_s(16).htb
           end
           script.chunks[-1] = latest_chunk + append_data
         end
@@ -79,11 +79,11 @@ module Tapyrus
     def read_length(opcode, buf)
       case opcode
       when OP_PUSHDATA1
-        buf.read(1).unpack('C').first
+        buf.read(1).unpack("C").first
       when OP_PUSHDATA2
-        buf.read(2).unpack('v').first
+        buf.read(2).unpack("v").first
       when OP_PUSHDATA4
-        buf.read(4).unpack('V').first
+        buf.read(4).unpack("V").first
       else
         opcode if opcode < OP_PUSHDATA1
       end

@@ -3,7 +3,7 @@ module Tapyrus
     # blocktxn message.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki#blocktxn
     class BlockTxn < Base
-      COMMAND = 'blocktxn'
+      COMMAND = "blocktxn"
 
       attr_accessor :block_transactions
 

@@ -25,7 +25,7 @@ module Tapyrus
       end
 
       def find_from_dns_seeds
-        logger.debug 'discover peer address from DNS seeds.'
+        logger.debug "discover peer address from DNS seeds."
         dns_seeds
           .map do |seed|
             begin

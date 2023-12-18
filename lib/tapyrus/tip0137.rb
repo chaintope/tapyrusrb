@@ -85,38 +85,38 @@ module Tapyrus
         .tap do |decoded|
           header = decoded[1]
           validate_header!(header)
-          jwk = header.dig('jwk', 'keys', 0)
+          jwk = header.dig("jwk", "keys", 0)
           key = to_tapyrus_key(jwk)
           payload = decoded[0]
           color_id =
             begin
-              Tapyrus::Color::ColorIdentifier.parse_from_payload(payload['color_id']&.htb) if payload['color_id']
+              Tapyrus::Color::ColorIdentifier.parse_from_payload(payload["color_id"]&.htb) if payload["color_id"]
             rescue => _e
-              raise ArgumentError, 'color_id is invalid'
+              raise ArgumentError, "color_id is invalid"
             end
           script_pubkey =
             begin
-              Tapyrus::Script.parse_from_payload(payload['script_pubkey']&.htb)
+              Tapyrus::Script.parse_from_payload(payload["script_pubkey"]&.htb)
             rescue => _e
-              raise ArgumentError, 'script_pubkey is invalid'
+              raise ArgumentError, "script_pubkey is invalid"
             end
           validate_payload!(
             key: key,
-            txid: payload['txid'],
-            index: payload['index'],
+            txid: payload["txid"],
+            index: payload["index"],
             color_id: color_id,
-            value: payload['value'],
+            value: payload["value"],
             script_pubkey: script_pubkey,
-            address: payload['address'],
-            message: payload['message']
+            address: payload["address"],
+            message: payload["message"]
           )
           if client
             validate_on_blockchain!(
               client: client,
-              txid: payload['txid'],
-              index: payload['index'],
+              txid: payload["txid"],
+              index: payload["index"],
               color_id: color_id,
-              value: payload['value'],
+              value: payload["value"],
               script_pubkey: script_pubkey
             )
           end
@@ -134,45 +134,45 @@ module Tapyrus
     end
 
     def validate_header!(header)
-      raise ArgumentError, 'type must be "JWT"' if header['typ'] && header['typ'] != 'JWT'
-      raise ArgumentError, 'alg must be "ES256K"' if header['alg'] && header['alg'] != Tapyrus::JWS::ALGO
+      raise ArgumentError, 'type must be "JWT"' if header["typ"] && header["typ"] != "JWT"
+      raise ArgumentError, 'alg must be "ES256K"' if header["alg"] && header["alg"] != Tapyrus::JWS::ALGO
     end
 
     def validate_payload!(key:, txid:, index:, value:, script_pubkey:, color_id: nil, address: nil, message: nil)
-      raise ArgumentError, 'txid is invalid' if !txid || !/^[0-9a-fA-F]{64}$/.match(txid)
-      raise ArgumentError, 'index is invalid' if !index || !/^\d+$/.match(index.to_s) || index < 0 || index >= 2**32
+      raise ArgumentError, "txid is invalid" if !txid || !/^[0-9a-fA-F]{64}$/.match(txid)
+      raise ArgumentError, "index is invalid" if !index || !/^\d+$/.match(index.to_s) || index < 0 || index >= 2**32
 
-      raise ArgumentError, 'value is invalid' if !value || !/^\d+$/.match(value.to_s) || value < 0 || value >= 2**64
+      raise ArgumentError, "value is invalid" if !value || !/^\d+$/.match(value.to_s) || value < 0 || value >= 2**64
       if !script_pubkey || !script_pubkey.is_a?(Tapyrus::Script) || !(script_pubkey.p2pkh? || script_pubkey.cp2pkh?)
         raise ArgumentError,
-              'script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh'
+              "script_pubkey is invalid. scirpt_pubkey must be a hex string and its type must be p2pkh or cp2pkh"
       end
 
       if color_id
         if !color_id.is_a?(Tapyrus::Color::ColorIdentifier) || !color_id.valid?
-          raise ArgumentError, 'color_id is invalid'
+          raise ArgumentError, "color_id is invalid"
         end
 
-        raise ArgumentError, 'color_id should be equal to colorId in scriptPubkey' if color_id != script_pubkey.color_id
+        raise ArgumentError, "color_id should be equal to colorId in scriptPubkey" if color_id != script_pubkey.color_id
       end
 
       begin
         address && Base58.decode(address)
       rescue ArgumentError => e
-        raise ArgumentError, 'address is invalid'
+        raise ArgumentError, "address is invalid"
       end
 
       if address && script_pubkey.to_addr != address
-        raise ArgumentError, 'address is invalid. An address should be derived from scriptPubkey'
+        raise ArgumentError, "address is invalid. An address should be derived from scriptPubkey"
       end
 
       if (script_pubkey.p2pkh? && key.to_p2pkh != script_pubkey.to_addr) ||
            (script_pubkey.cp2pkh? && key.to_p2pkh != script_pubkey.remove_color.to_addr)
-        raise ArgumentError, 'key is invalid'
+        raise ArgumentError, "key is invalid"
       end
 
       if message && !/^([0-9a-fA-F]{2})+$/.match(message)
-        raise ArgumentError, 'message is invalid. message must be a hex string'
+        raise ArgumentError, "message is invalid. message must be a hex string"
       end
     end
 
@@ -180,15 +180,15 @@ module Tapyrus
       raw_tx = client.getrawtransaction(txid)
       tx = Tapyrus::Tx.parse_from_payload(raw_tx.htb)
       output = tx.outputs[index]
-      raise ArgumentError, 'output not found in blockchain' unless output
+      raise ArgumentError, "output not found in blockchain" unless output
       if color_id != output.color_id
-        raise ArgumentError, 'color_id of transaction in blockchain is not match to one in the signed message'
+        raise ArgumentError, "color_id of transaction in blockchain is not match to one in the signed message"
       end
       if value != output.value
-        raise ArgumentError, 'value of transaction in blockchain is not match to one in the signed message'
+        raise ArgumentError, "value of transaction in blockchain is not match to one in the signed message"
       end
       if script_pubkey != output.script_pubkey
-        raise ArgumentError, 'script_pubkey of transaction in blockchain is not match to one in the signed message'
+        raise ArgumentError, "script_pubkey of transaction in blockchain is not match to one in the signed message"
       end
     end
 

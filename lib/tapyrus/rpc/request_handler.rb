@@ -23,13 +23,13 @@ module Tapyrus
       def getblockheader(block_id, verbose)
         block_hash = block_id.rhex
         entry = node.chain.find_entry_by_hash(block_hash)
-        raise ArgumentError.new('Block not found') unless entry
+        raise ArgumentError.new("Block not found") unless entry
         if verbose
           {
             hash: block_id,
             height: entry.height,
             features: entry.header.features,
-            featuresHex: entry.header.features.to_even_length_hex.ljust(8, '0'),
+            featuresHex: entry.header.features.to_even_length_hex.ljust(8, "0"),
             merkleroot: entry.header.merkle_root.rhex,
             immutablemerkleroot: entry.header.im_merkle_root.rhex,
             time: entry.header.time,
@@ -53,7 +53,7 @@ module Tapyrus
             id: peer.id,
             addr: "#{peer.host}:#{peer.port}",
             addrlocal: local_addr,
-            services: peer.remote_version.services.to_even_length_hex.rjust(16, '0'),
+            services: peer.remote_version.services.to_even_length_hex.rjust(16, "0"),
             relaytxes: peer.remote_version.relay,
             lastsend: peer.last_send,
             lastrecv: peer.last_recv,
@@ -86,7 +86,7 @@ module Tapyrus
         begin
           Tapyrus::Tx.parse_from_payload(hex_tx.htb).to_h
         rescue Exception
-          raise ArgumentError.new('TX decode failed')
+          raise ArgumentError.new("TX decode failed")
         end
       end
 
@@ -99,7 +99,7 @@ module Tapyrus
           h[:p2sh] = script.to_p2sh.to_addr unless script.p2sh?
           h
         rescue Exception
-          raise ArgumentError.new('Script decode failed')
+          raise ArgumentError.new("Script decode failed")
         end
       end
 

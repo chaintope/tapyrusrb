@@ -3,10 +3,10 @@ module Tapyrus
     # verack message
     # https://bitcoin.org/en/developer-reference#verack
     class VerAck < Base
-      COMMAND = 'verack'
+      COMMAND = "verack"
 
       def to_payload
-        ''
+        ""
       end
     end
   end

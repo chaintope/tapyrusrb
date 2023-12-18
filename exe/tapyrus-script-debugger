@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'tapyrus'
-require 'terminal-table'
-
+require "tapyrus"
+require "terminal-table"
 
 print "Enter scriptPubkey: "
 script_pubkey_hex = gets.chomp
@@ -32,7 +31,7 @@ unless tx_hex.length == 0
   print "Enter index of the input: "
   input_index = gets.chomp
   begin
-  tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
+    tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
   rescue StandardError
     warn "Invalid tx data."
     exit
@@ -45,7 +44,8 @@ unless tx_hex.length == 0
 end
 
 begin
-debugger = Tapyrus::ScriptDebugger.new(script_pubkey: script_pubkey, script_sig: script_sig, tx: tx, index: input_index)
+  debugger =
+    Tapyrus::ScriptDebugger.new(script_pubkey: script_pubkey, script_sig: script_sig, tx: tx, index: input_index)
 rescue ArgumentError => e
   warn e.message
   exit

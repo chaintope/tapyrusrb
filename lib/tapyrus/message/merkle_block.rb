@@ -3,7 +3,7 @@ module Tapyrus
     # merckleblock message
     # https://bitcoin.org/en/developer-reference#merkleblock
     class MerkleBlock < Base
-      COMMAND = 'merkleblock'
+      COMMAND = "merkleblock"
 
       attr_accessor :header
       attr_accessor :tx_count
@@ -18,7 +18,7 @@ module Tapyrus
         m = new
         buf = StringIO.new(payload)
         m.header = Tapyrus::BlockHeader.parse_from_payload(buf)
-        m.tx_count = buf.read(4).unpack('V').first
+        m.tx_count = buf.read(4).unpack("V").first
         hash_count = Tapyrus.unpack_var_int_from_io(buf)
         hash_count.times { m.hashes << buf.read(32).bth }
         flag_count = Tapyrus.unpack_var_int_from_io(buf)
@@ -29,7 +29,7 @@ module Tapyrus
       end
 
       def to_payload
-        header.to_payload << [tx_count].pack('V') << Tapyrus.pack_var_int(hashes.size) << hashes.map(&:htb).join <<
+        header.to_payload << [tx_count].pack("V") << Tapyrus.pack_var_int(hashes.size) << hashes.map(&:htb).join <<
           Tapyrus.pack_var_int(flags.htb.bytesize) << flags.htb
       end
     end

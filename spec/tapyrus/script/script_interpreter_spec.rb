@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Tapyrus::ScriptInterpreter do
-  describe 'check script_test.json' do
-    script_json = fixture_file('script_tests.json').select { |j| j.size > 3 }
+  describe "check script_test.json" do
+    script_json = fixture_file("script_tests.json").select { |j| j.size > 3 }
     script_json.each do |r|
       it "should validate script #{r.inspect}" do
         if r[0].is_a?(Array)
@@ -18,7 +18,7 @@ describe Tapyrus::ScriptInterpreter do
         tx = build_spending_tx(script_sig, credit_tx, amount)
         script_flags =
           flags
-            .split(',')
+            .split(",")
             .map { |s| Tapyrus.const_get("SCRIPT_VERIFY_#{s}") }
             .inject(Tapyrus::SCRIPT_VERIFY_NONE) { |flags, f| flags |= f }
         expected_err_code = find_error_code(error_code)
@@ -46,10 +46,10 @@ describe Tapyrus::ScriptInterpreter do
     end
   end
 
-  describe '#eval' do
-    it 'should be verified.' do
-      script_pubkey = Tapyrus::Script.from_string('1 OP_ADD 7 OP_EQUAL')
-      script_sig = Tapyrus::Script.from_string('6')
+  describe "#eval" do
+    it "should be verified." do
+      script_pubkey = Tapyrus::Script.from_string("1 OP_ADD 7 OP_EQUAL")
+      script_sig = Tapyrus::Script.from_string("6")
       expect(Tapyrus::ScriptInterpreter.eval(script_sig, script_pubkey)).to be true
     end
   end
@@ -74,7 +74,7 @@ describe Tapyrus::ScriptInterpreter do
   end
 
   def find_error_code(error_code)
-    error_code = 'SIG_NULLFAIL' if error_code == 'NULLFAIL'
-    Tapyrus::ScriptError.name_to_code('SCRIPT_ERR_' + error_code)
+    error_code = "SIG_NULLFAIL" if error_code == "NULLFAIL"
+    Tapyrus::ScriptError.name_to_code("SCRIPT_ERR_" + error_code)
   end
 end

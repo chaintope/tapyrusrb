@@ -1,41 +1,41 @@
 module Tapyrus
   module Message
-    autoload :Base, 'tapyrus/message/base'
-    autoload :Inventory, 'tapyrus/message/inventory'
-    autoload :InventoriesParser, 'tapyrus/message/inventories_parser'
-    autoload :HeadersParser, 'tapyrus/message/headers_parser'
-    autoload :Version, 'tapyrus/message/version'
-    autoload :VerAck, 'tapyrus/message/ver_ack'
-    autoload :Addr, 'tapyrus/message/addr'
-    autoload :NetworkAddr, 'tapyrus/message/network_addr'
-    autoload :Block, 'tapyrus/message/block'
-    autoload :FilterLoad, 'tapyrus/message/filter_load'
-    autoload :FilterAdd, 'tapyrus/message/filter_add'
-    autoload :FilterClear, 'tapyrus/message/filter_clear'
-    autoload :MerkleBlock, 'tapyrus/message/merkle_block'
-    autoload :Tx, 'tapyrus/message/tx'
-    autoload :Ping, 'tapyrus/message/ping'
-    autoload :Pong, 'tapyrus/message/pong'
-    autoload :Inv, 'tapyrus/message/inv'
-    autoload :GetBlocks, 'tapyrus/message/get_blocks'
-    autoload :GetHeaders, 'tapyrus/message/get_headers'
-    autoload :Headers, 'tapyrus/message/headers'
-    autoload :GetAddr, 'tapyrus/message/get_addr'
-    autoload :GetData, 'tapyrus/message/get_data'
-    autoload :SendHeaders, 'tapyrus/message/send_headers'
-    autoload :FeeFilter, 'tapyrus/message/fee_filter'
-    autoload :MemPool, 'tapyrus/message/mem_pool'
-    autoload :NotFound, 'tapyrus/message/not_found'
-    autoload :Error, 'tapyrus/message/error'
-    autoload :Reject, 'tapyrus/message/reject'
-    autoload :SendCmpct, 'tapyrus/message/send_cmpct'
-    autoload :CmpctBlock, 'tapyrus/message/cmpct_block'
-    autoload :HeaderAndShortIDs, 'tapyrus/message/header_and_short_ids'
-    autoload :PrefilledTx, 'tapyrus/message/prefilled_tx'
-    autoload :GetBlockTxn, 'tapyrus/message/get_block_txn'
-    autoload :BlockTransactionRequest, 'tapyrus/message/block_transaction_request'
-    autoload :BlockTxn, 'tapyrus/message/block_txn'
-    autoload :BlockTransactions, 'tapyrus/message/block_transactions'
+    autoload :Base, "tapyrus/message/base"
+    autoload :Inventory, "tapyrus/message/inventory"
+    autoload :InventoriesParser, "tapyrus/message/inventories_parser"
+    autoload :HeadersParser, "tapyrus/message/headers_parser"
+    autoload :Version, "tapyrus/message/version"
+    autoload :VerAck, "tapyrus/message/ver_ack"
+    autoload :Addr, "tapyrus/message/addr"
+    autoload :NetworkAddr, "tapyrus/message/network_addr"
+    autoload :Block, "tapyrus/message/block"
+    autoload :FilterLoad, "tapyrus/message/filter_load"
+    autoload :FilterAdd, "tapyrus/message/filter_add"
+    autoload :FilterClear, "tapyrus/message/filter_clear"
+    autoload :MerkleBlock, "tapyrus/message/merkle_block"
+    autoload :Tx, "tapyrus/message/tx"
+    autoload :Ping, "tapyrus/message/ping"
+    autoload :Pong, "tapyrus/message/pong"
+    autoload :Inv, "tapyrus/message/inv"
+    autoload :GetBlocks, "tapyrus/message/get_blocks"
+    autoload :GetHeaders, "tapyrus/message/get_headers"
+    autoload :Headers, "tapyrus/message/headers"
+    autoload :GetAddr, "tapyrus/message/get_addr"
+    autoload :GetData, "tapyrus/message/get_data"
+    autoload :SendHeaders, "tapyrus/message/send_headers"
+    autoload :FeeFilter, "tapyrus/message/fee_filter"
+    autoload :MemPool, "tapyrus/message/mem_pool"
+    autoload :NotFound, "tapyrus/message/not_found"
+    autoload :Error, "tapyrus/message/error"
+    autoload :Reject, "tapyrus/message/reject"
+    autoload :SendCmpct, "tapyrus/message/send_cmpct"
+    autoload :CmpctBlock, "tapyrus/message/cmpct_block"
+    autoload :HeaderAndShortIDs, "tapyrus/message/header_and_short_ids"
+    autoload :PrefilledTx, "tapyrus/message/prefilled_tx"
+    autoload :GetBlockTxn, "tapyrus/message/get_block_txn"
+    autoload :BlockTransactionRequest, "tapyrus/message/block_transaction_request"
+    autoload :BlockTxn, "tapyrus/message/block_txn"
+    autoload :BlockTransactions, "tapyrus/message/block_transactions"
 
     USER_AGENT = "/tapyrusrb:#{Tapyrus::VERSION}/"
 
@@ -52,7 +52,7 @@ module Tapyrus
 
     DEFAULT_SERVICE_FLAGS = SERVICE_FLAGS[:none]
 
-    DEFAULT_STOP_HASH = '00' * 32
+    DEFAULT_STOP_HASH = "00" * 32
 
     # the protocol version.
     VERSION = {

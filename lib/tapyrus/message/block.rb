@@ -7,7 +7,7 @@ module Tapyrus
       attr_accessor :transactions
       attr_accessor :use_segwit
 
-      COMMAND = 'block'
+      COMMAND = "block"
 
       def initialize(header, transactions = [])
         @header = header

@@ -21,7 +21,7 @@ module Tapyrus
       @script_pubkey = script_pubkey
       @script_sig = script_sig
       if tx
-        raise ArgumentError, 'index should be specified' if index.nil?
+        raise ArgumentError, "index should be specified" if index.nil?
         @tx_checker = Tapyrus::TxChecker.new(tx: tx, input_index: index)
         if (tx_checker.tx.in.size - 1) < tx_checker.input_index
           raise ArgumentError, "Tx does not have #{tx_checker.input_index}-th input."
@@ -52,7 +52,7 @@ module Tapyrus
             return(
               StepResult.error(
                 current_stack: interpreter.stack.dup,
-                error: 'Script evaluated without error but finished with a false/empty top stack element'
+                error: "Script evaluated without error but finished with a false/empty top stack element"
               )
             )
           end
@@ -96,9 +96,9 @@ module Tapyrus
   end
 
   class StepResult
-    STATUS_RUNNING = 'running'
-    STATUS_HALT = 'halt'
-    STATUS_FINISHED = 'finished'
+    STATUS_RUNNING = "running"
+    STATUS_HALT = "halt"
+    STATUS_FINISHED = "finished"
 
     STATUSES = [STATUS_RUNNING, STATUS_HALT, STATUS_FINISHED]
 
@@ -112,7 +112,7 @@ module Tapyrus
     # @param [String] message
     # @param [String] error an error message.
     def initialize(status, current_stack: [], message: nil, error: nil)
-      raise ArgumentError, 'Unsupported status specified.' unless STATUSES.include?(status)
+      raise ArgumentError, "Unsupported status specified." unless STATUSES.include?(status)
       @status = status
       @current_stack = current_stack
       @error = error
@@ -141,7 +141,7 @@ module Tapyrus
 
     def stack_table
       rows = current_stack.map { |s| [s] }.reverse
-      Terminal::Table.new(title: 'Current Stack', rows: rows)
+      Terminal::Table.new(title: "Current Stack", rows: rows)
     end
 
     def print_result
@@ -155,10 +155,10 @@ module Tapyrus
 
   class EmptyTxChecker
     def check_sig(script_sig, pubkey, script_code)
-      raise TxUnspecifiedError, 'Signature verification failed. You need to enter tx and input index.'
+      raise TxUnspecifiedError, "Signature verification failed. You need to enter tx and input index."
     end
     def verify_sig(sig, pubkey, digest, allow_hybrid: false)
-      raise TxUnspecifiedError, 'Signature verification failed. You need to enter tx and input index.'
+      raise TxUnspecifiedError, "Signature verification failed. You need to enter tx and input index."
     end
   end
 end

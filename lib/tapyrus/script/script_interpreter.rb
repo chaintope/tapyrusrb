@@ -70,7 +70,7 @@ module Tapyrus
         return set_error(SCRIPT_ERR_SIG_PUSHONLY) unless script_sig.push_only?
         tmp = stack
         @stack = stack_copy
-        raise 'stack cannot be empty.' if stack.empty?
+        raise "stack cannot be empty." if stack.empty?
         begin
           redeem_script = Tapyrus::Script.parse_from_payload(stack.pop.htb)
         rescue Exception => e
@@ -86,7 +86,7 @@ module Tapyrus
       if flag?(SCRIPT_VERIFY_CLEANSTACK)
         # Disallow CLEANSTACK without P2SH, as otherwise a switch CLEANSTACK->P2SH+CLEANSTACK would be possible,
         # which is not a softfork (and P2SH should be one).
-        raise 'assert' unless flag?(SCRIPT_VERIFY_P2SH)
+        raise "assert" unless flag?(SCRIPT_VERIFY_P2SH)
         return set_error(SCRIPT_ERR_CLEANSTACK) unless stack.size == 1
       end
 
@@ -146,7 +146,7 @@ module Tapyrus
         else
           case opcode
           when OP_0
-            stack << ''
+            stack << ""
           when OP_DEPTH
             push_int(stack.size)
           when OP_EQUAL, OP_EQUALVERIFY
@@ -184,7 +184,7 @@ module Tapyrus
               return set_error(SCRIPT_ERR_UNBALANCED_CONDITIONAL) if stack.size < 1
               value = pop_string.htb
               if flag?(SCRIPT_VERIFY_MINIMALIF)
-                if value.bytesize > 1 || (value.bytesize == 1 && value[0].unpack('C').first != 1)
+                if value.bytesize > 1 || (value.bytesize == 1 && value[0].unpack("C").first != 1)
                   return set_error(SCRIPT_ERR_MINIMALIF)
                 end
               end
@@ -585,7 +585,7 @@ module Tapyrus
       raise '"script number overflow"' if data.bytesize > max_num_size
       if require_minimal && data.bytesize > 0
         if data.bytes[-1] & 0x7f == 0 && (data.bytesize <= 1 || data.bytes[data.bytesize - 2] & 0x80 == 0)
-          raise 'non-minimally encoded script number'
+          raise "non-minimally encoded script number"
         end
       end
       Script.decode_number(s)
@@ -644,7 +644,7 @@ module Tapyrus
     def defined_hashtype_signature?(signature)
       sig = signature.htb
       return false if sig.empty?
-      s = sig.unpack('C*')
+      s = sig.unpack("C*")
       hash_type = s[-1] & (~(SIGHASH_TYPE[:anyonecanpay]))
       return false if hash_type < SIGHASH_TYPE[:all] || hash_type > SIGHASH_TYPE[:single]
       true
@@ -680,13 +680,13 @@ module Tapyrus
         case opcode
         when OP_PUSHDATA1
           offset += 1
-          buf.read(1).unpack('C').first
+          buf.read(1).unpack("C").first
         when OP_PUSHDATA2
           offset += 2
-          buf.read(2).unpack('v').first
+          buf.read(2).unpack("v").first
         when OP_PUSHDATA4
           offset += 4
-          buf.read(4).unpack('V').first
+          buf.read(4).unpack("V").first
         else
           opcode
         end

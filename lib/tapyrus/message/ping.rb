@@ -3,7 +3,7 @@ module Tapyrus
     # ping message class
     # https://bitcoin.org/en/developer-reference#ping
     class Ping < Base
-      COMMAND = 'ping'
+      COMMAND = "ping"
 
       attr_accessor :nonce
 
@@ -12,11 +12,11 @@ module Tapyrus
       end
 
       def self.parse_from_payload(payload)
-        new(payload.unpack('Q').first)
+        new(payload.unpack("Q").first)
       end
 
       def to_payload
-        [nonce].pack('Q')
+        [nonce].pack("Q")
       end
 
       def to_response

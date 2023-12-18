@@ -4,19 +4,19 @@ module Tapyrus
   module Base58
     module_function
 
-    ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
     SIZE = ALPHABET.size
 
     # encode hex value to base58 string.
     def encode(hex)
-      leading_zero_bytes = (hex.match(/^([0]+)/) ? $1 : '').size / 2
+      leading_zero_bytes = (hex.match(/^([0]+)/) ? $1 : "").size / 2
       int_val = hex.to_i(16)
-      base58_val = ''
+      base58_val = ""
       while int_val > 0
         int_val, remainder = int_val.divmod(SIZE)
         base58_val = ALPHABET[remainder] + base58_val
       end
-      ('1' * leading_zero_bytes) + base58_val
+      ("1" * leading_zero_bytes) + base58_val
     end
 
     # decode base58 string to hex value.
@@ -26,13 +26,13 @@ module Tapyrus
         .reverse
         .split(//)
         .each_with_index do |char, index|
-          raise ArgumentError, 'Value passed not a valid Base58 String.' if (char_index = ALPHABET.index(char)).nil?
+          raise ArgumentError, "Value passed not a valid Base58 String." if (char_index = ALPHABET.index(char)).nil?
           int_val += char_index * (SIZE**index)
         end
       s = int_val.to_even_length_hex
-      s = '' if s == '00'
-      leading_zero_bytes = (base58_val.match(/^([1]+)/) ? $1 : '').size
-      s = ('00' * leading_zero_bytes) + s if leading_zero_bytes > 0
+      s = "" if s == "00"
+      leading_zero_bytes = (base58_val.match(/^([1]+)/) ? $1 : "").size
+      s = ("00" * leading_zero_bytes) + s if leading_zero_bytes > 0
       s
     end
   end

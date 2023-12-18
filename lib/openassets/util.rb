@@ -3,8 +3,8 @@
 module OpenAssets
   module Util
     class << self
-      OA_VERSION_BYTE = '17' # 0x23
-      OA_VERSION_BYTE_TESTNET = '73' # 0x115
+      OA_VERSION_BYTE = "17" # 0x23
+      OA_VERSION_BYTE_TESTNET = "73" # 0x115
 
       def script_to_asset_id(script)
         hash_to_asset_id(Tapyrus.hash160(script))

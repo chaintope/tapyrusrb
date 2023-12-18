@@ -16,7 +16,7 @@ module Tapyrus
     def check_sig(script_sig, pubkey, script_code)
       return false if script_sig.empty?
       script_sig = script_sig.htb
-      hash_type = script_sig[-1].unpack('C').first
+      hash_type = script_sig[-1].unpack("C").first
       sig = script_sig[0..-2]
       sighash = tx.sighash_for_input(input_index, script_code, hash_type: hash_type)
       verify_sig(sig.bth, pubkey, sighash)
@@ -29,7 +29,7 @@ module Tapyrus
     # @return [Boolean] if check is passed return true, otherwise false.
     def verify_sig(sig, pubkey, digest, allow_hybrid: false)
       key_type =
-        pubkey.start_with?('02') || pubkey.start_with?('03') ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
+        pubkey.start_with?("02") || pubkey.start_with?("03") ? Key::TYPES[:compressed] : Key::TYPES[:uncompressed]
       sig = sig.htb
       algo = sig.bytesize == 64 ? :schnorr : :ecdsa
       begin

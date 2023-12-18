@@ -26,15 +26,15 @@ module Tapyrus
 
       # Return ColorIdentifier for native token(i.e TPC)
       def self.default
-        new(TokenTypes::NONE, '0000000000000000000000000000000000000000000000000000000000000000'.htb)
+        new(TokenTypes::NONE, "0000000000000000000000000000000000000000000000000000000000000000".htb)
       end
 
       def to_payload
-        [type, payload].pack('Ca*')
+        [type, payload].pack("Ca*")
       end
 
       def self.parse_from_payload(payload)
-        type, payload = payload.unpack('Ca*')
+        type, payload = payload.unpack("Ca*")
         new(type, payload)
       end
 

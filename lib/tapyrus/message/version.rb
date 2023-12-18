@@ -1,10 +1,10 @@
 # encoding: ascii-8bit
-require 'ipaddr'
+require "ipaddr"
 module Tapyrus
   module Message
     # https://bitcoin.org/en/developer-reference#version
     class Version < Base
-      COMMAND = 'version'
+      COMMAND = "version"
 
       attr_accessor :version
       attr_accessor :services
@@ -30,7 +30,7 @@ module Tapyrus
       end
 
       def self.parse_from_payload(payload)
-        version, services, timestamp, local_addr, remote_addr, nonce, rest = payload.unpack('VQQa26a26Qa*')
+        version, services, timestamp, local_addr, remote_addr, nonce, rest = payload.unpack("VQQa26a26Qa*")
         v = new
         v.version = version
         v.services = services
@@ -39,7 +39,7 @@ module Tapyrus
         v.remote_addr = NetworkAddr.parse_from_payload(remote_addr)
         v.nonce = nonce
         user_agent, rest = unpack_var_string(rest)
-        start_height, rest = rest.unpack('Va*')
+        start_height, rest = rest.unpack("Va*")
         v.user_agent = user_agent
         v.start_height = start_height
         v.relay = v.unpack_relay_field(rest).first
@@ -48,12 +48,12 @@ module Tapyrus
 
       def to_payload
         [
-          [version, services, timestamp].pack('VQQ'),
+          [version, services, timestamp].pack("VQQ"),
           local_addr.to_payload(true),
           remote_addr.to_payload(true),
-          [nonce].pack('Q'),
+          [nonce].pack("Q"),
           pack_var_string(user_agent),
-          [start_height].pack('V'),
+          [start_height].pack("V"),
           pack_boolean(relay)
         ].join
       end

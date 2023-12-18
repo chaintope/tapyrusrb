@@ -3,7 +3,7 @@ module Tapyrus
     # getblocktxn message.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class GetBlockTxn < Base
-      COMMAND = 'getblocktxn'
+      COMMAND = "getblocktxn"
 
       attr_accessor :request
 

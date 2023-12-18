@@ -38,8 +38,8 @@ module Tapyrus
 
       # connecting other peers and begin network activity.
       def start
-        raise 'Cannot start a peer pool twice.' if started
-        logger.debug 'Start connecting other pears.'
+        raise "Cannot start a peer pool twice." if started
+        logger.debug "Start connecting other pears."
         addr_list = peer_discovery.peers
 
         connect(addr_list)
@@ -72,8 +72,8 @@ module Tapyrus
 
       # terminate peers.
       def terminate
-        peers.each { |peer| peer.close('terminate') }
-        pending_peers.each { |peer| peer.close('terminate') }
+        peers.each { |peer| peer.close("terminate") }
+        pending_peers.each { |peer| peer.close("terminate") }
         @peers = []
         @started = false
       end

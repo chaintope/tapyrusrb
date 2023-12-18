@@ -16,20 +16,20 @@ module Tapyrus
       # @param [Array{String}] words the mnemonic words
       # @return [Tapyrus::SLIP39::Share] a share
       def self.from_words(words)
-        raise ArgumentError, 'Mnemonics should be an array of strings' unless words.is_a?(Array)
+        raise ArgumentError, "Mnemonics should be an array of strings" unless words.is_a?(Array)
         indices =
           words.map do |word|
             index = Tapyrus::SLIP39::WORDS.index(word.downcase)
-            raise IndexError, 'word not found in words list.' unless index
+            raise IndexError, "word not found in words list." unless index
             index
           end
 
-        raise ArgumentError, 'Invalid mnemonic length.' if indices.size < MIN_MNEMONIC_LENGTH_WORDS
-        raise ArgumentError, 'Invalid mnemonic checksum.' unless verify_rs1024_checksum(indices)
+        raise ArgumentError, "Invalid mnemonic length." if indices.size < MIN_MNEMONIC_LENGTH_WORDS
+        raise ArgumentError, "Invalid mnemonic checksum." unless verify_rs1024_checksum(indices)
 
         padding_length = (RADIX_BITS * (indices.size - METADATA_LENGTH_WORDS)) % 16
-        raise ArgumentError, 'Invalid mnemonic length.' if padding_length > 8
-        data = indices.map { |i| i.to_s(2).rjust(10, '0') }.join
+        raise ArgumentError, "Invalid mnemonic length." if padding_length > 8
+        data = indices.map { |i| i.to_s(2).rjust(10, "0") }.join
 
         s = self.new
         s.id = data[0...ID_LENGTH_BITS].to_i(2)
@@ -47,7 +47,7 @@ module Tapyrus
         start_index = 40 + padding_length
         end_index = start_index + value_length - padding_length
         padding_value = data[40...(40 + padding_length)]
-        raise ArgumentError, 'Invalid mnemonic. padding must only zero.' unless padding_value.to_i(2) == 0
+        raise ArgumentError, "Invalid mnemonic. padding must only zero." unless padding_value.to_i(2) == 0
         s.value = data[start_index...end_index].to_i(2).to_even_length_hex
         s.checksum = data[(40 + value_length)..-1].to_i(2)
         s

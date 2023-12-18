@@ -20,7 +20,7 @@ module Tapyrus
         @logger = peer.logger
         @sendheaders = false
         @attr_accessor = 0
-        @message = ''
+        @message = ""
         self.pending_connect_timeout = 5.0
       end
 
@@ -44,7 +44,7 @@ module Tapyrus
       end
 
       # close network connection.
-      def close(msg = '')
+      def close(msg = "")
         logger.info "close connection with #{addr}. #{msg}"
         close_connection_after_writing
       end

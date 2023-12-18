@@ -3,10 +3,10 @@ module Tapyrus
     # mempool message
     # https://bitcoin.org/en/developer-reference#mempool
     class MemPool < Base
-      COMMAND = 'mempool'
+      COMMAND = "mempool"
 
       def to_payload
-        ''
+        ""
       end
     end
   end

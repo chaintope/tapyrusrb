@@ -93,7 +93,7 @@ module Tapyrus
       def value
         return @value if @value
         self.right = left.dup unless right
-        Tapyrus.double_sha256([left.value + right.value].pack('H*')).bth
+        Tapyrus.double_sha256([left.value + right.value].pack("H*")).bth
       end
 
       def root?

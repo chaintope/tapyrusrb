@@ -27,7 +27,7 @@ module Tapyrus
       def run
         # TODO need process running check.
         return if running
-        logger.debug 'SPV node start running.'
+        logger.debug "SPV node start running."
         EM.run do
           # EM.start_server('0.0.0.0', Tapyrus.chain_params.default_port, Tapyrus::Network::InboundConnector, self)
           pool.start
@@ -38,7 +38,7 @@ module Tapyrus
       # close the node.
       def shutdown
         pool.terminate
-        logger.debug 'SPV node shutdown.'
+        logger.debug "SPV node shutdown."
       end
 
       # broadcast a transaction

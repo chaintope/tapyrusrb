@@ -3,7 +3,7 @@ module Tapyrus
     # feefilter message
     # https://bitcoin.org/en/developer-reference#feefilter
     class FeeFilter < Base
-      COMMAND = 'feefilter'
+      COMMAND = "feefilter"
 
       # The fee rate (in satoshis per kilobyte)
       attr_accessor :fee_rate
@@ -13,11 +13,11 @@ module Tapyrus
       end
 
       def self.parse_from_payload(payload)
-        new(payload.unpack('Q').first)
+        new(payload.unpack("Q").first)
       end
 
       def to_payload
-        [fee_rate].pack('Q')
+        [fee_rate].pack("Q")
       end
     end
   end

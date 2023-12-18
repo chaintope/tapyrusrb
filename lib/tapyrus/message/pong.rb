@@ -3,7 +3,7 @@ module Tapyrus
     # pong message
     # https://bitcoin.org/en/developer-reference#pong
     class Pong < Base
-      COMMAND = 'pong'
+      COMMAND = "pong"
 
       attr_reader :nonce
 
@@ -12,11 +12,11 @@ module Tapyrus
       end
 
       def self.parse_from_payload(payload)
-        new(payload.unpack('Q').first)
+        new(payload.unpack("Q").first)
       end
 
       def to_payload
-        [nonce].pack('Q')
+        [nonce].pack("Q")
       end
     end
   end

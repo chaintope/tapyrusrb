@@ -10,9 +10,9 @@ module Schnorr
     # @param contract [String] A contract information with 32-bytes binary format.
     # @return [(Schnorr::Signature, ECDSA::Point)] signature and point to prove the commitment to contract.
     def sign(message, private_key, contract)
-      raise 'The message must be a 32-byte array.' unless message.bytesize == 32
-      raise 'private_key is zero or over the curve order.' if private_key == 0 || private_key >= GROUP.order
-      raise 'The contract must be a 32-byte binary string.' unless contract.bytesize == 32
+      raise "The message must be a 32-byte array." unless message.bytesize == 32
+      raise "private_key is zero or over the curve order." if private_key == 0 || private_key >= GROUP.order
+      raise "The contract must be a 32-byte binary string." unless contract.bytesize == 32
 
       p = GROUP.new_point(private_key)
       k0 = Schnorr.deterministic_nonce(message, private_key)
@@ -32,7 +32,7 @@ module Schnorr
       rx = ECDSA::Format::IntegerOctetString.encode(r.x, GROUP.byte_length)
       h = Tapyrus.sha256(rx + contract)
       k1 = (k + h.bth.to_i(16)) % GROUP.order
-      raise 'Creation of signature failed. k + h(R || c) is zero' if k1.zero?
+      raise "Creation of signature failed. k + h(R || c) is zero" if k1.zero?
       [k1, r]
     end
 
