@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.description = 'The implementation of Tapyrus Protocol for Ruby.'
   spec.homepage = 'https://github.com/chaintope/tapyrusrb'
   spec.license = 'MIT'
+  spec.required_ruby_version = Gem::Requirement.new('>= 3.0.0')
 
   spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir = 'exe'
