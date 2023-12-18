@@ -17,13 +17,13 @@ module Tapyrus
 
     def pack_var_int(i)
       if i < 0xfd
-        [i].pack('C')
+        [i].pack("C")
       elsif i <= 0xffff
-        [0xfd, i].pack('Cv')
+        [0xfd, i].pack("Cv")
       elsif i <= 0xffffffff
-        [0xfe, i].pack('CV')
+        [0xfe, i].pack("CV")
       elsif i <= 0xffffffffffffffff
-        [0xff, i].pack('CQ')
+        [0xff, i].pack("CQ")
       else
         raise "int(#{i}) too large!"
       end
@@ -31,39 +31,39 @@ module Tapyrus
 
     # @return an integer for a valid payload, otherwise nil
     def unpack_var_int(payload)
-      case payload.unpack('C').first
+      case payload.unpack("C").first
       when 0xfd
-        payload.unpack('xva*')
+        payload.unpack("xva*")
       when 0xfe
-        payload.unpack('xVa*')
+        payload.unpack("xVa*")
       when 0xff
-        payload.unpack('xQa*')
+        payload.unpack("xQa*")
       else
-        payload.unpack('Ca*')
+        payload.unpack("Ca*")
       end
     end
 
     # @return an integer for a valid payload, otherwise nil
     def unpack_var_int_from_io(buf)
-      uchar = buf.read(1)&.unpack('C')&.first
+      uchar = buf.read(1)&.unpack("C")&.first
       case uchar
       when 0xfd
-        buf.read(2)&.unpack('v')&.first
+        buf.read(2)&.unpack("v")&.first
       when 0xfe
-        buf.read(4)&.unpack('V')&.first
+        buf.read(4)&.unpack("V")&.first
       when 0xff
-        buf.read(8)&.unpack('Q')&.first
+        buf.read(8)&.unpack("Q")&.first
       else
         uchar
       end
     end
 
     def pack_boolean(b)
-      b ? [0x01].pack('C') : [0x00].pack('C')
+      b ? [0x01].pack("C") : [0x00].pack("C")
     end
 
     def unpack_boolean(payload)
-      data, payload = payload.unpack('Ca*')
+      data, payload = payload.unpack("Ca*")
       [(data.zero? ? false : true), payload]
     end
 
@@ -77,7 +77,7 @@ module Tapyrus
 
     # byte convert to the sequence of bits packed eight in a byte with the least significant bit first.
     def byte_to_bit(byte)
-      byte.unpack('b*').first
+      byte.unpack("b*").first
     end
 
     # padding zero to the left of binary string until bytesize.
@@ -86,7 +86,7 @@ module Tapyrus
     # @return [String] padded binary string.
     def padding_zero(binary, bytesize)
       return binary unless binary.bytesize < bytesize
-      ('00' * (bytesize - binary.bytesize)).htb + binary
+      ("00" * (bytesize - binary.bytesize)).htb + binary
     end
 
     # generate sha256-ripemd160 hash for value
@@ -110,16 +110,16 @@ module Tapyrus
       hex = Base58.decode(addr)
       if hex.size == 50 && calc_checksum(hex[0...-8]) == hex[-8..-1]
         unless [Tapyrus.chain_params.address_version, Tapyrus.chain_params.p2sh_version].include?(hex[0..1])
-          raise 'Invalid version bytes.'
+          raise "Invalid version bytes."
         end
         [hex[2...-8], hex[0..1]]
       elsif hex.size == 116 && calc_checksum(hex[0...-8]) == hex[-8..-1]
         unless [Tapyrus.chain_params.cp2pkh_version, Tapyrus.chain_params.cp2sh_version].include?(hex[0..1])
-          raise 'Invalid version bytes.'
+          raise "Invalid version bytes."
         end
         [hex[2...-8], hex[0..1]]
       else
-        raise 'Invalid address.'
+        raise "Invalid address."
       end
     end
 
@@ -127,7 +127,7 @@ module Tapyrus
       double_sha256(hex.htb).bth[0..7]
     end
 
-    DIGEST_NAME_SHA256 = 'sha256'
+    DIGEST_NAME_SHA256 = "sha256"
 
     def hmac_sha256(key, data)
       OpenSSL::HMAC.digest(DIGEST_NAME_SHA256, key, data)

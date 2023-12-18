@@ -4,7 +4,7 @@ module Tapyrus
     include Tapyrus::Opcodes
 
     def self.prefix
-      [OP_0].pack('C*')
+      [OP_0].pack("C*")
     end
 
     # generate input script sig spending a multisig output script.
@@ -22,7 +22,7 @@ module Tapyrus
     # multiple parties. Signatures must be in the same order as the
     # pubkeys in the output script being redeemed.
     def self.add_sig_to_multisig_script_sig(sig_to_add, script_sig, hash_type = SIGHASH_TYPE[:all])
-      signature = sig_to_add + [hash_type].pack('C*')
+      signature = sig_to_add + [hash_type].pack("C*")
       offset = script_sig.empty? ? 0 : 1
       script_sig.insert(offset, Tapyrus::Script.pack_pushdata(signature))
     end

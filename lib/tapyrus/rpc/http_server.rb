@@ -1,5 +1,5 @@
-require 'evma_httpserver'
-require 'json'
+require "evma_httpserver"
+require "json"
 
 module Tapyrus
   module RPC
@@ -18,11 +18,11 @@ module Tapyrus
 
       def post_init
         super
-        logger.debug 'start http server.'
+        logger.debug "start http server."
       end
 
       def self.run(node, port = 8332)
-        EM.start_server('0.0.0.0', port, HttpServer, node)
+        EM.start_server("0.0.0.0", port, HttpServer, node)
       end
 
       # process http request.
@@ -47,7 +47,7 @@ module Tapyrus
               response.status = 200
               response.content = result
             end
-            response.content_type 'application/json'
+            response.content_type "application/json"
             response.send_response
           end
         EM.defer(operation, callback)
@@ -57,7 +57,7 @@ module Tapyrus
       # @return [Array] the array of command and args
       def parse_json_params
         params = JSON.parse(@http_post_content)
-        [params['method'], params['params']]
+        [params["method"], params["params"]]
       end
     end
   end

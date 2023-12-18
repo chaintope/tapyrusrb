@@ -31,26 +31,26 @@ module Tapyrus
       module_function
 
       def init
-        raise 'secp256k1 library dose not found.' unless File.exist?(ENV['SECP256K1_LIB_PATH'])
-        ffi_lib(ENV['SECP256K1_LIB_PATH'])
+        raise "secp256k1 library dose not found." unless File.exist?(ENV["SECP256K1_LIB_PATH"])
+        ffi_lib(ENV["SECP256K1_LIB_PATH"])
         load_functions
       end
 
       def load_functions
         attach_function(:secp256k1_context_create, [:uint], :pointer)
         attach_function(:secp256k1_context_destroy, [:pointer], :void)
-        attach_function(:secp256k1_context_randomize, [:pointer, :pointer], :int)
-        attach_function(:secp256k1_ec_pubkey_create, [:pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_ec_seckey_verify, [:pointer, :pointer], :int)
-        attach_function(:secp256k1_ecdsa_sign, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_ec_pubkey_serialize, [:pointer, :pointer, :pointer, :pointer, :uint], :int)
-        attach_function(:secp256k1_ecdsa_signature_serialize_der, [:pointer, :pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_ec_pubkey_parse, [:pointer, :pointer, :pointer, :size_t], :int)
-        attach_function(:secp256k1_ecdsa_signature_parse_der, [:pointer, :pointer, :pointer, :size_t], :int)
-        attach_function(:secp256k1_ecdsa_signature_normalize, [:pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_ecdsa_verify, [:pointer, :pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_schnorr_sign, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int)
-        attach_function(:secp256k1_schnorr_verify, [:pointer, :pointer, :pointer, :pointer], :int)
+        attach_function(:secp256k1_context_randomize, %i[pointer pointer], :int)
+        attach_function(:secp256k1_ec_pubkey_create, %i[pointer pointer pointer], :int)
+        attach_function(:secp256k1_ec_seckey_verify, %i[pointer pointer], :int)
+        attach_function(:secp256k1_ecdsa_sign, %i[pointer pointer pointer pointer pointer pointer], :int)
+        attach_function(:secp256k1_ec_pubkey_serialize, %i[pointer pointer pointer pointer uint], :int)
+        attach_function(:secp256k1_ecdsa_signature_serialize_der, %i[pointer pointer pointer pointer], :int)
+        attach_function(:secp256k1_ec_pubkey_parse, %i[pointer pointer pointer size_t], :int)
+        attach_function(:secp256k1_ecdsa_signature_parse_der, %i[pointer pointer pointer size_t], :int)
+        attach_function(:secp256k1_ecdsa_signature_normalize, %i[pointer pointer pointer], :int)
+        attach_function(:secp256k1_ecdsa_verify, %i[pointer pointer pointer pointer], :int)
+        attach_function(:secp256k1_schnorr_sign, %i[pointer pointer pointer pointer pointer pointer], :int)
+        attach_function(:secp256k1_schnorr_verify, %i[pointer pointer pointer pointer], :int)
       end
 
       def with_context(flags: (SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN))
@@ -59,7 +59,7 @@ module Tapyrus
           context = secp256k1_context_create(flags)
           ret, tries, max = 0, 0, 20
           while ret != 1
-            raise 'secp256k1_context_randomize failed.' if tries >= max
+            raise "secp256k1_context_randomize failed." if tries >= max
             tries += 1
             ret = secp256k1_context_randomize(context, FFI::MemoryPointer.from_string(SecureRandom.random_bytes(32)))
           end
@@ -74,7 +74,7 @@ module Tapyrus
         with_context do |context|
           ret, tries, max = 0, 0, 20
           while ret != 1
-            raise 'secp256k1_ec_seckey_verify in generate_key_pair failed.' if tries >= max
+            raise "secp256k1_ec_seckey_verify in generate_key_pair failed." if tries >= max
             tries += 1
             priv_key = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, SecureRandom.random_bytes(32))
             ret = secp256k1_ec_seckey_verify(context, priv_key)
@@ -145,7 +145,7 @@ module Tapyrus
       def generate_pubkey_in_context(context, privkey, compressed: true)
         internal_pubkey = FFI::MemoryPointer.new(:uchar, 64)
         result = secp256k1_ec_pubkey_create(context, internal_pubkey, privkey.htb)
-        raise 'error creating pubkey' unless result
+        raise "error creating pubkey" unless result
 
         pubkey = FFI::MemoryPointer.new(:uchar, 65)
         pubkey_len = FFI::MemoryPointer.new(:uint64)
@@ -157,14 +157,14 @@ module Tapyrus
             pubkey_len.put_uint64(0, 65)
             secp256k1_ec_pubkey_serialize(context, pubkey, pubkey_len, internal_pubkey, SECP256K1_EC_UNCOMPRESSED)
           end
-        raise 'error serialize pubkey' unless result || pubkey_len.read_uint64 > 0
+        raise "error serialize pubkey" unless result || pubkey_len.read_uint64 > 0
         pubkey.read_string(pubkey_len.read_uint64).bth
       end
 
       def sign_ecdsa(data, privkey, extra_entropy)
         with_context do |context|
           secret = FFI::MemoryPointer.new(:uchar, privkey.htb.bytesize).put_bytes(0, privkey.htb)
-          raise 'priv_key invalid' unless secp256k1_ec_seckey_verify(context, secret)
+          raise "priv_key invalid" unless secp256k1_ec_seckey_verify(context, secret)
 
           internal_signature = FFI::MemoryPointer.new(:uchar, 64)
           msg32 = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, data)
@@ -173,7 +173,7 @@ module Tapyrus
           ret, tries, max = 0, 0, 20
 
           while ret != 1
-            raise 'secp256k1_ecdsa_sign failed.' if tries >= max
+            raise "secp256k1_ecdsa_sign failed." if tries >= max
             tries += 1
             ret = secp256k1_ecdsa_sign(context, internal_signature, msg32, secret, nil, entropy)
           end
@@ -181,7 +181,7 @@ module Tapyrus
           signature = FFI::MemoryPointer.new(:uchar, 72)
           signature_len = FFI::MemoryPointer.new(:uint64).put_uint64(0, 72)
           result = secp256k1_ecdsa_signature_serialize_der(context, signature, signature_len, internal_signature)
-          raise 'secp256k1_ecdsa_signature_serialize_der failed' unless result
+          raise "secp256k1_ecdsa_signature_serialize_der failed" unless result
 
           signature.read_string(signature_len.read_uint64)
         end
@@ -190,12 +190,12 @@ module Tapyrus
       def sign_schnorr(data, privkey)
         with_context do |context|
           secret = FFI::MemoryPointer.new(:uchar, privkey.htb.bytesize).put_bytes(0, privkey.htb)
-          raise 'priv_key invalid' unless secp256k1_ec_seckey_verify(context, secret)
+          raise "priv_key invalid" unless secp256k1_ec_seckey_verify(context, secret)
 
           signature = FFI::MemoryPointer.new(:uchar, 64)
           msg32 = FFI::MemoryPointer.new(:uchar, 32).put_bytes(0, data)
           unless secp256k1_schnorr_sign(context, signature, msg32, secret, nil, nil) == 1
-            raise 'Failed to generate schnorr signature.'
+            raise "Failed to generate schnorr signature."
           end
           signature.read_string(64)
         end

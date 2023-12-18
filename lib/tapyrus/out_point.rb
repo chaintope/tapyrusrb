@@ -1,7 +1,7 @@
 module Tapyrus
   # outpoint class
   class OutPoint
-    COINBASE_HASH = '0000000000000000000000000000000000000000000000000000000000000000'
+    COINBASE_HASH = "0000000000000000000000000000000000000000000000000000000000000000"
     COINBASE_INDEX = 4_294_967_295
 
     attr_reader :tx_hash
@@ -21,7 +21,7 @@ module Tapyrus
     end
 
     def to_payload
-      [tx_hash.htb, index].pack('a32V')
+      [tx_hash.htb, index].pack("a32V")
     end
 
     def self.create_coinbase_outpoint

@@ -1,11 +1,11 @@
-require 'ipaddr'
+require "ipaddr"
 
 module Tapyrus
   module Message
     # addr message
     # https://bitcoin.org/en/developer-reference#addr
     class Addr < Base
-      COMMAND = 'addr'
+      COMMAND = "addr"
 
       attr_reader :addrs
 

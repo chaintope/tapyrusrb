@@ -29,7 +29,7 @@ module Tapyrus
 
     def self.parse_from_payload(payload)
       buf = payload.is_a?(String) ? StringIO.new(payload) : payload
-      features, prev_hash, merkle_root, im_merkle_root, time, x_filed_type = buf.read(105).unpack('Va32a32a32Vc')
+      features, prev_hash, merkle_root, im_merkle_root, time, x_filed_type = buf.read(105).unpack("Va32a32a32Vc")
       x_field = buf.read(unpack_var_int_from_io(buf)) unless x_filed_type == X_FILED_TYPES[:none]
       proof = buf.read(unpack_var_int_from_io(buf))
       new(
@@ -45,7 +45,7 @@ module Tapyrus
     end
 
     def to_payload(skip_proof = false)
-      payload = [features, prev_hash.htb, merkle_root.htb, im_merkle_root.htb, time, x_field_type].pack('Va32a32a32Vc')
+      payload = [features, prev_hash.htb, merkle_root.htb, im_merkle_root.htb, time, x_field_type].pack("Va32a32a32Vc")
       payload << pack_var_string(x_field.htb) unless x_field_type == X_FILED_TYPES[:none]
       payload << pack_var_string(proof.htb) if proof && !skip_proof
       payload

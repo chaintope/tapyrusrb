@@ -1,63 +1,63 @@
 # Porting part of the code from bitcoin-ruby. see the license.
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
-require 'tapyrus/version'
-require 'eventmachine'
-require 'ecdsa'
-require 'securerandom'
-require 'json'
-require 'jwt'
-require 'ffi'
-require 'observer'
-require 'tmpdir'
-require_relative 'openassets'
-require_relative 'schnorr'
+require "tapyrus/version"
+require "eventmachine"
+require "ecdsa"
+require "securerandom"
+require "json"
+require "jwt"
+require "ffi"
+require "observer"
+require "tmpdir"
+require_relative "openassets"
+require_relative "schnorr"
 
 module Tapyrus
-  autoload :Ext, 'tapyrus/ext'
-  autoload :Util, 'tapyrus/util'
-  autoload :ChainParams, 'tapyrus/chain_params'
-  autoload :Message, 'tapyrus/message'
-  autoload :Logger, 'tapyrus/logger'
-  autoload :Block, 'tapyrus/block'
-  autoload :BlockHeader, 'tapyrus/block_header'
-  autoload :Tx, 'tapyrus/tx'
-  autoload :Script, 'tapyrus/script/script'
-  autoload :Multisig, 'tapyrus/script/multisig'
-  autoload :ScriptInterpreter, 'tapyrus/script/script_interpreter'
-  autoload :ScriptDebugger, 'tapyrus/script/debugger'
-  autoload :ScriptError, 'tapyrus/script/script_error'
-  autoload :TxChecker, 'tapyrus/script/tx_checker'
-  autoload :TxIn, 'tapyrus/tx_in'
-  autoload :TxOut, 'tapyrus/tx_out'
-  autoload :OutPoint, 'tapyrus/out_point'
-  autoload :MerkleTree, 'tapyrus/merkle_tree'
-  autoload :Key, 'tapyrus/key'
-  autoload :ExtKey, 'tapyrus/ext_key'
-  autoload :ExtPubkey, 'tapyrus/ext_key'
-  autoload :Opcodes, 'tapyrus/opcodes'
-  autoload :Node, 'tapyrus/node'
-  autoload :Base58, 'tapyrus/base58'
-  autoload :Secp256k1, 'tapyrus/secp256k1'
-  autoload :Mnemonic, 'tapyrus/mnemonic'
-  autoload :ValidationState, 'tapyrus/validation'
-  autoload :Network, 'tapyrus/network'
-  autoload :Store, 'tapyrus/store'
-  autoload :RPC, 'tapyrus/rpc'
-  autoload :Wallet, 'tapyrus/wallet'
-  autoload :BloomFilter, 'tapyrus/bloom_filter'
-  autoload :KeyPath, 'tapyrus/key_path'
-  autoload :SLIP39, 'tapyrus/slip39'
-  autoload :Color, 'tapyrus/script/color'
-  autoload :Errors, 'tapyrus/errors'
-  autoload :TxBuilder, 'tapyrus/tx_builder'
-  autoload :BIP175, 'tapyrus/bip175'
-  autoload :Contract, 'tapyrus/contract'
-  autoload :TIP0137, 'tapyrus/tip0137'
-  autoload :JWS, 'tapyrus/jws'
+  autoload :Ext, "tapyrus/ext"
+  autoload :Util, "tapyrus/util"
+  autoload :ChainParams, "tapyrus/chain_params"
+  autoload :Message, "tapyrus/message"
+  autoload :Logger, "tapyrus/logger"
+  autoload :Block, "tapyrus/block"
+  autoload :BlockHeader, "tapyrus/block_header"
+  autoload :Tx, "tapyrus/tx"
+  autoload :Script, "tapyrus/script/script"
+  autoload :Multisig, "tapyrus/script/multisig"
+  autoload :ScriptInterpreter, "tapyrus/script/script_interpreter"
+  autoload :ScriptDebugger, "tapyrus/script/debugger"
+  autoload :ScriptError, "tapyrus/script/script_error"
+  autoload :TxChecker, "tapyrus/script/tx_checker"
+  autoload :TxIn, "tapyrus/tx_in"
+  autoload :TxOut, "tapyrus/tx_out"
+  autoload :OutPoint, "tapyrus/out_point"
+  autoload :MerkleTree, "tapyrus/merkle_tree"
+  autoload :Key, "tapyrus/key"
+  autoload :ExtKey, "tapyrus/ext_key"
+  autoload :ExtPubkey, "tapyrus/ext_key"
+  autoload :Opcodes, "tapyrus/opcodes"
+  autoload :Node, "tapyrus/node"
+  autoload :Base58, "tapyrus/base58"
+  autoload :Secp256k1, "tapyrus/secp256k1"
+  autoload :Mnemonic, "tapyrus/mnemonic"
+  autoload :ValidationState, "tapyrus/validation"
+  autoload :Network, "tapyrus/network"
+  autoload :Store, "tapyrus/store"
+  autoload :RPC, "tapyrus/rpc"
+  autoload :Wallet, "tapyrus/wallet"
+  autoload :BloomFilter, "tapyrus/bloom_filter"
+  autoload :KeyPath, "tapyrus/key_path"
+  autoload :SLIP39, "tapyrus/slip39"
+  autoload :Color, "tapyrus/script/color"
+  autoload :Errors, "tapyrus/errors"
+  autoload :TxBuilder, "tapyrus/tx_builder"
+  autoload :BIP175, "tapyrus/bip175"
+  autoload :Contract, "tapyrus/contract"
+  autoload :TIP0137, "tapyrus/tip0137"
+  autoload :JWS, "tapyrus/jws"
 
-  require_relative 'tapyrus/constants'
-  require_relative 'tapyrus/ext/ecdsa'
+  require_relative "tapyrus/constants"
+  require_relative "tapyrus/ext/ecdsa"
 
   extend Util
 
@@ -89,27 +89,27 @@ module Tapyrus
 
   # get secp implementation module
   def self.secp_impl
-    path = ENV['SECP256K1_LIB_PATH']
+    path = ENV["SECP256K1_LIB_PATH"]
     (path && File.exist?(path)) ? Tapyrus::Secp256k1::Native : Tapyrus::Secp256k1::Ruby
   end
 
   def self.hmac_sha512(key, data)
-    OpenSSL::HMAC.digest(OpenSSL::Digest.new('SHA512'), key, data)
+    OpenSSL::HMAC.digest(OpenSSL::Digest.new("SHA512"), key, data)
   end
 
   def self.hmac_sha256(key, data)
-    OpenSSL::HMAC.digest(OpenSSL::Digest.new('SHA256'), key, data)
+    OpenSSL::HMAC.digest(OpenSSL::Digest.new("SHA256"), key, data)
   end
 
   class ::String
     # binary convert to hex string
     def bth
-      unpack('H*').first
+      unpack("H*").first
     end
 
     # hex string convert to binary
     def htb
-      [self].pack('H*')
+      [self].pack("H*")
     end
 
     # binary convert to integer
@@ -164,7 +164,7 @@ module Tapyrus
   class ::Integer
     def to_even_length_hex
       hex = to_s(16)
-      hex.rjust((hex.length / 2.0).ceil * 2, '0')
+      hex.rjust((hex.length / 2.0).ceil * 2, "0")
     end
 
     def itb
@@ -173,7 +173,7 @@ module Tapyrus
 
     # convert bit string
     def to_bits(length = nil)
-      length ? to_s(2).rjust(length, '0') : to_s(2)
+      length ? to_s(2).rjust(length, "0") : to_s(2)
     end
   end
 end

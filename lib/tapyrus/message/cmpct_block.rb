@@ -3,7 +3,7 @@ module Tapyrus
     # cmpctblock message. support only version 1.
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class CmpctBlock < Base
-      COMMAND = 'cmpctblock'
+      COMMAND = "cmpctblock"
 
       attr_accessor :header_and_short_ids
 

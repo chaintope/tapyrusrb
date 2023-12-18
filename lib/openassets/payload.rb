@@ -9,7 +9,7 @@ module OpenAssets
     attr_accessor :quantities
     attr_accessor :metadata
 
-    def initialize(quantities = [], metadata = '')
+    def initialize(quantities = [], metadata = "")
       @quantities = quantities
       @metadata = metadata
     end
@@ -41,7 +41,7 @@ module OpenAssets
       payload << MARKER
       payload << VERSION
       payload << Tapyrus.pack_var_int(quantities.size) << quantities.map { |q| LEB128.encode_unsigned(q).read }.join
-      payload << Tapyrus.pack_var_int(metadata.length) << metadata.bytes.map { |b| sprintf('%02x', b) }.join.htb
+      payload << Tapyrus.pack_var_int(metadata.length) << metadata.bytes.map { |b| sprintf("%02x", b) }.join.htb
       payload
     end
   end

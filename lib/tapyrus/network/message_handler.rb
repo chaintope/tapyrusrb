@@ -22,7 +22,7 @@ module Tapyrus
         return unless command
 
         defer_handle_command(command, payload)
-        @message = ''
+        @message = ""
         parse(rest) if rest && rest.bytesize > 0
       end
 
@@ -30,7 +30,7 @@ module Tapyrus
         head_magic = Tapyrus.chain_params.magic_head
         return if @message.nil? || @message.size < MESSAGE_HEADER_SIZE
 
-        magic, command, length, checksum = @message.unpack('a4A12Va4')
+        magic, command, length, checksum = @message.unpack("a4A12Va4")
         raise Tapyrus::Message::Error, "invalid header magic. #{magic.bth}" unless magic.bth == head_magic
 
         payload = @message[MESSAGE_HEADER_SIZE...(MESSAGE_HEADER_SIZE + length)]
@@ -115,7 +115,7 @@ module Tapyrus
 
       def handshake_done
         return unless @incomming_handshake && @outgoing_handshake
-        logger.info 'handshake finished.'
+        logger.info "handshake finished."
         @connected = true
         post_handshake
       end
@@ -129,13 +129,13 @@ module Tapyrus
       end
 
       def on_ver_ack
-        logger.info('receive verack message.')
+        logger.info("receive verack message.")
         @outgoing_handshake = true
         handshake_done
       end
 
       def on_get_addr
-        logger.info('receive getaddr message.')
+        logger.info("receive getaddr message.")
         peer.send_addrs
       end
 
@@ -145,7 +145,7 @@ module Tapyrus
       end
 
       def on_send_headers
-        logger.info('receive sendheaders message.')
+        logger.info("receive sendheaders message.")
         @sendheaders = true
       end
 
@@ -170,17 +170,17 @@ module Tapyrus
       end
 
       def on_get_headers(headers)
-        logger.info('receive getheaders message.')
+        logger.info("receive getheaders message.")
         # TODO
       end
 
       def on_headers(headers)
-        logger.info('receive headers message.')
+        logger.info("receive headers message.")
         peer.handle_headers(headers)
       end
 
       def on_block(block)
-        logger.info('receive block message.')
+        logger.info("receive block message.")
         # TODO
       end
 
@@ -195,7 +195,7 @@ module Tapyrus
       end
 
       def on_mem_pool
-        logger.info('receive mempool message.')
+        logger.info("receive mempool message.")
         # TODO return mempool tx
       end
 
@@ -210,7 +210,7 @@ module Tapyrus
       end
 
       def on_inv(inv)
-        logger.info('receive inv message.')
+        logger.info("receive inv message.")
         blocks = []
         txs = []
         inv.inventories.each do |i|

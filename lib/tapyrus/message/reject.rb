@@ -8,7 +8,7 @@ module Tapyrus
       attr_accessor :reason
       attr_accessor :extra
 
-      COMMAND = 'reject'
+      COMMAND = "reject"
 
       CODE_MALFORMED = 0x01
       CODE_INVALID = 0x10
@@ -19,7 +19,7 @@ module Tapyrus
       CODE_INSUFFICIENT_FEE = 0x42
       CODE_CHECKPOINT = 0x43
 
-      def initialize(message, code, reason = '', extra = '')
+      def initialize(message, code, reason = "", extra = "")
         @message = message
         @code = code
         @reason = reason
@@ -28,15 +28,15 @@ module Tapyrus
 
       def self.parse_from_payload(payload)
         message, payload = Tapyrus.unpack_var_string(payload)
-        code, payload = payload.unpack('Ca*')
+        code, payload = payload.unpack("Ca*")
         reason, payload = Tapyrus.unpack_var_string(payload)
-        extra = ['tx', 'block'].include?(message) ? payload.bth : payload
+        extra = %w[tx block].include?(message) ? payload.bth : payload
         new(message, code, reason, extra)
       end
 
       def to_payload
-        e = ['tx', 'block'].include?(message) ? extra.htb : extra
-        Tapyrus.pack_var_string(message) << [code].pack('C') << Tapyrus.pack_var_string(reason) << e
+        e = %w[tx block].include?(message) ? extra.htb : extra
+        Tapyrus.pack_var_string(message) << [code].pack("C") << Tapyrus.pack_var_string(reason) << e
       end
     end
   end

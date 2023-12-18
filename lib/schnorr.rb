@@ -1,11 +1,11 @@
 module Schnorr
-  autoload :Signature, 'schnorr/signature'
-  autoload :SignToContract, 'schnorr/sign_to_contract'
+  autoload :Signature, "schnorr/signature"
+  autoload :SignToContract, "schnorr/sign_to_contract"
 
   module_function
 
   GROUP = ECDSA::Group::Secp256k1
-  ALGO16 = 'SCHNORR + SHA256'
+  ALGO16 = "SCHNORR + SHA256"
 
   # Generate schnorr signature.
   # @param message (String) A message to be signed with binary format.
@@ -13,8 +13,8 @@ module Schnorr
   # (The number of times to add the generator point to itself to get the public key.)
   # @return (Schnorr::Signature)
   def sign(message, private_key)
-    raise 'The message must be a 32-byte array.' unless message.bytesize == 32
-    raise 'private_key is zero or over the curve order.' if private_key == 0 || private_key >= GROUP.order
+    raise "The message must be a 32-byte array." unless message.bytesize == 32
+    raise "private_key is zero or over the curve order." if private_key == 0 || private_key >= GROUP.order
 
     p = GROUP.new_point(private_key)
     k0 = deterministic_nonce(message, private_key)
@@ -30,10 +30,10 @@ module Schnorr
   def deterministic_nonce(message, private_key)
     secret = ECDSA::Format::IntegerOctetString.encode(private_key, GROUP.byte_length)
     secret = secret + message + ALGO16
-    nonce = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(secret, '')
+    nonce = Tapyrus::Secp256k1::RFC6979.generate_rfc6979_nonce(secret, "")
 
     k0 = nonce % GROUP.order
-    raise 'Creation of signature failed. k is zero' if k0.zero?
+    raise "Creation of signature failed. k is zero" if k0.zero?
     k0
   end
 
@@ -58,19 +58,19 @@ module Schnorr
     pubkey = ECDSA::Format::PointOctetString.decode(public_key, GROUP)
     field = GROUP.field
 
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: r is not in the field.' unless field.include?(sig.r)
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: s is not in the field.' unless field.include?(sig.s)
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: r is zero.' if sig.r.zero?
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: s is zero.' if sig.s.zero?
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: r is larger than field size.' if sig.r >= field.prime
-    raise Schnorr::InvalidSignatureError, 'Invalid signature: s is larger than group order.' if sig.s >= GROUP.order
+    raise Schnorr::InvalidSignatureError, "Invalid signature: r is not in the field." unless field.include?(sig.r)
+    raise Schnorr::InvalidSignatureError, "Invalid signature: s is not in the field." unless field.include?(sig.s)
+    raise Schnorr::InvalidSignatureError, "Invalid signature: r is zero." if sig.r.zero?
+    raise Schnorr::InvalidSignatureError, "Invalid signature: s is zero." if sig.s.zero?
+    raise Schnorr::InvalidSignatureError, "Invalid signature: r is larger than field size." if sig.r >= field.prime
+    raise Schnorr::InvalidSignatureError, "Invalid signature: s is larger than group order." if sig.s >= GROUP.order
 
     e = create_challenge(sig.r, pubkey, message)
 
     r = GROUP.new_point(sig.s) + pubkey.multiply_by_scalar(e).negate
 
     if r.infinity? || r.x != sig.r || ECDSA::PrimeField.jacobi(r.y, GROUP.field.prime) != 1
-      raise Schnorr::InvalidSignatureError, 'signature verification failed.'
+      raise Schnorr::InvalidSignatureError, "signature verification failed."
     end
 
     true

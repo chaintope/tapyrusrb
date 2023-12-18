@@ -3,10 +3,10 @@ module Tapyrus
     # filterclear message
     # https://bitcoin.org/en/developer-reference#filterclear
     class FilterClear < Base
-      COMMAND = 'filterclear'
+      COMMAND = "filterclear"
 
       def to_payload
-        ''
+        ""
       end
     end
   end

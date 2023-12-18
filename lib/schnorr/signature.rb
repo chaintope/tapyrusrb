@@ -12,17 +12,17 @@ module Schnorr
     # @param s (Integer) the value of s.
     def initialize(r, s)
       @r, @s = r, s
-      r.is_a?(Integer) or raise ArgumentError, 'r is not an integer.'
-      s.is_a?(Integer) or raise ArgumentError, 's is not an integer.'
+      r.is_a?(Integer) or raise ArgumentError, "r is not an integer."
+      s.is_a?(Integer) or raise ArgumentError, "s is not an integer."
     end
 
     # Parse a string to a {Signature}.
     # @param string (String) signature string with binary format.
     # @return (Signature) signature instance.
     def self.decode(string)
-      raise InvalidSignatureError, 'Invalid schnorr signature length.' unless string.bytesize == 64
-      r = string[0...32].unpack('H*').first.to_i(16)
-      s = string[32..-1].unpack('H*').first.to_i(16)
+      raise InvalidSignatureError, "Invalid schnorr signature length." unless string.bytesize == 64
+      r = string[0...32].unpack("H*").first.to_i(16)
+      s = string[32..-1].unpack("H*").first.to_i(16)
       new(r, s)
     end
 

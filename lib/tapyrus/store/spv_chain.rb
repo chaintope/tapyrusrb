@@ -1,12 +1,12 @@
 module Tapyrus
   module Store
     KEY_PREFIX = {
-      entry: 'e', # key: block hash, value: Tapyrus::Store::ChainEntry payload
-      height: 'h', # key: block height, value: block hash.
-      best: 'B', # value: best block hash.
-      next: 'n', # key: block hash, value: A hash of the next block of the specified hash
-      agg_pubkey: 'a', # key: index, value: Activated block height | aggregated public key.
-      latest_agg_pubkey: 'g' # value: latest agg pubkey index.
+      entry: "e", # key: block hash, value: Tapyrus::Store::ChainEntry payload
+      height: "h", # key: block height, value: block hash.
+      best: "B", # value: best block hash.
+      next: "n", # key: block hash, value: A hash of the next block of the specified hash
+      agg_pubkey: "a", # key: index, value: Activated block height | aggregated public key.
+      latest_agg_pubkey: "g" # value: latest agg pubkey index.
     }
 
     class SPVChain
@@ -17,7 +17,7 @@ module Tapyrus
       # @param[Tapyrus::Store::DB::LevelDB] db
       # @param[Tapyrus::Block] genesis genesis block
       def initialize(db = Tapyrus::Store::DB::LevelDB.new, genesis: nil)
-        raise ArgumentError, 'genesis block should be specified.' unless genesis
+        raise ArgumentError, "genesis block should be specified." unless genesis
         @db = db # TODO multiple db switch
         @logger = Tapyrus::Logger.create(:debug)
         initialize_block(genesis)

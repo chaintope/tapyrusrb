@@ -3,7 +3,7 @@ module Tapyrus
     # sendcmpct message
     # https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki
     class SendCmpct < Base
-      COMMAND = 'sendcmpct'
+      COMMAND = "sendcmpct"
 
       MODE_HIGH = 1
       MODE_LOW = 0
@@ -20,13 +20,13 @@ module Tapyrus
 
       def self.parse_from_payload(payload)
         buf = StringIO.new(payload)
-        mode = buf.read(1).unpack('c').first
-        version = buf.read(8).unpack('Q').first
+        mode = buf.read(1).unpack("c").first
+        version = buf.read(8).unpack("Q").first
         new(mode, version)
       end
 
       def to_payload
-        [mode, version].pack('cQ')
+        [mode, version].pack("cQ")
       end
 
       def high?

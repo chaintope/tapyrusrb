@@ -4,8 +4,8 @@ module Tapyrus
     attr_accessor :code
     attr_accessor :extra_msg
 
-    def initialize(code, extra_msg = '')
-      raise 'invalid error code.' unless ERRCODES_MAP[code]
+    def initialize(code, extra_msg = "")
+      raise "invalid error code." unless ERRCODES_MAP[code]
       @code = code
       @extra_msg = extra_msg
     end
@@ -13,85 +13,85 @@ module Tapyrus
     def to_s
       case code
       when SCRIPT_ERR_OK
-        'No error'
+        "No error"
       when SCRIPT_ERR_EVAL_FALSE
-        'Script evaluated without error but finished with a false/empty top stack element'
+        "Script evaluated without error but finished with a false/empty top stack element"
       when SCRIPT_ERR_VERIFY
-        'Script failed an OP_VERIFY operation'
+        "Script failed an OP_VERIFY operation"
       when SCRIPT_ERR_EQUALVERIFY
-        'Script failed an OP_EQUALVERIFY operation'
+        "Script failed an OP_EQUALVERIFY operation"
       when SCRIPT_ERR_CHECKMULTISIGVERIFY
-        'Script failed an OP_CHECKMULTISIGVERIFY operation'
+        "Script failed an OP_CHECKMULTISIGVERIFY operation"
       when SCRIPT_ERR_CHECKSIGVERIFY
-        'Script failed an OP_CHECKSIGVERIFY operation'
+        "Script failed an OP_CHECKSIGVERIFY operation"
       when SCRIPT_ERR_NUMEQUALVERIFY
-        'Script failed an OP_NUMEQUALVERIFY operation'
+        "Script failed an OP_NUMEQUALVERIFY operation"
       when SCRIPT_ERR_SCRIPT_SIZE
-        'Script is too big'
+        "Script is too big"
       when SCRIPT_ERR_PUSH_SIZE
-        'Push value size limit exceeded'
+        "Push value size limit exceeded"
       when SCRIPT_ERR_OP_COUNT
-        'Operation limit exceeded'
+        "Operation limit exceeded"
       when SCRIPT_ERR_STACK_SIZE
-        'Stack size limit exceeded'
+        "Stack size limit exceeded"
       when SCRIPT_ERR_SIG_COUNT
-        'Signature count negative or greater than pubkey count'
+        "Signature count negative or greater than pubkey count"
       when SCRIPT_ERR_PUBKEY_COUNT
-        'Pubkey count negative or limit exceeded'
+        "Pubkey count negative or limit exceeded"
       when SCRIPT_ERR_BAD_OPCODE
-        'Opcode missing or not understood'
+        "Opcode missing or not understood"
       when SCRIPT_ERR_DISABLED_OPCODE
-        'Attempted to use a disabled opcode'
+        "Attempted to use a disabled opcode"
       when SCRIPT_ERR_INVALID_STACK_OPERATION
-        'Operation not valid with the current stack size'
+        "Operation not valid with the current stack size"
       when SCRIPT_ERR_INVALID_ALTSTACK_OPERATION
-        'Operation not valid with the current altstack size'
+        "Operation not valid with the current altstack size"
       when SCRIPT_ERR_OP_RETURN
-        'OP_was encountered'
+        "OP_was encountered"
       when SCRIPT_ERR_UNBALANCED_CONDITIONAL
-        'Invalid OP_IF construction'
+        "Invalid OP_IF construction"
       when SCRIPT_ERR_NEGATIVE_LOCKTIME
-        'Negative locktime'
+        "Negative locktime"
       when SCRIPT_ERR_UNSATISFIED_LOCKTIME
-        'Locktime requirement not satisfied'
+        "Locktime requirement not satisfied"
       when SCRIPT_ERR_SIG_HASHTYPE
-        'Signature hash type missing or not understood'
+        "Signature hash type missing or not understood"
       when SCRIPT_ERR_SIG_DER
-        'Non-canonical DER signature'
+        "Non-canonical DER signature"
       when SCRIPT_ERR_MINIMALDATA
-        'Data push larger than necessary'
+        "Data push larger than necessary"
       when SCRIPT_ERR_SIG_PUSHONLY
-        'Only non-push operators allowed in signatures'
+        "Only non-push operators allowed in signatures"
       when SCRIPT_ERR_SIG_HIGH_S
-        'Non-canonical signature S value is unnecessarily high'
+        "Non-canonical signature S value is unnecessarily high"
       when SCRIPT_ERR_SIG_NULLDUMMY
-        'Dummy CHECKMULTISIG argument must be zero'
+        "Dummy CHECKMULTISIG argument must be zero"
       when SCRIPT_ERR_MINIMALIF
-        'OP_IF/NOTIF argument must be minimal'
+        "OP_IF/NOTIF argument must be minimal"
       when SCRIPT_ERR_SIG_NULLFAIL
-        'Signature must be zero for failed CHECK(MULTI)SIG operation'
+        "Signature must be zero for failed CHECK(MULTI)SIG operation"
       when SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS
-        'NOPx reserved for soft-fork upgrades'
+        "NOPx reserved for soft-fork upgrades"
       when SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM
-        'Witness version reserved for soft-fork upgrades'
+        "Witness version reserved for soft-fork upgrades"
       when SCRIPT_ERR_PUBKEYTYPE
-        'Public key is neither compressed or uncompressed'
+        "Public key is neither compressed or uncompressed"
       when SCRIPT_ERR_OP_CODESEPARATOR
-        'Using OP_CODESEPARATOR in non-witness scrip'
+        "Using OP_CODESEPARATOR in non-witness scrip"
       when SCRIPT_ERR_SIG_FINDANDDELETE
-        'Signature is found in scriptCode'
+        "Signature is found in scriptCode"
       when SCRIPT_ERR_OP_COLOR_UNEXPECTED
-        'Unexpected OP_COLOR in script'
+        "Unexpected OP_COLOR in script"
       when SCRIPT_ERR_OP_COLOR_ID_INVALID
-        'Invalid ColorId in script'
+        "Invalid ColorId in script"
       when SCRIPT_ERR_OP_COLOR_MULTIPLE
-        'Multiple OP_COLOR found in script'
+        "Multiple OP_COLOR found in script"
       when SCRIPT_ERR_OP_COLOR_IN_BRANCH
-        'OP_COLOR is not permitted in a script branch'
+        "OP_COLOR is not permitted in a script branch"
       when SCRIPT_ERR_UNKNOWN_ERROR, SCRIPT_ERR_ERROR_COUNT
-        'unknown error'
+        "unknown error"
       else
-        extra_msg ? extra_msg : 'unknown error'
+        extra_msg ? extra_msg : "unknown error"
       end
     end
 

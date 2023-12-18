@@ -1,10 +1,10 @@
 module Tapyrus
   module Secp256k1
     module RFC6979
-      INITIAL_V = '0101010101010101010101010101010101010101010101010101010101010101'.htb
-      INITIAL_K = '0000000000000000000000000000000000000000000000000000000000000000'.htb
-      ZERO_B = '00'.htb
-      ONE_B = '01'.htb
+      INITIAL_V = "0101010101010101010101010101010101010101010101010101010101010101".htb
+      INITIAL_K = "0000000000000000000000000000000000000000000000000000000000000000".htb
+      ZERO_B = "00".htb
+      ONE_B = "01".htb
 
       module_function
 
@@ -30,16 +30,16 @@ module Tapyrus
         v = Tapyrus.hmac_sha256(k, v)
 
         # 3.2.h
-        t = ''
+        t = ""
         10_000.times do
           v = Tapyrus.hmac_sha256(k, v)
           t = (t + v)
           t_num = t.bth.to_i(16)
           return t_num if 1 <= t_num && t_num < Tapyrus::Secp256k1::GROUP.order
-          k = Tapyrus.hmac_sha256(k, v + '00'.htb)
+          k = Tapyrus.hmac_sha256(k, v + "00".htb)
           v = Tapyrus.hmac_sha256(k, v)
         end
-        raise 'A valid nonce was not found.'
+        raise "A valid nonce was not found."
       end
     end
   end

@@ -8,7 +8,7 @@ module Tapyrus
 
       attr_reader :inventories
 
-      COMMAND = 'notfound'
+      COMMAND = "notfound"
 
       def initialize(inventories = [])
         @inventories = inventories

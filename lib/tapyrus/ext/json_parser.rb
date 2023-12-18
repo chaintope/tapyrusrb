@@ -1,4 +1,4 @@
-require 'json/pure'
+require "json/pure"
 
 module Tapyrus
   module Ext

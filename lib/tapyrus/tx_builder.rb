@@ -85,12 +85,12 @@ module Tapyrus
       script_pubkey = Tapyrus::Script.parse_from_addr(address)
 
       unless color_id.default?
-        raise ArgumentError, 'invalid address' if !script_pubkey.p2pkh? && !script_pubkey.p2sh?
+        raise ArgumentError, "invalid address" if !script_pubkey.p2pkh? && !script_pubkey.p2sh?
         script_pubkey = script_pubkey.add_color(color_id)
       end
 
       output = Tapyrus::TxOut.new(script_pubkey: script_pubkey, value: value)
-      raise ArgumentError, 'The transaction amount is too small' if color_id.default? && output.dust?
+      raise ArgumentError, "The transaction amount is too small" if color_id.default? && output.dust?
       @outgoings[color_id] ||= 0
       @outgoings[color_id] += value
       @outputs << output
@@ -119,7 +119,7 @@ module Tapyrus
     # @param address [String] p2pkh or p2sh address.
     def change_address(address)
       script_pubkey = Tapyrus::Script.parse_from_addr(address)
-      raise ArgumentError, 'invalid address' if !script_pubkey.p2pkh? && !script_pubkey.p2sh?
+      raise ArgumentError, "invalid address" if !script_pubkey.p2pkh? && !script_pubkey.p2sh?
       @change_script_pubkey = script_pubkey
       self
     end

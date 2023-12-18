@@ -144,22 +144,22 @@ module Tapyrus
     OP_CHECKDATASIGVERIFY = 0xbb
     OP_COLOR = 0xbc
 
-    DUPLICATE_KEY = [:OP_NOP2, :OP_NOP3]
+    DUPLICATE_KEY = %i[OP_NOP2 OP_NOP3]
     OPCODES_MAP =
       Hash[
-        *(constants.grep(/^OP_/) - [:OP_NOP2, :OP_NOP3, :OP_CHECKLOCKTIMEVERIFY, :OP_CHECKSEQUENCEVERIFY]).map do |c|
-          [const_get(c), c.to_s]
-        end.flatten
+        *(constants.grep(/^OP_/) - %i[OP_NOP2 OP_NOP3 OP_CHECKLOCKTIMEVERIFY OP_CHECKSEQUENCEVERIFY])
+          .map { |c| [const_get(c), c.to_s] }
+          .flatten
       ]
     NAME_MAP = Hash[*constants.grep(/^OP_/).map { |c| [c.to_s, const_get(c)] }.flatten]
 
     def opcode_to_name(opcode)
-      return OPCODES_MAP[opcode].delete('OP_') if opcode == OP_0 || (opcode <= OP_16 && opcode >= OP_1)
+      return OPCODES_MAP[opcode].delete("OP_") if opcode == OP_0 || (opcode <= OP_16 && opcode >= OP_1)
       OPCODES_MAP[opcode]
     end
 
     def name_to_opcode(name)
-      return NAME_MAP['OP_' + name] if name =~ /^\d/ && name.to_i < 17 && name.to_i > -1
+      return NAME_MAP["OP_" + name] if name =~ /^\d/ && name.to_i < 17 && name.to_i > -1
       NAME_MAP[name]
     end
 
@@ -176,7 +176,7 @@ module Tapyrus
     end
 
     def opcode_to_small_int(opcode)
-      return 0 if opcode == ''.b || opcode == OP_0
+      return 0 if opcode == "".b || opcode == OP_0
       return -1 if opcode == OP_1NEGATE
       return opcode - (OP_1 - 1) if opcode >= OP_1 && opcode <= OP_16
       nil

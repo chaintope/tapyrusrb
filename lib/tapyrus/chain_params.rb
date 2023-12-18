@@ -1,4 +1,4 @@
-require 'yaml'
+require "yaml"
 
 module Tapyrus
   # Network parameter class
@@ -37,20 +37,20 @@ module Tapyrus
 
     # production genesis
     def self.prod
-      init('prod')
+      init("prod")
     end
 
     # development genesis
     def self.dev
-      init('dev')
+      init("dev")
     end
 
     def prod?
-      network == 'prod'
+      network == "prod"
     end
 
     def dev?
-      network == 'dev'
+      network == "dev"
     end
 
     def self.init(name)

@@ -1,4 +1,4 @@
-require 'murmurhash3'
+require "murmurhash3"
 module Tapyrus
   class BloomFilter
     LN2_SQUARED = 0.4804530139182014246671025263266649717305529515945455 # log(2) ** 2

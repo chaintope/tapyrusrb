@@ -7,7 +7,7 @@ module Tapyrus
     include Tapyrus::HexConverter
 
     MAX_DEPTH = 255
-    MASTER_FINGERPRINT = '00000000'
+    MASTER_FINGERPRINT = "00000000"
 
     attr_accessor :ver
     attr_accessor :depth
@@ -21,10 +21,10 @@ module Tapyrus
     def self.generate_master(seed)
       ext_key = ExtKey.new
       ext_key.depth = ext_key.number = 0
-      ext_key.parent_fingerprint = '00000000'
-      l = Tapyrus.hmac_sha512('Tapyrus seed', seed.htb)
+      ext_key.parent_fingerprint = "00000000"
+      l = Tapyrus.hmac_sha512("Tapyrus seed", seed.htb)
       left = l[0..31].bth.to_i(16)
-      raise 'invalid key' if left >= CURVE_ORDER || left == 0
+      raise "invalid key" if left >= CURVE_ORDER || left == 0
       l_priv = ECDSA::Format::IntegerOctetString.encode(left, 32)
       ext_key.key = Tapyrus::Key.new(priv_key: l_priv.bth, key_type: Tapyrus::Key::TYPES[:compressed])
       ext_key.chain_code = l[32..-1]
@@ -45,8 +45,8 @@ module Tapyrus
 
     # serialize extended private key
     def to_payload
-      version.htb << [depth].pack('C') << parent_fingerprint.htb << [number].pack('N') << chain_code <<
-        [0x00].pack('C') << key.priv_key.htb
+      version.htb << [depth].pack("C") << parent_fingerprint.htb << [number].pack("N") << chain_code <<
+        [0x00].pack("C") << key.priv_key.htb
     end
 
     # Base58 encoded extended private key
@@ -99,15 +99,15 @@ module Tapyrus
       new_key.number = number
       new_key.parent_fingerprint = fingerprint
       if number > (Tapyrus::HARDENED_THRESHOLD - 1)
-        data = [0x00].pack('C') << key.priv_key.htb << [number].pack('N')
+        data = [0x00].pack("C") << key.priv_key.htb << [number].pack("N")
       else
-        data = key.pubkey.htb << [number].pack('N')
+        data = key.pubkey.htb << [number].pack("N")
       end
       l = Tapyrus.hmac_sha512(chain_code, data)
       left = l[0..31].bth.to_i(16)
-      raise 'invalid key' if left >= CURVE_ORDER
+      raise "invalid key" if left >= CURVE_ORDER
       child_priv = (left + key.priv_key.to_i(16)) % CURVE_ORDER
-      raise 'invalid key ' if child_priv >= CURVE_ORDER
+      raise "invalid key " if child_priv >= CURVE_ORDER
       child_priv = ECDSA::Format::IntegerOctetString.encode(child_priv, 32)
       new_key.key = Tapyrus::Key.new(priv_key: child_priv.bth, key_type: key_type)
       new_key.chain_code = l[32..-1]
@@ -143,9 +143,9 @@ module Tapyrus
       ext_key = ExtKey.new
       ext_key.ver = buf.read(4).bth # version
       raise ArgumentError, Errors::Messages::INVALID_BIP32_VERSION unless ExtKey.support_version?(ext_key.ver)
-      ext_key.depth = buf.read(1).unpack('C').first
+      ext_key.depth = buf.read(1).unpack("C").first
       ext_key.parent_fingerprint = buf.read(4).bth
-      ext_key.number = buf.read(4).unpack('N').first
+      ext_key.number = buf.read(4).unpack("N").first
       if ext_key.depth == 0
         unless ext_key.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
           raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT
@@ -156,7 +156,7 @@ module Tapyrus
         raise ArgumentError, Errors::Messages::INVALID_BIP32_ZERO_DEPTH
       end
       ext_key.chain_code = buf.read(32)
-      raise ArgumentError, Errors::Messages::INVALID_BIP32_PRIV_PREFIX unless buf.read(1).bth == '00' # 0x00
+      raise ArgumentError, Errors::Messages::INVALID_BIP32_PRIV_PREFIX unless buf.read(1).bth == "00" # 0x00
       ext_key.key = Tapyrus::Key.new(priv_key: buf.read(32).bth, key_type: Tapyrus::Key::TYPES[:compressed])
       ext_key
     end
@@ -200,7 +200,7 @@ module Tapyrus
     end
 
     def master?
-      depth == 0 && number == 0 && parent_fingerprint == '00000000'
+      depth == 0 && number == 0 && parent_fingerprint == "00000000"
     end
   end
 
@@ -217,7 +217,7 @@ module Tapyrus
 
     # serialize extended pubkey
     def to_payload
-      version.htb << [depth].pack('C') << parent_fingerprint.htb << [number].pack('N') << chain_code << pub.htb
+      version.htb << [depth].pack("C") << parent_fingerprint.htb << [number].pack("N") << chain_code << pub.htb
     end
 
     def pub
@@ -272,11 +272,11 @@ module Tapyrus
       new_key.depth = depth + 1
       new_key.number = number
       new_key.parent_fingerprint = fingerprint
-      raise 'hardened key is not support' if number > (Tapyrus::HARDENED_THRESHOLD - 1)
-      data = pub.htb << [number].pack('N')
+      raise "hardened key is not support" if number > (Tapyrus::HARDENED_THRESHOLD - 1)
+      data = pub.htb << [number].pack("N")
       l = Tapyrus.hmac_sha512(chain_code, data)
       left = l[0..31].bth.to_i(16)
-      raise 'invalid key' if left >= CURVE_ORDER
+      raise "invalid key" if left >= CURVE_ORDER
       l_priv = ECDSA::Format::IntegerOctetString.encode(left, 32)
       p1 = Tapyrus::Key.new(priv_key: l_priv.bth, key_type: Tapyrus::Key::TYPES[:uncompressed]).to_point
       p2 = Tapyrus::Key.new(pubkey: pubkey, key_type: key_type).to_point
@@ -314,9 +314,9 @@ module Tapyrus
       ext_pubkey = ExtPubkey.new
       ext_pubkey.ver = buf.read(4).bth # version
       raise ArgumentError, Errors::Messages::INVALID_BIP32_VERSION unless ExtPubkey.support_version?(ext_pubkey.ver)
-      ext_pubkey.depth = buf.read(1).unpack('C').first
+      ext_pubkey.depth = buf.read(1).unpack("C").first
       ext_pubkey.parent_fingerprint = buf.read(4).bth
-      ext_pubkey.number = buf.read(4).unpack('N').first
+      ext_pubkey.number = buf.read(4).unpack("N").first
       if ext_pubkey.depth == 0
         unless ext_pubkey.parent_fingerprint == ExtKey::MASTER_FINGERPRINT
           raise ArgumentError, Errors::Messages::INVALID_BIP32_FINGERPRINT
@@ -365,7 +365,7 @@ module Tapyrus
     end
 
     def master?
-      depth == 0 && number == 0 && parent_fingerprint == '00000000'
+      depth == 0 && number == 0 && parent_fingerprint == "00000000"
     end
   end
 end

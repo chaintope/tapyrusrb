@@ -5,11 +5,11 @@ module Tapyrus
     # @return [Array[Integer]] key path numbers.
     def parse_key_path(path_string)
       path_string
-        .split('/')
+        .split("/")
         .map
         .with_index do |p, index|
           if index == 0
-            raise ArgumentError.new("#{path_string} is invalid format.") unless p == 'm'
+            raise ArgumentError.new("#{path_string} is invalid format.") unless p == "m"
             next
           end
           raise ArgumentError.new("#{path_string} is invalid format.") unless p.delete("'") =~ /^[0-9]+$/
@@ -23,7 +23,7 @@ module Tapyrus
     # @param [Array[Integer]] key path numbers.
     # @return [String] path string.
     def to_key_path(numbers)
-      "m/#{numbers.map { |p| p >= Tapyrus::HARDENED_THRESHOLD ? "#{p - Tapyrus::HARDENED_THRESHOLD}'" : p.to_s }.join('/')}"
+      "m/#{numbers.map { |p| p >= Tapyrus::HARDENED_THRESHOLD ? "#{p - Tapyrus::HARDENED_THRESHOLD}'" : p.to_s }.join("/")}"
     end
   end
 end

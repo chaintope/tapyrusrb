@@ -9,7 +9,7 @@ module Tapyrus
     SIGNATURE_SIZE = 72
     COMPACT_SIGNATURE_SIZE = 65
 
-    SIG_ALGO = [:ecdsa, :schnorr]
+    SIG_ALGO = %i[ecdsa schnorr]
 
     attr_accessor :priv_key
     attr_accessor :pubkey
@@ -31,7 +31,7 @@ module Tapyrus
     # @return [Tapyrus::Key] a key object.
     def initialize(priv_key: nil, pubkey: nil, key_type: nil, compressed: true, allow_hybrid: false)
       if key_type.nil? && !compressed.nil? && pubkey.nil?
-        warn('Use key_type parameter instead of compressed. compressed parameter removed in the future.')
+        warn("Use key_type parameter instead of compressed. compressed parameter removed in the future.")
       end
       if key_type
         @key_type = key_type
@@ -64,22 +64,22 @@ module Tapyrus
     # https://en.bitcoin.it/wiki/Wallet_import_format
     def self.from_wif(wif)
       hex = Base58.decode(wif)
-      raise ArgumentError, 'data is too short' if hex.htb.bytesize < 4
+      raise ArgumentError, "data is too short" if hex.htb.bytesize < 4
       version = hex[0..1]
       data = hex[2...-8].htb
       checksum = hex[-8..-1]
-      raise ArgumentError, 'invalid version' unless version == Tapyrus.chain_params.privkey_version
+      raise ArgumentError, "invalid version" unless version == Tapyrus.chain_params.privkey_version
       unless Tapyrus.calc_checksum(version + data.bth) == checksum
         raise ArgumentError, Errors::Messages::INVALID_CHECKSUM
       end
       key_len = data.bytesize
-      if key_len == COMPRESSED_PUBLIC_KEY_SIZE && data[-1].unpack('C').first == 1
+      if key_len == COMPRESSED_PUBLIC_KEY_SIZE && data[-1].unpack("C").first == 1
         key_type = TYPES[:compressed]
         data = data[0..-2]
       elsif key_len == 32
         key_type = TYPES[:uncompressed]
       else
-        raise ArgumentError, 'Wrong number of bytes for a private key, not 32 or 33'
+        raise ArgumentError, "Wrong number of bytes for a private key, not 32 or 33"
       end
       new(priv_key: data.bth, key_type: key_type)
     end
@@ -88,7 +88,7 @@ module Tapyrus
     def to_wif
       version = Tapyrus.chain_params.privkey_version
       hex = version + priv_key
-      hex += '01' if compressed?
+      hex += "01" if compressed?
       hex += Tapyrus.calc_checksum(hex)
       Base58.encode(hex)
     end
@@ -100,7 +100,7 @@ module Tapyrus
     # @param [Symbol] algo Algorithms used for verification. Either :ecdsa or :schnorr is supported. default value is :ecdsa.
     # @return [String] signature data with binary format
     def sign(data, low_r = true, extra_entropy = nil, algo: :ecdsa)
-      raise ArgumentError, 'Unsupported algorithm has been specified.' unless SIG_ALGO.include?(algo)
+      raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
       case algo
       when :ecdsa
         sign_ecdsa(data, low_r, extra_entropy)
@@ -119,7 +119,7 @@ module Tapyrus
     def verify(sig, origin, algo: :ecdsa)
       return false unless valid_pubkey?
       begin
-        raise ArgumentError, 'Unsupported algorithm has been specified.' unless SIG_ALGO.include?(algo)
+        raise ArgumentError, "Unsupported algorithm has been specified." unless SIG_ALGO.include?(algo)
         sig = ecdsa_signature_parse_der_lax(sig) if algo == :ecdsa
         secp256k1_module.verify_sig(origin, sig, pubkey, algo: algo)
       rescue Exception
@@ -173,17 +173,45 @@ module Tapyrus
 
     # check +sig+ is low.
     def self.low_signature?(sig)
-      s = sig.unpack('C*')
+      s = sig.unpack("C*")
       len_r = s[3]
       len_s = s[5 + len_r]
       val_s = s.slice(6 + len_r, len_s)
 
       # prettier-ignore
       max_mod_half_order = [
-          0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-          0x5d, 0x57, 0x6e, 0x73, 0x57, 0xa4, 0x50, 0x1d,
-          0xdf, 0xe9, 0x2f, 0x46, 0x68, 0x1b, 0x20, 0xa0
+        0x7f,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x5d,
+        0x57,
+        0x6e,
+        0x73,
+        0x57,
+        0xa4,
+        0x50,
+        0x1d,
+        0xdf,
+        0xe9,
+        0x2f,
+        0x46,
+        0x68,
+        0x1b,
+        0x20,
+        0xa0
       ]
       compare_big_endian(val_s, [0]) > 0 && compare_big_endian(val_s, max_mod_half_order) <= 0
     end
@@ -199,7 +227,7 @@ module Tapyrus
 
       return false if sig.bytesize < num_parts || sig.bytesize > size # Minimum and maximum size check
 
-      s = sig.unpack('C*')
+      s = sig.unpack("C*")
 
       return false if s[0] != 0x30 || s[1] != s.size - (data_sig ? 2 : 3) # A signature is of type 0x30 (compound). Make sure the length covers the entire signature.
 
@@ -267,11 +295,11 @@ module Tapyrus
     # strict DER before being passed to this module, and we know it supports all
     # violations present in the blockchain before that point.
     def ecdsa_signature_parse_der_lax(sig)
-      sig_array = sig.unpack('C*')
+      sig_array = sig.unpack("C*")
       len_r = sig_array[3]
-      r = sig_array[4...(len_r + 4)].pack('C*').bth
+      r = sig_array[4...(len_r + 4)].pack("C*").bth
       len_s = sig_array[len_r + 5]
-      s = sig_array[(len_r + 6)...(len_r + 6 + len_s)].pack('C*').bth
+      s = sig_array[(len_r + 6)...(len_r + 6 + len_s)].pack("C*").bth
       ECDSA::Signature.new(r.to_i(16), s.to_i(16)).to_der
     end
 
@@ -292,7 +320,7 @@ module Tapyrus
       if low_r && !sig_has_low_r?(sig)
         counter = 1
         until sig_has_low_r?(sig)
-          extra_entropy = [counter].pack('I*').bth.ljust(64, '0').htb
+          extra_entropy = [counter].pack("I*").bth.ljust(64, "0").htb
           sig = secp256k1_module.sign_data(data, priv_key, extra_entropy, algo: :ecdsa)
           counter += 1
         end

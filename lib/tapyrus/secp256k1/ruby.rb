@@ -90,7 +90,7 @@ module Tapyrus
       def sign_ecdsa(data, privkey, extra_entropy)
         privkey = privkey.htb
         private_key = ECDSA::Format::IntegerOctetString.decode(privkey)
-        extra_entropy ||= ''
+        extra_entropy ||= ""
         nonce = RFC6979.generate_rfc6979_nonce(privkey + data, extra_entropy)
 
         # port form ecdsa gem.
@@ -112,7 +112,7 @@ module Tapyrus
 
         signature = ECDSA::Signature.new(r, s).to_der
         public_key = Tapyrus::Key.new(priv_key: privkey.bth).pubkey
-        raise 'Creation of signature failed.' unless Tapyrus::Secp256k1::Ruby.verify_sig(data, signature, public_key)
+        raise "Creation of signature failed." unless Tapyrus::Secp256k1::Ruby.verify_sig(data, signature, public_key)
         signature
       end
 

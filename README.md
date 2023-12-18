@@ -43,7 +43,7 @@ gem leveldb-native
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'tapyrus'
+gem "tapyrus"
 ```
 
 And then execute:

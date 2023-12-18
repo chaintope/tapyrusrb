@@ -1,4 +1,4 @@
-require 'logger'
+require "logger"
 
 module Tapyrus
   # Simple Logger module
@@ -15,15 +15,8 @@ module Tapyrus
       logger.level = level
       logger.formatter =
         proc do |severity, datetime, progname, msg|
-          Format % [
-            severity[0..0],
-            format_datetime(datetime),
-            $$,
-            Thread.current.object_id,
-            severity,
-            progname,
-            msg2str(msg)
-          ]
+          Format %
+            [severity[0..0], format_datetime(datetime), $$, Thread.current.object_id, severity, progname, msg2str(msg)]
         end
       logger
     end
@@ -40,7 +33,7 @@ module Tapyrus
     end
 
     def format_datetime(time)
-      time.strftime(@datetime_format || '%Y-%m-%dT%H:%M:%S.%6N '.freeze)
+      time.strftime(@datetime_format || "%Y-%m-%dT%H:%M:%S.%6N ".freeze)
     end
   end
 end

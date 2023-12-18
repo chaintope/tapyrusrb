@@ -46,7 +46,7 @@ module Tapyrus
     # @return [Script] CP2PKH script
     # @raise [ArgumentError] if color_id is nil or invalid
     def self.to_cp2pkh(color_id, pubkey_hash)
-      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
+      raise ArgumentError, "Specified color identifier is invalid" unless color_id&.valid?
       new << color_id.to_payload << OP_COLOR << OP_DUP << OP_HASH160 << pubkey_hash << OP_EQUALVERIFY << OP_CHECKSIG
     end
 
@@ -56,7 +56,7 @@ module Tapyrus
     # @return [Script] CP2SH script
     # @raise [ArgumentError] if color_id is nil or invalid
     def self.to_cp2sh(color_id, script_hash)
-      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
+      raise ArgumentError, "Specified color identifier is invalid" unless color_id&.valid?
       new << color_id.to_payload << OP_COLOR << OP_HASH160 << script_hash << OP_EQUAL
     end
 
@@ -66,8 +66,8 @@ module Tapyrus
     # @raise [ArgumentError] if color_id is nil or invalid
     # @raise [RuntimeError] if script is neither p2pkh nor p2sh
     def add_color(color_id)
-      raise ArgumentError, 'Specified color identifier is invalid' unless color_id&.valid?
-      raise RuntimeError, 'Only p2pkh and p2sh can add color' unless p2pkh? or p2sh?
+      raise ArgumentError, "Specified color identifier is invalid" unless color_id&.valid?
+      raise RuntimeError, "Only p2pkh and p2sh can add color" unless p2pkh? or p2sh?
       Tapyrus::Script.new.tap do |s|
         s << color_id.to_payload << OP_COLOR
         s.chunks += self.chunks
@@ -78,7 +78,7 @@ module Tapyrus
     # @return [Script] P2PKH or P2SH script
     # @raise [RuntimeError] if script is neither cp2pkh nor cp2sh
     def remove_color
-      raise RuntimeError, 'Only cp2pkh and cp2sh can remove color' unless cp2pkh? or cp2sh?
+      raise RuntimeError, "Only cp2pkh and cp2sh can remove color" unless cp2pkh? or cp2sh?
 
       Tapyrus::Script.new.tap { |s| s.chunks = self.chunks[2..-1] }
     end
@@ -101,7 +101,7 @@ module Tapyrus
     def self.from_string(string)
       script = new
       string
-        .split(' ')
+        .split(" ")
         .each do |v|
           opcode = Opcodes.name_to_opcode(v)
           if opcode
@@ -144,18 +144,18 @@ module Tapyrus
             case pushcode
             when OP_PUSHDATA1
               packed_size = buf.read(1)
-              packed_size.unpack('C').first
+              packed_size.unpack("C").first
             when OP_PUSHDATA2
               packed_size = buf.read(2)
-              packed_size.unpack('v').first
+              packed_size.unpack("v").first
             when OP_PUSHDATA4
               packed_size = buf.read(4)
-              packed_size.unpack('V').first
+              packed_size.unpack("V").first
             else
               pushcode if pushcode < OP_PUSHDATA1
             end
           if len
-            s.chunks << [len].pack('C') if buf.eof?
+            s.chunks << [len].pack("C") if buf.eof?
             unless buf.eof?
               chunk = (packed_size ? (opcode + packed_size) : (opcode)) + buf.read(len)
               s.chunks << chunk
@@ -374,11 +374,11 @@ module Tapyrus
               end
             else
               opcode = Opcodes.opcode_to_name(c.ord)
-              opcode ? opcode : 'OP_UNKNOWN [error]'
+              opcode ? opcode : "OP_UNKNOWN [error]"
             end
           end
         end
-        .join(' ')
+        .join(" ")
     end
 
     # generate sha-256 hash for payload
@@ -410,15 +410,15 @@ module Tapyrus
     # Byte vectors are interpreted as Booleans where False is represented by any representation of zero,
     # and True is represented by any representation of non-zero.
     def self.encode_number(i)
-      return '' if i == 0
+      return "" if i == 0
       negative = i < 0
 
       hex = i.abs.to_even_length_hex
-      hex = '0' + hex unless (hex.length % 2).zero?
+      hex = "0" + hex unless (hex.length % 2).zero?
       v = hex.htb.reverse # change endian
 
-      v = v << (negative ? 0x80 : 0x00) unless (v[-1].unpack('C').first & 0x80) == 0
-      v[-1] = [v[-1].unpack('C').first | 0x80].pack('C') if negative
+      v = v << (negative ? 0x80 : 0x00) unless (v[-1].unpack("C").first & 0x80) == 0
+      v[-1] = [v[-1].unpack("C").first | 0x80].pack("C") if negative
       v.bth
     end
 
@@ -426,8 +426,8 @@ module Tapyrus
     def self.decode_number(s)
       v = s.htb.reverse
       return 0 if v.length.zero?
-      mbs = v[0].unpack('C').first
-      v[0] = [mbs - 0x80].pack('C') unless (mbs & 0x80) == 0
+      mbs = v[0].unpack("C").first
+      v[0] = [mbs - 0x80].pack("C") unless (mbs & 0x80) == 0
       result = v.bth.to_i(16)
       result = -result unless (mbs & 0x80) == 0
       result
@@ -438,15 +438,15 @@ module Tapyrus
       size = data.bytesize
       header =
         if size < OP_PUSHDATA1
-          [size].pack('C')
+          [size].pack("C")
         elsif size < 0xff
-          [OP_PUSHDATA1, size].pack('CC')
+          [OP_PUSHDATA1, size].pack("CC")
         elsif size < 0xffff
-          [OP_PUSHDATA2, size].pack('Cv')
+          [OP_PUSHDATA2, size].pack("Cv")
         elsif size < 0xffffffff
-          [OP_PUSHDATA4, size].pack('CV')
+          [OP_PUSHDATA4, size].pack("CV")
         else
-          raise ArgumentError, 'data size is too big.'
+          raise ArgumentError, "data size is too big."
         end
       header + data
     end
@@ -460,7 +460,7 @@ module Tapyrus
 
     # removes chunks matching subscript byte-for-byte and returns as a new object.
     def find_and_delete(subscript)
-      raise ArgumentError, 'subscript must be Tapyrus::Script' unless subscript.is_a?(Script)
+      raise ArgumentError, "subscript must be Tapyrus::Script" unless subscript.is_a?(Script)
       return self if subscript.chunks.empty?
       buf = []
       i = 0
@@ -519,10 +519,10 @@ module Tapyrus
     end
 
     def type
-      return 'pubkeyhash' if p2pkh?
-      return 'scripthash' if p2sh?
-      return 'multisig' if multisig?
-      'nonstandard'
+      return "pubkeyhash" if p2pkh?
+      return "scripthash" if p2sh?
+      return "multisig" if multisig?
+      "nonstandard"
     end
 
     def to_h

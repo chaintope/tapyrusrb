@@ -29,7 +29,7 @@ module Tapyrus
     def self.parse_from_payload(payload)
       buf = payload.is_a?(String) ? StringIO.new(payload) : payload
       tx = new
-      tx.features = buf.read(4).unpack('V').first
+      tx.features = buf.read(4).unpack("V").first
 
       in_count = Tapyrus.unpack_var_int_from_io(buf)
 
@@ -38,7 +38,7 @@ module Tapyrus
       out_count = Tapyrus.unpack_var_int_from_io(buf)
       out_count.times { tx.outputs << TxOut.parse_from_payload(buf) }
 
-      tx.lock_time = buf.read(4).unpack('V').first
+      tx.lock_time = buf.read(4).unpack("V").first
 
       tx
     end
@@ -52,18 +52,18 @@ module Tapyrus
     end
 
     def txid
-      buf = [features].pack('V')
+      buf = [features].pack("V")
       buf << Tapyrus.pack_var_int(inputs.length) << inputs.map { |i| i.to_payload(use_malfix: true) }.join
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
-      buf << [lock_time].pack('V')
+      buf << [lock_time].pack("V")
       Tapyrus.double_sha256(buf).reverse.bth
     end
 
     def to_payload
-      buf = [features].pack('V')
+      buf = [features].pack("V")
       buf << Tapyrus.pack_var_int(inputs.length) << inputs.map(&:to_payload).join
       buf << Tapyrus.pack_var_int(outputs.length) << outputs.map(&:to_payload).join
-      buf << [lock_time].pack('V')
+      buf << [lock_time].pack("V")
       buf
     end
 
@@ -109,9 +109,9 @@ module Tapyrus
     # @param [Tapyrus::Script] output_script script pubkey or script code. if script pubkey is P2SH, set redeem script to this.
     # @return [String] sighash
     def sighash_for_input(input_index, output_script, hash_type: SIGHASH_TYPE[:all])
-      raise ArgumentError, 'input_index must be specified.' unless input_index
-      raise ArgumentError, 'does not exist input corresponding to input_index.' if input_index >= inputs.size
-      raise ArgumentError, 'script_pubkey must be specified.' unless output_script
+      raise ArgumentError, "input_index must be specified." unless input_index
+      raise ArgumentError, "does not exist input corresponding to input_index." if input_index >= inputs.size
+      raise ArgumentError, "script_pubkey must be specified." unless output_script
       sighash_for_legacy(input_index, output_script, hash_type)
     end
 
@@ -167,7 +167,7 @@ module Tapyrus
 
       case hash_type & 0x1f
       when SIGHASH_TYPE[:none]
-        outs = ''
+        outs = ""
         out_size = Tapyrus.pack_var_int(0)
       when SIGHASH_TYPE[:single]
         return "\x01".ljust(32, "\x00") if index >= outputs.size
@@ -179,12 +179,12 @@ module Tapyrus
       ins = [ins[index]] if hash_type & SIGHASH_TYPE[:anyonecanpay] != 0
 
       buf = [
-        [features].pack('V'),
+        [features].pack("V"),
         Tapyrus.pack_var_int(ins.size),
         ins,
         out_size,
         outs,
-        [lock_time, hash_type].pack('VV')
+        [lock_time, hash_type].pack("VV")
       ].join
 
       Tapyrus.double_sha256(buf)

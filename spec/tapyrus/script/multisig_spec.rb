@@ -1,33 +1,33 @@
-require 'spec_helper'
+require "spec_helper"
 include Tapyrus::Opcodes
 
 describe Tapyrus::Multisig do
-  describe '#to_multisig_script_sig' do
+  describe "#to_multisig_script_sig" do
     let(:sig) do
-      [
-        '3045022062437a8f60651cd968137355775fa8bdb83d4ca717fdbc08bf9868a0',
-        '51e0542f022100f5cd626c15ef0de0803ddf299e8895743e7ff484d6335874ed',
-        'fe086ee0a08fec'
+      %w[
+        3045022062437a8f60651cd968137355775fa8bdb83d4ca717fdbc08bf9868a0
+        51e0542f022100f5cd626c15ef0de0803ddf299e8895743e7ff484d6335874ed
+        fe086ee0a08fec
       ].join.htb
     end
     let(:hash_type) { Tapyrus::SIGHASH_TYPE[:none] }
     subject { Tapyrus::Multisig.to_multisig_script_sig(sig, sig, hash_type) }
-    it 'should generate multisig script sig' do
-      expected_script = [
-        '00483045022062437a8f60651cd968137355775fa8bdb83d4ca717fdbc08bf98',
-        '68a051e0542f022100f5cd626c15ef0de0803ddf299e8895743e7ff484d63358',
-        '74edfe086ee0a08fec02483045022062437a8f60651cd968137355775fa8bdb8',
-        '3d4ca717fdbc08bf9868a051e0542f022100f5cd626c15ef0de0803ddf299e88',
-        '95743e7ff484d6335874edfe086ee0a08fec02'
+    it "should generate multisig script sig" do
+      expected_script = %w[
+        00483045022062437a8f60651cd968137355775fa8bdb83d4ca717fdbc08bf98
+        68a051e0542f022100f5cd626c15ef0de0803ddf299e8895743e7ff484d63358
+        74edfe086ee0a08fec02483045022062437a8f60651cd968137355775fa8bdb8
+        3d4ca717fdbc08bf9868a051e0542f022100f5cd626c15ef0de0803ddf299e88
+        95743e7ff484d6335874edfe086ee0a08fec02
       ].join.htb
       expect(subject).to eq expected_script
     end
   end
 
-  describe '#sort_p2sh_multisig_signatures' do
+  describe "#sort_p2sh_multisig_signatures" do
     let(:tx) do
       Tapyrus::Tx.new.tap do |tx|
-        out_point = Tapyrus::OutPoint.new('txid', 0)
+        out_point = Tapyrus::OutPoint.new("txid", 0)
         tx.inputs << Tapyrus::TxIn.new(out_point: out_point)
         tx.outputs << Tapyrus::TxOut.new(value: 10_000_000, script_pubkey: p2sh[0])
       end
@@ -38,7 +38,7 @@ describe Tapyrus::Multisig do
 
     subject { tx.verify_input_sig(0, p2sh[0]) }
 
-    context '3 of 3' do
+    context "3 of 3" do
       let(:m) { 3 }
       it do
         # add sigs in all possible orders, sort them, and see if they are valid
@@ -52,7 +52,7 @@ describe Tapyrus::Multisig do
       end
     end
 
-    context '2 of 3' do
+    context "2 of 3" do
       let(:m) { 2 }
       it do
         # add sigs in all possible orders, sort them, and see if they are valid

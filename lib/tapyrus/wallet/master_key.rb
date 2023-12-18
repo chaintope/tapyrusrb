@@ -12,7 +12,7 @@ module Tapyrus
       attr_accessor :encrypted
       attr_accessor :mnemonic # ephemeral data existing only at initialization
 
-      def initialize(seed, salt: '', encrypted: false, mnemonic: nil)
+      def initialize(seed, salt: "", encrypted: false, mnemonic: nil)
         @mnemonic = mnemonic
         @seed = seed
         @encrypted = encrypted
@@ -23,7 +23,7 @@ module Tapyrus
       # @return Tapyrus::Wallet::MasterKey
       def self.generate
         entropy = SecureRandom.hex(32)
-        mnemonic = Tapyrus::Mnemonic.new('english')
+        mnemonic = Tapyrus::Mnemonic.new("english")
         self.recover_from_words(mnemonic.to_mnemonic(entropy))
       end
 
@@ -31,7 +31,7 @@ module Tapyrus
       # @param [Array] words the mnemonic word list.
       # @return Tapyrus::Wallet::MasterKey
       def self.recover_from_words(words)
-        mnemonic = Tapyrus::Mnemonic.new('english')
+        mnemonic = Tapyrus::Mnemonic.new("english")
         seed = mnemonic.to_seed(words)
         self.new(seed, mnemonic: words)
       end
@@ -41,9 +41,9 @@ module Tapyrus
       # @return [Tapyrus::Wallet::MasterKey]
       def self.parse_from_payload(payload)
         flag, payload = unpack_var_int(payload)
-        raise 'encrypted flag is invalid.' unless [0, 1].include?(flag)
+        raise "encrypted flag is invalid." unless [0, 1].include?(flag)
         salt, payload = unpack_var_string(payload)
-        salt = '' unless salt
+        salt = "" unless salt
         seed, payload = unpack_var_string(payload)
         self.new(seed.bth, salt: salt.bth, encrypted: flag == 1)
       end
@@ -58,7 +58,7 @@ module Tapyrus
       # get master key
       # @return [Tapyrus::ExtKey] the master key
       def key
-        raise 'seed is encrypted. please decrypt the seed.' if encrypted
+        raise "seed is encrypted. please decrypt the seed." if encrypted
         Tapyrus::ExtKey.generate_master(seed)
       end
 
@@ -72,12 +72,12 @@ module Tapyrus
 
       # encrypt seed
       def encrypt(passphrase)
-        raise 'The wallet is already encrypted.' if encrypted
+        raise "The wallet is already encrypted." if encrypted
         @salt = SecureRandom.hex(16)
-        enc = OpenSSL::Cipher.new('AES-256-CBC')
+        enc = OpenSSL::Cipher.new("AES-256-CBC")
         enc.encrypt
         enc.key, enc.iv = key_iv(enc, passphrase)
-        encrypted_data = ''
+        encrypted_data = ""
         encrypted_data << enc.update(seed)
         encrypted_data << enc.final
         @seed = encrypted_data
@@ -86,16 +86,16 @@ module Tapyrus
 
       # decrypt seed
       def decrypt(passphrase)
-        raise 'The wallet is not encrypted.' unless encrypted
-        dec = OpenSSL::Cipher.new('AES-256-CBC')
+        raise "The wallet is not encrypted." unless encrypted
+        dec = OpenSSL::Cipher.new("AES-256-CBC")
         dec.decrypt
         dec.key, dec.iv = key_iv(dec, passphrase)
-        decrypted_data = ''
+        decrypted_data = ""
         decrypted_data << dec.update(seed)
         decrypted_data << dec.final
         @seed = decrypted_data
         @encrypted = false
-        @salt = ''
+        @salt = ""
       end
 
       private

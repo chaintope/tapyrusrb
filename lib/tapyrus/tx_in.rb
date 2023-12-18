@@ -30,7 +30,7 @@ module Tapyrus
     def self.parse_from_payload(payload)
       buf = payload.is_a?(String) ? StringIO.new(payload) : payload
       i = new
-      hash, index = buf.read(36).unpack('a32V')
+      hash, index = buf.read(36).unpack("a32V")
       i.out_point = OutPoint.new(hash.bth, index)
       sig_length = Tapyrus.unpack_var_int_from_io(buf)
       if sig_length == 0
@@ -38,7 +38,7 @@ module Tapyrus
       else
         i.script_sig = Script.parse_from_payload(buf.read(sig_length))
       end
-      i.sequence = buf.read(4).unpack('V').first
+      i.sequence = buf.read(4).unpack("V").first
       i
     end
 
@@ -52,7 +52,7 @@ module Tapyrus
         p << Tapyrus.pack_var_int(script_sig.to_payload.bytesize)
         p << script_sig.to_payload
       end
-      p << [sequence].pack('V')
+      p << [sequence].pack("V")
       p
     end
 

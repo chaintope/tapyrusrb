@@ -3,7 +3,7 @@ module Tapyrus
     # tx message
     # https://bitcoin.org/en/developer-reference#tx
     class Tx < Base
-      COMMAND = 'tx'
+      COMMAND = "tx"
 
       attr_accessor :tx
       attr_accessor :use_segwit

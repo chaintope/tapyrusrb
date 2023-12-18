@@ -1,4 +1,4 @@
-require 'securerandom'
+require "securerandom"
 
 module Tapyrus
   module SLIP39
@@ -31,33 +31,33 @@ module Tapyrus
       # @param [String] secret master secret with hex format.
       # @param [String] passphrase the passphrase used for encryption/decryption.
       # @return [Array[Array[Tapyrus::SLIP39::Share]]] array of group shares.
-      def self.setup_shares(groups: [], group_threshold: nil, exp: 0, secret: nil, passphrase: '')
-        raise ArgumentError, 'Groups is empty.' if groups.empty?
-        raise ArgumentError, 'Group threshold must be greater than 0.' if group_threshold.nil? || group_threshold < 1
-        raise ArgumentError, 'Master secret does not specified.' unless secret
+      def self.setup_shares(groups: [], group_threshold: nil, exp: 0, secret: nil, passphrase: "")
+        raise ArgumentError, "Groups is empty." if groups.empty?
+        raise ArgumentError, "Group threshold must be greater than 0." if group_threshold.nil? || group_threshold < 1
+        raise ArgumentError, "Master secret does not specified." unless secret
         if (secret.htb.bytesize * 8) < MIN_STRENGTH_BITS
           raise ArgumentError,
                 "The length of the master secret (#{secret.htb.bytesize} bytes) must be at least #{MIN_STRENGTH_BITS / 8} bytes."
         end
         unless secret.bytesize.even?
-          raise ArgumentError, 'The length of the master secret in bytes must be an even number.'
+          raise ArgumentError, "The length of the master secret in bytes must be an even number."
         end
         unless passphrase.ascii_only?
-          raise ArgumentError, 'The passphrase must contain only printable ASCII characters (code points 32-126).'
+          raise ArgumentError, "The passphrase must contain only printable ASCII characters (code points 32-126)."
         end
         if group_threshold > groups.length
           raise ArgumentError,
                 "The requested group threshold (#{group_threshold}) must not exceed the number of groups (#{groups.length})."
         end
         groups.each do |threshold, count|
-          raise ArgumentError, 'Group threshold must be greater than 0.' if threshold.nil? || threshold < 1
+          raise ArgumentError, "Group threshold must be greater than 0." if threshold.nil? || threshold < 1
           if threshold > count
             raise ArgumentError,
                   "The requested member threshold (#{threshold}) must not exceed the number of share (#{count})."
           end
           if threshold == 1 && count > 1
             raise ArgumentError,
-                  'Creating multiple member shares with member threshold 1 is not allowed. Use 1-of-1 member sharing instead.'
+                  "Creating multiple member shares with member threshold 1 is not allowed. Use 1-of-1 member sharing instead."
           end
         end
 
@@ -97,8 +97,8 @@ module Tapyrus
       # @param [Array[Tapyrus::SLIP30::Share]] shares an array of shares.
       # @param [String] passphrase the passphrase using decrypt master secret.
       # @return [String] a master secret.
-      def self.recover_secret(shares, passphrase: '')
-        raise ArgumentError, 'share is empty.' if shares.nil? || shares.empty?
+      def self.recover_secret(shares, passphrase: "")
+        raise ArgumentError, "share is empty." if shares.nil? || shares.empty?
         groups = {}
         id = shares[0].id
         exp = shares[0].iteration_exp
@@ -106,15 +106,15 @@ module Tapyrus
         group_count = shares.first.group_count
 
         shares.each do |share|
-          raise ArgumentError, 'Invalid set of shares. All shares must have the same id.' unless id == share.id
+          raise ArgumentError, "Invalid set of shares. All shares must have the same id." unless id == share.id
           unless group_threshold == share.group_threshold
-            raise ArgumentError, 'Invalid set of shares. All shares must have the same group threshold.'
+            raise ArgumentError, "Invalid set of shares. All shares must have the same group threshold."
           end
           unless group_count == share.group_count
-            raise ArgumentError, 'Invalid set of shares. All shares must have the same group count.'
+            raise ArgumentError, "Invalid set of shares. All shares must have the same group count."
           end
           unless exp == share.iteration_exp
-            raise ArgumentError, 'Invalid set of shares. All Shares must have the same iteration exponent.'
+            raise ArgumentError, "Invalid set of shares. All Shares must have the same iteration exponent."
           end
           groups[share.group_index] ||= []
           groups[share.group_index] << share
@@ -134,16 +134,16 @@ module Tapyrus
             x_coordinates = []
             shares.each do |share|
               unless member_threshold == share.member_threshold
-                raise ArgumentError, 'Invalid set of shares. All shares in a group must have the same member threshold.'
+                raise ArgumentError, "Invalid set of shares. All shares in a group must have the same member threshold."
               end
               unless value_length == share.value.length
-                raise ArgumentError, 'Invalid set of shares. All share values must have the same length.'
+                raise ArgumentError, "Invalid set of shares. All share values must have the same length."
               end
               x_coordinates << share.member_index
             end
             x_coordinates.uniq!
             unless x_coordinates.size == shares.size
-              raise ArgumentError, 'Invalid set of shares. Share indices must be unique.'
+              raise ArgumentError, "Invalid set of shares. Share indices must be unique."
             end
             interpolate_shares = shares.map { |s| [s.member_index, s.value] }
 
@@ -151,7 +151,7 @@ module Tapyrus
             digest_value = interpolate(interpolate_shares, DIGEST_INDEX).htb
             digest, random_value = digest_value[0...DIGEST_LENGTH_BYTES].bth, digest_value[DIGEST_LENGTH_BYTES..-1].bth
             recover_digest = create_digest(secret, random_value)
-            raise ArgumentError, 'Invalid digest of the shared secret.' unless digest == recover_digest
+            raise ArgumentError, "Invalid digest of the shared secret." unless digest == recover_digest
 
             group_shares[group_index] = secret
           end
@@ -169,7 +169,7 @@ module Tapyrus
         digest_value = interpolate(interpolate_shares, DIGEST_INDEX).htb
         digest, random_value = digest_value[0...DIGEST_LENGTH_BYTES].bth, digest_value[DIGEST_LENGTH_BYTES..-1].bth
         recover_digest = create_digest(secret, random_value)
-        raise ArgumentError, 'Invalid digest of the shared secret.' unless digest == recover_digest
+        raise ArgumentError, "Invalid digest of the shared secret." unless digest == recover_digest
 
         decrypt(secret, passphrase, exp, id)
       end
@@ -186,7 +186,7 @@ module Tapyrus
 
         log_prod = shares.sum { |s| LOG_TABLE[s[0] ^ x] }
 
-        result = ('00' * shares.first[1].length).htb
+        result = ("00" * shares.first[1].length).htb
         shares.each do |share|
           log_basis_eval = (log_prod - LOG_TABLE[share[0] ^ x] - shares.sum { |s| LOG_TABLE[share[0] ^ s[0]] }) % 255
           result =
@@ -213,7 +213,7 @@ module Tapyrus
         salt = get_salt(id)
         e = (Tapyrus::SLIP39::BASE_ITERATION_COUNT << exp) / Tapyrus::SLIP39::ROUND_COUNT
         Tapyrus::SLIP39::ROUND_COUNT.times.to_a.reverse.each do |i|
-          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
+          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, "sha256")
           l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
         end
         (r + l).bth
@@ -231,7 +231,7 @@ module Tapyrus
         salt = get_salt(id)
         e = (Tapyrus::SLIP39::BASE_ITERATION_COUNT << exp) / Tapyrus::SLIP39::ROUND_COUNT
         Tapyrus::SLIP39::ROUND_COUNT.times.to_a.each do |i|
-          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, 'sha256')
+          f = OpenSSL::PKCS5.pbkdf2_hmac((i.itb + passphrase), salt + r, e, r.bytesize, "sha256")
           l, r = padding_zero(r, r.bytesize), padding_zero((l.bti ^ f.bti).itb, r.bytesize)
         end
         (r + l).bth
@@ -250,7 +250,7 @@ module Tapyrus
       # @param [Integer] id id
       # @return [String] salt with binary format.
       def self.get_salt(id)
-        (Tapyrus::SLIP39::CUSTOMIZATION_STRING.pack('c*') + id.itb)
+        (Tapyrus::SLIP39::CUSTOMIZATION_STRING.pack("c*") + id.itb)
       end
 
       # Split the share into +count+ with threshold +threshold+.

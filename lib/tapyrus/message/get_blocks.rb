@@ -6,7 +6,7 @@ module Tapyrus
       include HeadersParser
       extend HeadersParser
 
-      COMMAND = 'getblocks'
+      COMMAND = "getblocks"
 
       # protocol version
       attr_accessor :version

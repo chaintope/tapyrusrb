@@ -1,4 +1,4 @@
-require 'leveldb-native'
+require "leveldb-native"
 
 module Tapyrus
   module Wallet
@@ -24,10 +24,10 @@ module Tapyrus
         w = self.new(wallet_id, path_prefix)
 
         # generate seed
-        raise RuntimeError, 'the seed already exist.' if w.db.registered_master?
+        raise RuntimeError, "the seed already exist." if w.db.registered_master?
         master = Tapyrus::Wallet::MasterKey.generate
         w.db.register_master_key(master)
-        w.create_account('Default')
+        w.create_account("Default")
         w
       end
 
@@ -48,8 +48,8 @@ module Tapyrus
       def self.current_wallet(path_prefix = default_path_prefix)
         path = wallet_paths(path_prefix).first # TODO default wallet selection
         return nil unless path
-        path.slice!(path_prefix + 'wallet')
-        path.slice!('/')
+        path.slice!(path_prefix + "wallet")
+        path.slice!("/")
         self.load(path.to_i, path_prefix)
       end
 
@@ -70,7 +70,7 @@ module Tapyrus
       # @param [String] name a account name.
       # @return [Tapyrus::Wallet::Account]
       def create_account(purpose = Account::PURPOSE_TYPE[:native_segwit], name)
-        raise ArgumentError.new('Account already exists.') if find_account(name, purpose)
+        raise ArgumentError.new("Account already exists.") if find_account(name, purpose)
         index = accounts.size
         path = "m/#{purpose}'/#{Tapyrus.chain_params.bip44_coin_type}'/#{index}'"
         account_key = master_key.derive(path).ext_pubkey
@@ -92,7 +92,7 @@ module Tapyrus
       # @return [String] generated address.
       def generate_new_address(account_name)
         account = find_account(account_name)
-        raise ArgumentError.new('Account does not exist.') unless account
+        raise ArgumentError.new("Account does not exist.") unless account
         account.create_receive.addr
       end
 
@@ -121,7 +121,8 @@ module Tapyrus
 
       # decrypt wallet
       # @param [String] passphrase the wallet passphrase
-      def decrypt(passphrase); end
+      def decrypt(passphrase)
+      end
 
       # wallet information
       def to_h

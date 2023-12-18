@@ -146,7 +146,7 @@ module Tapyrus
       end
 
       # close peer connection.
-      def close(msg = '')
+      def close(msg = "")
         conn.close(msg)
       end
 
