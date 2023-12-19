@@ -56,7 +56,7 @@ module Tapyrus
 
     # generate key pair
     def self.generate(key_type = TYPES[:compressed])
-      priv_key, pubkey = Tapyrus.secp_impl.generate_key_pair
+      priv_key, pubkey = Tapyrus.secp_impl.generate_key_pair(compressed: key_type != TYPES[:uncompressed])
       new(priv_key: priv_key, pubkey: pubkey, key_type: key_type)
     end
 

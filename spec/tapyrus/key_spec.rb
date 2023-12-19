@@ -289,4 +289,25 @@ describe Tapyrus::Key do
       expect(found_small).to be true
     end
   end
+
+  describe "#generate" do
+    context "pure ruby" do
+      it "return decompressed public key" do
+        test_generate
+      end
+    end
+
+    context "libsecp256k1", use_secp256k1: true do
+      it "return decompressed public key" do
+        test_generate
+      end
+    end
+
+    def test_generate
+      compressed = Tapyrus::Key.generate(Tapyrus::Key::TYPES[:compressed])
+      expect(compressed.compressed?).to be true
+      uncompressed = Tapyrus::Key.generate(Tapyrus::Key::TYPES[:uncompressed])
+      expect(uncompressed.compressed?).to be false
+    end
+  end
 end
