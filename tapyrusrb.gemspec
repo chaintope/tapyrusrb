@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "json_pure", ">= 2.6.3", "< 2.8.0"
   spec.add_runtime_dependency "terminal-table", "~> 3.0.2"
   spec.add_runtime_dependency "jwt"
+  spec.add_development_dependency "observer"
 
   # for options
   spec.add_development_dependency "leveldb-native"
