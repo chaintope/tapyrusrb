@@ -1,6 +1,5 @@
 module Tapyrus
   module Ext
-
     refine Object do
       def build_json
         self.is_a?(Array) ? "[#{self.map { |o| o.to_h.to_json }.join(",")}]" : to_h.to_json

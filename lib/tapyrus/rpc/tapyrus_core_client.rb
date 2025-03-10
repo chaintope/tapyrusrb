@@ -114,11 +114,12 @@ module Tapyrus
     end
 
     def response_body2json(body)
-      json_data = JSON.parse(
-        body.gsub(/\\u([\da-fA-F]{4})/) do
-          [$1].pack("H*").unpack("n*").pack("U*").encode("ISO-8859-1").force_encoding("UTF-8")
-        end
-      )
+      json_data =
+        JSON.parse(
+          body.gsub(/\\u([\da-fA-F]{4})/) do
+            [$1].pack("H*").unpack("n*").pack("U*").encode("ISO-8859-1").force_encoding("UTF-8")
+          end
+        )
       convert_floats_to_strings(json_data)
     end
 
