@@ -1,5 +1,4 @@
 require "net/http"
-require "json/pure"
 
 module Tapyrus
   module RPC
@@ -115,13 +114,29 @@ module Tapyrus
     end
 
     def response_body2json(body)
-      Tapyrus::Ext::JsonParser.new(
+      json_data = JSON.parse(
         body.gsub(/\\u([\da-fA-F]{4})/) do
           [$1].pack("H*").unpack("n*").pack("U*").encode("ISO-8859-1").force_encoding("UTF-8")
         end
-      ).parse
+      )
+      convert_floats_to_strings(json_data)
+    end
+
+    # Convert float value
+    def convert_floats_to_strings(obj)
+      case obj
+      when Float
+        obj.to_s
+      when Hash
+        obj.transform_values { |v| convert_floats_to_strings(v) }
+      when Array
+        obj.map { |item| convert_floats_to_strings(item) }
+      else
+        obj
+      end
     end
 
     module_function :response_body2json
+    module_function :convert_floats_to_strings
   end
 end

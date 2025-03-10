@@ -1,6 +1,5 @@
 module Tapyrus
   module Ext
-    autoload :JsonParser, "tapyrus/ext/json_parser"
 
     refine Object do
       def build_json
