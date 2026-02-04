@@ -529,19 +529,14 @@
         }
       },
       "error": "issuer.email must be a valid email address"
-    },
-    {
-      "name": "data_uri_too_large",
-      "description": "Data URI exceeds 32KB (32768 bytes) size limit. Generate a Data URI larger than 32KB at runtime for testing.",
-      "metadata": {
-        "version": "1.0",
-        "name": "Test Token",
-        "symbol": "TEST",
-        "icon": "data:image/png;base64,<BASE64_DATA_EXCEEDING_32KB>"
-      },
-      "error": "icon must be an HTTPS URL or Data URI",
-      "max_size_bytes": 32768,
-      "note": "Generate Data URI at runtime: 'data:image/png;base64,' + base64_encode(random_bytes(33000))"
     }
-  ]
+  ],
+  "notes": {
+    "data_uri_size_limit": {
+      "description": "Data URI fields (icon, image, animation_url) have a 32KB (32768 bytes) size limit. This cannot be tested via JSON fixture due to file size. Test at runtime by generating a Data URI larger than 32KB.",
+      "max_size_bytes": 32768,
+      "error": "icon must be an HTTPS URL or Data URI",
+      "example": "data:image/png;base64, + base64_encode(random_bytes(33000))"
+    }
+  }
 }

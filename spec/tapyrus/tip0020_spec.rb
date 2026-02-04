@@ -494,8 +494,7 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
 
     describe "invalid test cases" do
       it "rejects all invalid test vectors with appropriate errors" do
-        # Skip data_uri_too_large as it requires runtime generation of 32KB+ data
-        fixtures["invalid_test_cases"].reject { |t| t["name"] == "data_uri_too_large" }.each do |test_case|
+        fixtures["invalid_test_cases"].each do |test_case|
           data = test_case["metadata"]
           token_type = detect_token_type(data)
           expect {
