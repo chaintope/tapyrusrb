@@ -1,0 +1,547 @@
+{
+  "valid_test_cases": [
+    {
+      "name": "minimal",
+      "description": "Required fields only (version, name and symbol)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Minimal Token",
+        "symbol": "MIN"
+      },
+      "canonical": "{\"name\":\"Minimal Token\",\"symbol\":\"MIN\",\"version\":\"1.0\"}",
+      "hash": "82a8c79ac45f4501c052e3a37b6e2e05d420e990b0eeaa84796b1cd6b7d23cfc"
+    },
+    {
+      "name": "reissuable",
+      "description": "Reissuable token with decimals and website",
+      "metadata": {
+        "version": "1.0",
+        "name": "Reissuable Token",
+        "symbol": "REIS",
+        "decimals": 8,
+        "description": "A reissuable token for testing",
+        "website": "https://example.com/reissuable"
+      },
+      "canonical": "{\"decimals\":8,\"description\":\"A reissuable token for testing\",\"name\":\"Reissuable Token\",\"symbol\":\"REIS\",\"version\":\"1.0\",\"website\":\"https://example.com/reissuable\"}",
+      "hash": "961987187ad59ce689ec72e342737e040fc2ffbe3b75d8d405ccb28f76566fb6"
+    },
+    {
+      "name": "non_reissuable",
+      "description": "Non-reissuable token with description",
+      "metadata": {
+        "version": "1.0",
+        "name": "Non-Reissuable Token",
+        "symbol": "NREIS",
+        "description": "A non-reissuable token for testing"
+      },
+      "canonical": "{\"description\":\"A non-reissuable token for testing\",\"name\":\"Non-Reissuable Token\",\"symbol\":\"NREIS\",\"version\":\"1.0\"}",
+      "hash": "87a561aee769401d7d5d2615a4d220cd1f0300c51f95caf1f88f450d02dcff48"
+    },
+    {
+      "name": "nft",
+      "description": "NFT with icon",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test NFT",
+        "symbol": "TNFT",
+        "description": "A unique NFT for testing",
+        "icon": "https://example.com/nft-icon.png"
+      },
+      "canonical": "{\"description\":\"A unique NFT for testing\",\"icon\":\"https://example.com/nft-icon.png\",\"name\":\"Test NFT\",\"symbol\":\"TNFT\",\"version\":\"1.0\"}",
+      "hash": "d1aeec668af4d354dff05fcbdcb6bf3bcb9230696a7479cd0e7ab5f0e796390c"
+    },
+    {
+      "name": "with_issuer",
+      "description": "Token with issuer information",
+      "metadata": {
+        "version": "1.0",
+        "name": "Issued Token",
+        "symbol": "ISS",
+        "decimals": 6,
+        "description": "A token with issuer information",
+        "issuer": {
+          "name": "Test Issuer",
+          "url": "https://issuer.example.com"
+        },
+        "website": "https://example.com/issued"
+      },
+      "canonical": "{\"decimals\":6,\"description\":\"A token with issuer information\",\"issuer\":{\"name\":\"Test Issuer\",\"url\":\"https://issuer.example.com\"},\"name\":\"Issued Token\",\"symbol\":\"ISS\",\"version\":\"1.0\",\"website\":\"https://example.com/issued\"}",
+      "hash": "835fd6b8ada9b5a2305a901f0b56ebce5c10b4d2a3c7f27db467c753a9019760"
+    },
+    {
+      "name": "max_length_name",
+      "description": "Token with maximum length name (64 characters)",
+      "metadata": {
+        "version": "1.0",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "symbol": "MAX"
+      },
+      "canonical": "{\"name\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"symbol\":\"MAX\",\"version\":\"1.0\"}",
+      "hash": "49b5aa451a439153e4192a5d05f9e6d186bf3c17191242dcf689e62534561f39"
+    },
+    {
+      "name": "max_length_symbol",
+      "description": "Token with maximum length symbol (12 characters)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Max Symbol Token",
+        "symbol": "AAAAAAAAAAAA"
+      },
+      "canonical": "{\"name\":\"Max Symbol Token\",\"symbol\":\"AAAAAAAAAAAA\",\"version\":\"1.0\"}",
+      "hash": "5802454047341920a7ebccc12c4e9bb55dc84950ab03864f9abe5152f2c4cb39"
+    },
+    {
+      "name": "decimals_zero",
+      "description": "Token with decimals explicitly set to 0 (should not appear in canonical form)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Zero Decimals Token",
+        "symbol": "ZERO",
+        "decimals": 0
+      },
+      "canonical": "{\"name\":\"Zero Decimals Token\",\"symbol\":\"ZERO\",\"version\":\"1.0\"}",
+      "hash": "5d94bc858b44e02ec9af623e7d12799256dc8adfbf120357d3d388c873a24972"
+    },
+    {
+      "name": "decimals_max",
+      "description": "Token with maximum decimals (18)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Max Decimals Token",
+        "symbol": "MAXD",
+        "decimals": 18
+      },
+      "canonical": "{\"decimals\":18,\"name\":\"Max Decimals Token\",\"symbol\":\"MAXD\",\"version\":\"1.0\"}",
+      "hash": "e2cbad785199d9f1e85566051e4be290ba25acec263b5b9561716826d4a211aa"
+    },
+    {
+      "name": "data_uri_icon",
+      "description": "Token with Data URI icon",
+      "metadata": {
+        "version": "1.0",
+        "name": "Data URI Icon Token",
+        "symbol": "DURI",
+        "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+      },
+      "canonical": "{\"icon\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\"name\":\"Data URI Icon Token\",\"symbol\":\"DURI\",\"version\":\"1.0\"}",
+      "hash": "f152fc720df61e987a39153c09066bdb7ab2785aa079919e960b6855467bd186"
+    },
+    {
+      "name": "with_terms",
+      "description": "Token with terms of service URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "Terms Token",
+        "symbol": "TERM",
+        "terms": "https://example.com/terms"
+      },
+      "canonical": "{\"name\":\"Terms Token\",\"symbol\":\"TERM\",\"terms\":\"https://example.com/terms\",\"version\":\"1.0\"}",
+      "hash": "6af2bfa50634919c0ba90b1a3a2b5bd8c275d9f4e17f7b07f1211d97b48ac54c"
+    },
+    {
+      "name": "with_properties",
+      "description": "Token with custom properties",
+      "metadata": {
+        "version": "1.0",
+        "name": "Properties Token",
+        "symbol": "PROP",
+        "properties": {
+          "category": "utility",
+          "tier": "gold"
+        }
+      },
+      "canonical": "{\"name\":\"Properties Token\",\"properties\":{\"category\":\"utility\",\"tier\":\"gold\"},\"symbol\":\"PROP\",\"version\":\"1.0\"}",
+      "hash": "2c5a7344b332c0bd825a6306cb115add8ce5046d17b22170da21e62ce6b48e83"
+    },
+    {
+      "name": "nft_with_image",
+      "description": "NFT with image URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "NFT with Image",
+        "symbol": "NFTI",
+        "description": "An NFT with image",
+        "image": "https://example.com/nft-image.png"
+      },
+      "canonical": "{\"description\":\"An NFT with image\",\"image\":\"https://example.com/nft-image.png\",\"name\":\"NFT with Image\",\"symbol\":\"NFTI\",\"version\":\"1.0\"}",
+      "hash": "e876e1e7c2c8c092e27596e79a0e0f57cee074ff804c19b864e52689ece78ace"
+    },
+    {
+      "name": "nft_with_animation",
+      "description": "NFT with animation URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "NFT with Animation",
+        "symbol": "NFTA",
+        "description": "An NFT with animation",
+        "animation_url": "https://example.com/nft-video.mp4"
+      },
+      "canonical": "{\"animation_url\":\"https://example.com/nft-video.mp4\",\"description\":\"An NFT with animation\",\"name\":\"NFT with Animation\",\"symbol\":\"NFTA\",\"version\":\"1.0\"}",
+      "hash": "a2bcde25d0f93bc86e8b6ce44f5306169a158105b0c2c98b3bbfc1b32ef1647b"
+    },
+    {
+      "name": "nft_with_external_url",
+      "description": "NFT with external URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "NFT with External URL",
+        "symbol": "NFTE",
+        "description": "An NFT with external URL",
+        "external_url": "https://example.com/view/nft/123"
+      },
+      "canonical": "{\"description\":\"An NFT with external URL\",\"external_url\":\"https://example.com/view/nft/123\",\"name\":\"NFT with External URL\",\"symbol\":\"NFTE\",\"version\":\"1.0\"}",
+      "hash": "b5432f21fc4efb26e59e965e54f2eff88d303f677a638eb5527b001a001e2f4a"
+    },
+    {
+      "name": "nft_with_attributes",
+      "description": "NFT with attributes array",
+      "metadata": {
+        "version": "1.0",
+        "name": "NFT with Attributes",
+        "symbol": "NFTAT",
+        "description": "An NFT with attributes",
+        "attributes": [
+          { "trait_type": "Color", "value": "Blue" },
+          { "trait_type": "Rarity", "value": "Legendary" },
+          { "trait_type": "Power", "value": 100, "display_type": "number" }
+        ]
+      },
+      "canonical": "{\"attributes\":[{\"trait_type\":\"Color\",\"value\":\"Blue\"},{\"trait_type\":\"Rarity\",\"value\":\"Legendary\"},{\"display_type\":\"number\",\"trait_type\":\"Power\",\"value\":100}],\"description\":\"An NFT with attributes\",\"name\":\"NFT with Attributes\",\"symbol\":\"NFTAT\",\"version\":\"1.0\"}",
+      "hash": "78c3df250de6ea36b92129fdb3e0d7258bfae21324eedf4fc1918c6e6dbae3ee"
+    },
+    {
+      "name": "issuer_with_email",
+      "description": "Token with issuer including valid email",
+      "metadata": {
+        "version": "1.0",
+        "name": "Email Issuer Token",
+        "symbol": "EISS",
+        "issuer": {
+          "name": "Test Issuer",
+          "url": "https://issuer.example.com",
+          "email": "contact@issuer.example.com"
+        }
+      },
+      "canonical": "{\"issuer\":{\"email\":\"contact@issuer.example.com\",\"name\":\"Test Issuer\",\"url\":\"https://issuer.example.com\"},\"name\":\"Email Issuer Token\",\"symbol\":\"EISS\",\"version\":\"1.0\"}",
+      "hash": "b54dfb8394ae3f29b07090b75f9eee59d4a338fee2a0e53df16bed2c1bc67813"
+    },
+    {
+      "name": "nft_full",
+      "description": "NFT with all NFT-specific fields",
+      "metadata": {
+        "version": "1.0",
+        "name": "Full NFT",
+        "symbol": "FNFT",
+        "description": "A full NFT with all fields",
+        "image": "https://example.com/full-nft.png",
+        "animation_url": "https://example.com/full-nft.mp4",
+        "external_url": "https://example.com/view/full-nft",
+        "attributes": [
+          { "trait_type": "Level", "value": 5 }
+        ]
+      },
+      "canonical": "{\"animation_url\":\"https://example.com/full-nft.mp4\",\"attributes\":[{\"trait_type\":\"Level\",\"value\":5}],\"description\":\"A full NFT with all fields\",\"external_url\":\"https://example.com/view/full-nft\",\"image\":\"https://example.com/full-nft.png\",\"name\":\"Full NFT\",\"symbol\":\"FNFT\",\"version\":\"1.0\"}",
+      "hash": "4fe9273bdc7b71fce97d16917fc59ae4403991d2c52f38555f91929d85dd4211"
+    }
+  ],
+  "invalid_test_cases": [
+    {
+      "name": "missing_version",
+      "description": "Missing required field: version",
+      "metadata": {
+        "version": "",
+        "name": "Test Token",
+        "symbol": "TEST"
+      },
+      "error": "version is required"
+    },
+    {
+      "name": "invalid_version",
+      "description": "Unsupported version (only 1.0 is supported)",
+      "metadata": {
+        "version": "2.0",
+        "name": "Test Token",
+        "symbol": "TEST"
+      },
+      "error": "version must be 1.0"
+    },
+    {
+      "name": "missing_name",
+      "description": "Missing required field: name",
+      "metadata": {
+        "version": "1.0",
+        "symbol": "TEST"
+      },
+      "error": "name is required"
+    },
+    {
+      "name": "empty_name",
+      "description": "Empty name string",
+      "metadata": {
+        "version": "1.0",
+        "name": "",
+        "symbol": "TEST"
+      },
+      "error": "name is required"
+    },
+    {
+      "name": "name_too_long",
+      "description": "Name exceeds 64 characters (65 characters)",
+      "metadata": {
+        "version": "1.0",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "symbol": "TEST"
+      },
+      "error": "name must be 64 characters or less"
+    },
+    {
+      "name": "missing_symbol",
+      "description": "Missing required field: symbol",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token"
+      },
+      "error": "symbol is required"
+    },
+    {
+      "name": "empty_symbol",
+      "description": "Empty symbol string",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": ""
+      },
+      "error": "symbol is required"
+    },
+    {
+      "name": "symbol_too_long",
+      "description": "Symbol exceeds 12 characters (13 characters)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "AAAAAAAAAAAAA"
+      },
+      "error": "symbol must be 12 characters or less"
+    },
+    {
+      "name": "decimals_negative",
+      "description": "Decimals is negative",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "decimals": -1
+      },
+      "error": "decimals must be between 0 and 18"
+    },
+    {
+      "name": "decimals_too_large",
+      "description": "Decimals exceeds maximum (19)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "decimals": 19
+      },
+      "error": "decimals must be between 0 and 18"
+    },
+    {
+      "name": "description_too_long",
+      "description": "Description exceeds 256 characters (257 characters)",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "description": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "error": "description must be 256 characters or less"
+    },
+    {
+      "name": "website_http",
+      "description": "Website uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "website": "http://example.com"
+      },
+      "error": "website must be an HTTPS URL"
+    },
+    {
+      "name": "website_invalid_url",
+      "description": "Website is not a valid URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "website": "not-a-url"
+      },
+      "error": "website must be an HTTPS URL"
+    },
+    {
+      "name": "icon_http",
+      "description": "Icon uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "icon": "http://example.com/icon.png"
+      },
+      "error": "icon must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "icon_invalid_format",
+      "description": "Icon is not a valid URL or Data URI",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "icon": "not-a-valid-icon"
+      },
+      "error": "icon must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "terms_http",
+      "description": "Terms uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "terms": "http://example.com/terms"
+      },
+      "error": "terms must be an HTTPS URL"
+    },
+    {
+      "name": "terms_invalid_url",
+      "description": "Terms is not a valid URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "terms": "not-a-url"
+      },
+      "error": "terms must be an HTTPS URL"
+    },
+    {
+      "name": "image_http",
+      "description": "Image uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "image": "http://example.com/image.png"
+      },
+      "error": "image must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "image_invalid_url",
+      "description": "Image is not a valid URL or Data URI",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "image": "not-a-valid-url"
+      },
+      "error": "image must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "animation_url_http",
+      "description": "Animation URL uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "animation_url": "http://example.com/video.mp4"
+      },
+      "error": "animation_url must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "animation_url_invalid",
+      "description": "Animation URL is not a valid URL or Data URI",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "animation_url": "not-a-valid-url"
+      },
+      "error": "animation_url must be an HTTPS URL or Data URI"
+    },
+    {
+      "name": "external_url_http",
+      "description": "External URL uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "external_url": "http://example.com/nft/123"
+      },
+      "error": "external_url must be an HTTPS URL"
+    },
+    {
+      "name": "external_url_invalid",
+      "description": "External URL is not a valid URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "external_url": "not-a-valid-url"
+      },
+      "error": "external_url must be an HTTPS URL"
+    },
+    {
+      "name": "issuer_url_http",
+      "description": "Issuer URL uses HTTP instead of HTTPS",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "issuer": {
+          "name": "Test Issuer",
+          "url": "http://example.com"
+        }
+      },
+      "error": "issuer.url must be an HTTPS URL"
+    },
+    {
+      "name": "issuer_url_invalid",
+      "description": "Issuer URL is not a valid URL",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "issuer": {
+          "name": "Test Issuer",
+          "url": "not-a-url"
+        }
+      },
+      "error": "issuer.url must be an HTTPS URL"
+    },
+    {
+      "name": "issuer_email_invalid",
+      "description": "Issuer email is not a valid email address",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "issuer": {
+          "name": "Test Issuer",
+          "email": "not-an-email"
+        }
+      },
+      "error": "issuer.email must be a valid email address"
+    },
+    {
+      "name": "data_uri_too_large",
+      "description": "Data URI exceeds 32KB (32768 bytes) size limit. Generate a Data URI larger than 32KB at runtime for testing.",
+      "metadata": {
+        "version": "1.0",
+        "name": "Test Token",
+        "symbol": "TEST",
+        "icon": "data:image/png;base64,<BASE64_DATA_EXCEEDING_32KB>"
+      },
+      "error": "icon must be an HTTPS URL or Data URI",
+      "max_size_bytes": 32768,
+      "note": "Generate Data URI at runtime: 'data:image/png;base64,' + base64_encode(random_bytes(33000))"
+    }
+  ]
+}
