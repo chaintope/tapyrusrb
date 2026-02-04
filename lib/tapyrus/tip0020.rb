@@ -16,8 +16,21 @@ module Tapyrus
       VALID_TOKEN_TYPES = %i[reissuable non_reissuable nft].freeze
       NFT_FIELDS = %i[image animation_url external_url attributes].freeze
 
-      attr_accessor :token_type, :version, :name, :symbol, :decimals, :description, :icon, :issuer, :website, :terms, :properties,
-                    :image, :animation_url, :external_url, :attributes
+      attr_accessor :token_type,
+                    :version,
+                    :name,
+                    :symbol,
+                    :decimals,
+                    :description,
+                    :icon,
+                    :issuer,
+                    :website,
+                    :terms,
+                    :properties,
+                    :image,
+                    :animation_url,
+                    :external_url,
+                    :attributes
 
       # @param token_type [Symbol] Token type (:reissuable, :non_reissuable, :nft)
       # @param version [String] Schema version (default: "1.0")
@@ -34,7 +47,23 @@ module Tapyrus
       # @param animation_url [String] NFT animation/video/audio URL (HTTPS or Data URI) - only for NFT
       # @param external_url [String] External URL to view NFT (HTTPS required) - only for NFT
       # @param attributes [Array<Hash>] NFT attributes array with trait_type, value, display_type - only for NFT
-      def initialize(token_type:, version: CURRENT_VERSION, name:, symbol:, decimals: 0, description: nil, icon: nil, issuer: nil, website: nil, terms: nil, properties: nil, image: nil, animation_url: nil, external_url: nil, attributes: nil)
+      def initialize(
+        token_type:,
+        version: CURRENT_VERSION,
+        name:,
+        symbol:,
+        decimals: 0,
+        description: nil,
+        icon: nil,
+        issuer: nil,
+        website: nil,
+        terms: nil,
+        properties: nil,
+        image: nil,
+        animation_url: nil,
+        external_url: nil,
+        attributes: nil
+      )
         @token_type = token_type
         @version = version
         @name = name
@@ -57,36 +86,32 @@ module Tapyrus
       # @raise [ArgumentError] if validation fails
       def validate!
         raise ArgumentError, "token_type is required" if token_type.nil?
-        raise ArgumentError, "token_type must be one of #{VALID_TOKEN_TYPES.join(', ')}" unless VALID_TOKEN_TYPES.include?(token_type)
+        unless VALID_TOKEN_TYPES.include?(token_type)
+          raise ArgumentError, "token_type must be one of #{VALID_TOKEN_TYPES.join(", ")}"
+        end
         validate_nft_fields!
         raise ArgumentError, "version is required" if version.nil? || version.empty?
         raise ArgumentError, "version must be #{CURRENT_VERSION}" unless version == CURRENT_VERSION
         raise ArgumentError, "name is required" if name.nil? || name.empty?
         raise ArgumentError, "name must be #{MAX_NAME_LENGTH} characters or less" if name.length > MAX_NAME_LENGTH
         raise ArgumentError, "symbol is required" if symbol.nil? || symbol.empty?
-        raise ArgumentError, "symbol must be #{MAX_SYMBOL_LENGTH} characters or less" if symbol.length > MAX_SYMBOL_LENGTH
-        raise ArgumentError, "decimals must be between #{MIN_DECIMALS} and #{MAX_DECIMALS}" if decimals < MIN_DECIMALS || decimals > MAX_DECIMALS
+        if symbol.length > MAX_SYMBOL_LENGTH
+          raise ArgumentError, "symbol must be #{MAX_SYMBOL_LENGTH} characters or less"
+        end
+        if decimals < MIN_DECIMALS || decimals > MAX_DECIMALS
+          raise ArgumentError, "decimals must be between #{MIN_DECIMALS} and #{MAX_DECIMALS}"
+        end
         if description && description.length > MAX_DESCRIPTION_LENGTH
           raise ArgumentError, "description must be #{MAX_DESCRIPTION_LENGTH} characters or less"
         end
-        if icon && !valid_icon_format?(icon)
-          raise ArgumentError, "icon must be an HTTPS URL or Data URI"
-        end
-        if website && !valid_https_url?(website)
-          raise ArgumentError, "website must be an HTTPS URL"
-        end
-        if terms && !valid_https_url?(terms)
-          raise ArgumentError, "terms must be an HTTPS URL"
-        end
-        if image && !valid_media_url?(image)
-          raise ArgumentError, "image must be an HTTPS URL or Data URI"
-        end
+        raise ArgumentError, "icon must be an HTTPS URL or Data URI" if icon && !valid_icon_format?(icon)
+        raise ArgumentError, "website must be an HTTPS URL" if website && !valid_https_url?(website)
+        raise ArgumentError, "terms must be an HTTPS URL" if terms && !valid_https_url?(terms)
+        raise ArgumentError, "image must be an HTTPS URL or Data URI" if image && !valid_media_url?(image)
         if animation_url && !valid_media_url?(animation_url)
           raise ArgumentError, "animation_url must be an HTTPS URL or Data URI"
         end
-        if external_url && !valid_https_url?(external_url)
-          raise ArgumentError, "external_url must be an HTTPS URL"
-        end
+        raise ArgumentError, "external_url must be an HTTPS URL" if external_url && !valid_https_url?(external_url)
         validate_issuer! if issuer
       end
 
@@ -95,13 +120,9 @@ module Tapyrus
       def validate_issuer!
         return unless issuer.is_a?(Hash)
         issuer_url = issuer[:url] || issuer["url"]
-        if issuer_url && !valid_https_url?(issuer_url)
-          raise ArgumentError, "issuer.url must be an HTTPS URL"
-        end
+        raise ArgumentError, "issuer.url must be an HTTPS URL" if issuer_url && !valid_https_url?(issuer_url)
         issuer_email = issuer[:email] || issuer["email"]
-        if issuer_email && !valid_email?(issuer_email)
-          raise ArgumentError, "issuer.email must be a valid email address"
-        end
+        raise ArgumentError, "issuer.email must be a valid email address" if issuer_email && !valid_email?(issuer_email)
       end
 
       # Validate NFT-specific fields are only used with NFT token type
@@ -110,7 +131,7 @@ module Tapyrus
         return if token_type == :nft
         nft_fields_present = NFT_FIELDS.select { |field| send(field) }
         unless nft_fields_present.empty?
-          raise ArgumentError, "#{nft_fields_present.join(', ')} can only be used with NFT token type"
+          raise ArgumentError, "#{nft_fields_present.join(", ")} can only be used with NFT token type"
         end
       end
 
@@ -254,9 +275,7 @@ module Tapyrus
 
       # Check if media URL is valid (HTTPS URL or Data URI with size limit)
       def valid_media_url?(url)
-        if url.start_with?("data:")
-          return url.bytesize <= MAX_DATA_URI_SIZE
-        end
+        return url.bytesize <= MAX_DATA_URI_SIZE if url.start_with?("data:")
         valid_https_url?(url)
       end
 
@@ -272,9 +291,12 @@ module Tapyrus
       def jcs_serialize(obj)
         case obj
         when Hash
-          pairs = obj.keys.map(&:to_s).sort.map do |key|
-            "#{jcs_serialize(key)}:#{jcs_serialize(obj[key.to_sym] || obj[key])}"
-          end
+          pairs =
+            obj
+              .keys
+              .map(&:to_s)
+              .sort
+              .map { |key| "#{jcs_serialize(key)}:#{jcs_serialize(obj[key.to_sym] || obj[key])}" }
           "{#{pairs.join(",")}}"
         when Array
           "[#{obj.map { |v| jcs_serialize(v) }.join(",")}]"
@@ -303,8 +325,8 @@ module Tapyrus
         if num.abs >= 1e21 || (num != 0 && num.abs < 1e-6)
           # Exponential format
           exp = Math.log10(num.abs).floor
-          mantissa = num / (10 ** exp)
-          "#{mantissa}e#{exp >= 0 ? '+' : ''}#{exp}"
+          mantissa = num / (10**exp)
+          "#{mantissa}e#{exp >= 0 ? "+" : ""}#{exp}"
         else
           # Remove trailing zeros
           str = num.to_s

@@ -13,19 +13,24 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
       end
 
       it "creates metadata with all fields for reissuable token" do
-        metadata = described_class.new(
-          token_type: :reissuable,
-          version: "1.0",
-          name: "Test Token",
-          symbol: "TEST",
-          decimals: 8,
-          description: "A test token",
-          icon: "https://example.com/icon.png",
-          issuer: { name: "Test Issuer" },
-          website: "https://example.com",
-          terms: "https://example.com/terms",
-          properties: { category: "utility" }
-        )
+        metadata =
+          described_class.new(
+            token_type: :reissuable,
+            version: "1.0",
+            name: "Test Token",
+            symbol: "TEST",
+            decimals: 8,
+            description: "A test token",
+            icon: "https://example.com/icon.png",
+            issuer: {
+              name: "Test Issuer"
+            },
+            website: "https://example.com",
+            terms: "https://example.com/terms",
+            properties: {
+              category: "utility"
+            }
+          )
         expect(metadata.version).to eq("1.0")
         expect(metadata.name).to eq("Test Token")
         expect(metadata.symbol).to eq("TEST")
@@ -39,15 +44,16 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
       end
 
       it "creates NFT metadata with NFT-specific fields" do
-        metadata = described_class.new(
-          token_type: :nft,
-          name: "Test NFT",
-          symbol: "TNFT",
-          image: "https://example.com/image.png",
-          animation_url: "https://example.com/video.mp4",
-          external_url: "https://example.com/nft/1",
-          attributes: [{ trait_type: "Color", value: "Blue" }]
-        )
+        metadata =
+          described_class.new(
+            token_type: :nft,
+            name: "Test NFT",
+            symbol: "TNFT",
+            image: "https://example.com/image.png",
+            animation_url: "https://example.com/video.mp4",
+            external_url: "https://example.com/nft/1",
+            attributes: [{ trait_type: "Color", value: "Blue" }]
+          )
         expect(metadata.token_type).to eq(:nft)
         expect(metadata.image).to eq("https://example.com/image.png")
         expect(metadata.animation_url).to eq("https://example.com/video.mp4")
@@ -62,80 +68,155 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
       end
 
       it "raises error when token_type is invalid" do
-        expect { described_class.new(token_type: :invalid, name: "Test", symbol: "TEST") }.to raise_error(ArgumentError, /token_type must be one of/)
+        expect { described_class.new(token_type: :invalid, name: "Test", symbol: "TEST") }.to raise_error(
+          ArgumentError,
+          /token_type must be one of/
+        )
       end
 
       it "raises error when NFT fields are used with reissuable token" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", image: "https://example.com/image.png") }.to raise_error(ArgumentError, /image.*can only be used with NFT token type/)
+        expect {
+          described_class.new(
+            token_type: :reissuable,
+            name: "Test",
+            symbol: "TEST",
+            image: "https://example.com/image.png"
+          )
+        }.to raise_error(ArgumentError, /image.*can only be used with NFT token type/)
       end
 
       it "raises error when NFT fields are used with non_reissuable token" do
-        expect { described_class.new(token_type: :non_reissuable, name: "Test", symbol: "TEST", attributes: [{ trait_type: "Color", value: "Blue" }]) }.to raise_error(ArgumentError, /attributes.*can only be used with NFT token type/)
+        expect {
+          described_class.new(
+            token_type: :non_reissuable,
+            name: "Test",
+            symbol: "TEST",
+            attributes: [{ trait_type: "Color", value: "Blue" }]
+          )
+        }.to raise_error(ArgumentError, /attributes.*can only be used with NFT token type/)
       end
 
       it "raises error when version is empty" do
-        expect { described_class.new(token_type: :reissuable, version: "", name: "Test", symbol: "TEST") }.to raise_error(ArgumentError, "version is required")
+        expect {
+          described_class.new(token_type: :reissuable, version: "", name: "Test", symbol: "TEST")
+        }.to raise_error(ArgumentError, "version is required")
       end
 
       it "raises error when version is not 1.0" do
-        expect { described_class.new(token_type: :reissuable, version: "2.0", name: "Test", symbol: "TEST") }.to raise_error(ArgumentError, "version must be 1.0")
+        expect {
+          described_class.new(token_type: :reissuable, version: "2.0", name: "Test", symbol: "TEST")
+        }.to raise_error(ArgumentError, "version must be 1.0")
       end
 
       it "raises error when name is missing" do
-        expect { described_class.new(token_type: :reissuable, name: nil, symbol: "TEST") }.to raise_error(ArgumentError, "name is required")
+        expect { described_class.new(token_type: :reissuable, name: nil, symbol: "TEST") }.to raise_error(
+          ArgumentError,
+          "name is required"
+        )
       end
 
       it "raises error when name is empty" do
-        expect { described_class.new(token_type: :reissuable, name: "", symbol: "TEST") }.to raise_error(ArgumentError, "name is required")
+        expect { described_class.new(token_type: :reissuable, name: "", symbol: "TEST") }.to raise_error(
+          ArgumentError,
+          "name is required"
+        )
       end
 
       it "raises error when name exceeds 64 characters" do
         long_name = "a" * 65
-        expect { described_class.new(token_type: :reissuable, name: long_name, symbol: "TEST") }.to raise_error(ArgumentError, /name must be 64 characters or less/)
+        expect { described_class.new(token_type: :reissuable, name: long_name, symbol: "TEST") }.to raise_error(
+          ArgumentError,
+          /name must be 64 characters or less/
+        )
       end
 
       it "raises error when symbol is missing" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: nil) }.to raise_error(ArgumentError, "symbol is required")
+        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: nil) }.to raise_error(
+          ArgumentError,
+          "symbol is required"
+        )
       end
 
       it "raises error when symbol exceeds 12 characters" do
         long_symbol = "a" * 13
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: long_symbol) }.to raise_error(ArgumentError, /symbol must be 12 characters or less/)
+        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: long_symbol) }.to raise_error(
+          ArgumentError,
+          /symbol must be 12 characters or less/
+        )
       end
 
       it "raises error when decimals is out of range" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", decimals: -1) }.to raise_error(ArgumentError, /decimals must be between/)
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", decimals: 19) }.to raise_error(ArgumentError, /decimals must be between/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", decimals: -1)
+        }.to raise_error(ArgumentError, /decimals must be between/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", decimals: 19)
+        }.to raise_error(ArgumentError, /decimals must be between/)
       end
 
       it "raises error when description exceeds 256 characters" do
         long_desc = "a" * 257
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", description: long_desc) }.to raise_error(ArgumentError, /description must be 256 characters or less/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", description: long_desc)
+        }.to raise_error(ArgumentError, /description must be 256 characters or less/)
       end
 
       it "raises error when website is not HTTPS" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", website: "http://example.com") }.to raise_error(ArgumentError, /website must be an HTTPS URL/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", website: "http://example.com")
+        }.to raise_error(ArgumentError, /website must be an HTTPS URL/)
       end
 
       it "raises error when icon is not valid format" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", icon: "http://example.com/icon.png") }.to raise_error(ArgumentError, /icon must be an HTTPS URL or Data URI/)
+        expect {
+          described_class.new(
+            token_type: :reissuable,
+            name: "Test",
+            symbol: "TEST",
+            icon: "http://example.com/icon.png"
+          )
+        }.to raise_error(ArgumentError, /icon must be an HTTPS URL or Data URI/)
       end
 
       it "raises error when terms is not HTTPS" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", terms: "http://example.com/terms") }.to raise_error(ArgumentError, /terms must be an HTTPS URL/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", terms: "http://example.com/terms")
+        }.to raise_error(ArgumentError, /terms must be an HTTPS URL/)
       end
 
       it "raises error when issuer.url is not HTTPS" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", issuer: { name: "Test", url: "http://example.com" }) }.to raise_error(ArgumentError, /issuer\.url must be an HTTPS URL/)
+        expect {
+          described_class.new(
+            token_type: :reissuable,
+            name: "Test",
+            symbol: "TEST",
+            issuer: {
+              name: "Test",
+              url: "http://example.com"
+            }
+          )
+        }.to raise_error(ArgumentError, /issuer\.url must be an HTTPS URL/)
       end
 
       it "raises error when issuer.email is invalid" do
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", issuer: { name: "Test", email: "not-an-email" }) }.to raise_error(ArgumentError, /issuer\.email must be a valid email address/)
+        expect {
+          described_class.new(
+            token_type: :reissuable,
+            name: "Test",
+            symbol: "TEST",
+            issuer: {
+              name: "Test",
+              email: "not-an-email"
+            }
+          )
+        }.to raise_error(ArgumentError, /issuer\.email must be a valid email address/)
       end
 
       it "raises error when Data URI exceeds 32KB" do
         large_data_uri = "data:image/png;base64," + ("A" * 33 * 1024)
-        expect { described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", icon: large_data_uri) }.to raise_error(ArgumentError, /icon must be an HTTPS URL or Data URI/)
+        expect {
+          described_class.new(token_type: :reissuable, name: "Test", symbol: "TEST", icon: large_data_uri)
+        }.to raise_error(ArgumentError, /icon must be an HTTPS URL or Data URI/)
       end
 
       it "accepts Data URI within 32KB limit" do
@@ -158,14 +239,17 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
     end
 
     it "includes optional fields when present" do
-      metadata = described_class.new(
-        token_type: :reissuable,
-        name: "Test Token",
-        symbol: "TEST",
-        description: "A test token",
-        terms: "https://example.com/terms",
-        properties: { category: "utility" }
-      )
+      metadata =
+        described_class.new(
+          token_type: :reissuable,
+          name: "Test Token",
+          symbol: "TEST",
+          description: "A test token",
+          terms: "https://example.com/terms",
+          properties: {
+            category: "utility"
+          }
+        )
       expect(metadata.to_h).to include(description: "A test token")
       expect(metadata.to_h).to include(terms: "https://example.com/terms")
       expect(metadata.to_h).to include(properties: { category: "utility" })
@@ -180,16 +264,19 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
     end
 
     it "sorts keys alphabetically" do
-      metadata = described_class.new(
-        token_type: :reissuable,
-        name: "Test Token",
-        symbol: "TEST",
-        decimals: 8,
-        description: "A test token"
-      )
+      metadata =
+        described_class.new(
+          token_type: :reissuable,
+          name: "Test Token",
+          symbol: "TEST",
+          decimals: 8,
+          description: "A test token"
+        )
       canonical = metadata.canonicalize
       # Keys should be in alphabetical order
-      expect(canonical).to match(/\{"decimals":8,"description":"A test token","name":"Test Token","symbol":"TEST","version":"1\.0"\}/)
+      expect(canonical).to match(
+        /\{"decimals":8,"description":"A test token","name":"Test Token","symbol":"TEST","version":"1\.0"\}/
+      )
     end
   end
 
@@ -263,7 +350,9 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
   describe "#derive_color_id", network: :prod do
     let(:key) { Tapyrus::Key.generate }
     let(:pubkey) { key.pubkey }
-    let(:out_point) { Tapyrus::OutPoint.from_txid("0000000000000000000000000000000000000000000000000000000000000001", 0) }
+    let(:out_point) do
+      Tapyrus::OutPoint.from_txid("0000000000000000000000000000000000000000000000000000000000000001", 0)
+    end
 
     context "with reissuable token_type" do
       let(:metadata) { described_class.new(token_type: :reissuable, name: "Test Token", symbol: "TEST") }
@@ -364,10 +453,8 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         fixtures["valid_test_cases"].each do |test_case|
           metadata = build_metadata(test_case["metadata"])
 
-          expect(metadata.canonicalize).to eq(test_case["canonical"]),
-            "#{test_case['name']}: canonical mismatch"
-          expect(metadata.hash_hex).to eq(test_case["hash"]),
-            "#{test_case['name']}: hash mismatch"
+          expect(metadata.canonicalize).to eq(test_case["canonical"]), "#{test_case["name"]}: canonical mismatch"
+          expect(metadata.hash_hex).to eq(test_case["hash"]), "#{test_case["name"]}: hash mismatch"
         end
       end
 
@@ -516,7 +603,7 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
               attributes: data["attributes"]
             )
           }.to raise_error(ArgumentError, /#{Regexp.escape(test_case["error"])}/),
-            "#{test_case['name']}: expected error '#{test_case['error']}'"
+          "#{test_case["name"]}: expected error '#{test_case["error"]}'"
         end
       end
 
@@ -526,7 +613,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, version: data["version"], name: data["name"], symbol: data["symbol"])
+            described_class.new(
+              token_type: :reissuable,
+              version: data["version"],
+              name: data["name"],
+              symbol: data["symbol"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -537,7 +629,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, version: data["version"], name: data["name"], symbol: data["symbol"])
+            described_class.new(
+              token_type: :reissuable,
+              version: data["version"],
+              name: data["name"],
+              symbol: data["symbol"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -614,7 +711,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], decimals: data["decimals"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              decimals: data["decimals"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -625,7 +727,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], decimals: data["decimals"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              decimals: data["decimals"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -636,7 +743,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], description: data["description"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              description: data["description"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -647,7 +759,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], website: data["website"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              website: data["website"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -658,7 +775,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], website: data["website"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              website: data["website"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -691,7 +813,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], terms: data["terms"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              terms: data["terms"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
@@ -702,7 +829,12 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         it "raises ArgumentError" do
           data = test_case["metadata"]
           expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], terms: data["terms"])
+            described_class.new(
+              token_type: :reissuable,
+              name: data["name"],
+              symbol: data["symbol"],
+              terms: data["terms"]
+            )
           }.to raise_error(ArgumentError, /#{test_case["error"]}/)
         end
       end
