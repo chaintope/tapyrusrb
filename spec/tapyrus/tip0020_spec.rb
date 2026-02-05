@@ -280,24 +280,24 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
     end
   end
 
-  describe "#hash and #hash_hex" do
+  describe "#digest and #digest_hex" do
     it "calculates SHA256 hash of canonicalized metadata" do
       metadata = described_class.new(token_type: :reissuable, name: "Test Token", symbol: "TEST")
-      expect(metadata.hash.bytesize).to eq(32)
-      expect(metadata.hash_hex.length).to eq(64)
-      expect(metadata.hash_hex).to match(/^[0-9a-f]{64}$/)
+      expect(metadata.digest.bytesize).to eq(32)
+      expect(metadata.digest_hex.length).to eq(64)
+      expect(metadata.digest_hex).to match(/^[0-9a-f]{64}$/)
     end
 
     it "returns consistent hash for same metadata" do
       metadata1 = described_class.new(token_type: :reissuable, name: "Test Token", symbol: "TEST")
       metadata2 = described_class.new(token_type: :reissuable, name: "Test Token", symbol: "TEST")
-      expect(metadata1.hash_hex).to eq(metadata2.hash_hex)
+      expect(metadata1.digest_hex).to eq(metadata2.digest_hex)
     end
 
     it "returns different hash for different metadata" do
       metadata1 = described_class.new(token_type: :reissuable, name: "Test Token 1", symbol: "TEST1")
       metadata2 = described_class.new(token_type: :reissuable, name: "Test Token 2", symbol: "TEST2")
-      expect(metadata1.hash_hex).not_to eq(metadata2.hash_hex)
+      expect(metadata1.digest_hex).not_to eq(metadata2.digest_hex)
     end
   end
 
@@ -452,7 +452,7 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
           metadata = build_metadata(test_case["metadata"])
 
           expect(metadata.canonicalize).to eq(test_case["canonical"]), "#{test_case["name"]}: canonical mismatch"
-          expect(metadata.hash_hex).to eq(test_case["hash"]), "#{test_case["name"]}: hash mismatch"
+          expect(metadata.digest_hex).to eq(test_case["hash"]), "#{test_case["name"]}: hash mismatch"
           if test_case["p2c_address"]
             expect(metadata.derive_p2c_address(base_point)).to eq(test_case["p2c_address"]),
             "#{test_case["name"]}: p2c_address mismatch"

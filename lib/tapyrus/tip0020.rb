@@ -162,14 +162,14 @@ module Tapyrus
 
       # Calculate SHA256 hash of canonicalized metadata
       # @return [String] 32-byte binary hash
-      def hash
+      def digest
         Tapyrus.sha256(canonicalize)
       end
 
       # Calculate SHA256 hash and return as hex string
       # @return [String] 64-character hex string
-      def hash_hex
-        hash.bth
+      def digest_hex
+        digest.bth
       end
 
       # Calculate P2C commitment: c = SHA256(P || h)
@@ -178,7 +178,7 @@ module Tapyrus
       def commitment(pubkey)
         pubkey_bin = pubkey.htb
         raise ArgumentError, "pubkey must be 33 bytes compressed public key" unless pubkey_bin.bytesize == 33
-        Tapyrus.sha256(pubkey_bin + hash)
+        Tapyrus.sha256(pubkey_bin + digest)
       end
 
       # Calculate P2C commitment and return as hex string
