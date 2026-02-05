@@ -458,6 +458,17 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         end
       end
 
+      it "validates P2C derivation for all test vectors", network: :prod do
+        base_point = fixtures["base_point"]
+        fixtures["valid_test_cases"]
+          .select { |t| t["p2c_address"] }
+          .each do |test_case|
+            metadata = build_metadata(test_case["metadata"])
+            expect(metadata.derive_p2c_address(base_point)).to eq(test_case["p2c_address"]),
+            "#{test_case["name"]}: p2c_address mismatch"
+          end
+      end
+
       describe "minimal (required fields only)" do
         let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "minimal" } }
 

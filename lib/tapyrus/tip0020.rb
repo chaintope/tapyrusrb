@@ -191,6 +191,7 @@ module Tapyrus
       # Derive P2C public key: P' = P + c * G
       # @param pubkey [String] payment base public key (33 bytes compressed, hex string)
       # @return [String] P2C public key (33 bytes compressed, hex string)
+      # @raise [ArgumentError] if derivation results in point at infinity
       def derive_p2c_pubkey(pubkey)
         c = commitment(pubkey)
         c_int = c.bth.to_i(16)
@@ -200,6 +201,8 @@ module Tapyrus
         point_p = Tapyrus::Key.new(pubkey: pubkey).to_point
         point_cg = group.generator * c_int
         point_p_prime = point_p + point_cg
+
+        raise ArgumentError, "P2C derivation resulted in point at infinity" if point_p_prime.infinity?
 
         # Compress the result
         ECDSA::Format::PointOctetString.encode(point_p_prime, compression: true).bth
