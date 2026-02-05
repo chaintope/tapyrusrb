@@ -420,17 +420,14 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
   describe "fixture test vectors" do
     let(:fixtures) { fixture_file("tip0020_metadata.json") }
 
-    # Determine token type based on NFT-specific fields
     def detect_token_type(data)
       nft_fields = %w[image animation_url external_url attributes]
-      has_nft_fields = nft_fields.any? { |f| data[f] }
-      has_nft_fields ? :nft : :reissuable
+      nft_fields.any? { |f| data[f] } ? :nft : :reissuable
     end
 
     def build_metadata(data)
-      token_type = detect_token_type(data)
       described_class.new(
-        token_type: token_type,
+        token_type: detect_token_type(data),
         version: data["version"] || Tapyrus::TIP0020::Metadata::CURRENT_VERSION,
         name: data["name"],
         symbol: data["symbol"],
@@ -448,144 +445,20 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
       )
     end
 
-    describe "valid test cases" do
-      it "validates all valid test vectors" do
+    describe "valid test cases", network: :prod do
+      it "validates canonical form, hash, and P2C address for all test vectors" do
+        base_point = fixtures["base_point"]
         fixtures["valid_test_cases"].each do |test_case|
           metadata = build_metadata(test_case["metadata"])
 
-          expect(metadata.canonicalize).to eq(test_case["canonical"]), "#{test_case["name"]}: canonical mismatch"
-          expect(metadata.hash_hex).to eq(test_case["hash"]), "#{test_case["name"]}: hash mismatch"
-        end
-      end
-
-      it "validates P2C derivation for all test vectors", network: :prod do
-        base_point = fixtures["base_point"]
-        fixtures["valid_test_cases"]
-          .select { |t| t["p2c_address"] }
-          .each do |test_case|
-            metadata = build_metadata(test_case["metadata"])
+          expect(metadata.canonicalize).to eq(test_case["canonical"]),
+            "#{test_case["name"]}: canonical mismatch"
+          expect(metadata.hash_hex).to eq(test_case["hash"]),
+            "#{test_case["name"]}: hash mismatch"
+          if test_case["p2c_address"]
             expect(metadata.derive_p2c_address(base_point)).to eq(test_case["p2c_address"]),
-            "#{test_case["name"]}: p2c_address mismatch"
+              "#{test_case["name"]}: p2c_address mismatch"
           end
-      end
-
-      describe "minimal (required fields only)" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "minimal" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "reissuable token" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "reissuable" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "non-reissuable token" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "non_reissuable" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "NFT" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "nft" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "token with issuer" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "with_issuer" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "max length name" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "max_length_name" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "max length symbol" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "max_length_symbol" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "decimals zero" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "decimals_zero" } }
-
-        it "has correct canonical form and hash (decimals=0 should not appear in canonical)" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "decimals max" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "decimals_max" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "data URI icon" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "data_uri_icon" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "with terms" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "with_terms" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
-        end
-      end
-
-      describe "with properties" do
-        let(:test_case) { fixtures["valid_test_cases"].find { |t| t["name"] == "with_properties" } }
-
-        it "has correct canonical form and hash" do
-          metadata = build_metadata(test_case["metadata"])
-          expect(metadata.canonicalize).to eq(test_case["canonical"])
-          expect(metadata.hash_hex).to eq(test_case["hash"])
         end
       end
     end
@@ -593,260 +466,10 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
     describe "invalid test cases" do
       it "rejects all invalid test vectors with appropriate errors" do
         fixtures["invalid_test_cases"].each do |test_case|
-          data = test_case["metadata"]
-          token_type = detect_token_type(data)
-          expect {
-            described_class.new(
-              token_type: token_type,
-              version: data["version"] || Tapyrus::TIP0020::Metadata::CURRENT_VERSION,
-              name: data["name"],
-              symbol: data["symbol"],
-              decimals: data["decimals"] || 0,
-              description: data["description"],
-              icon: data["icon"],
-              issuer: data["issuer"]&.transform_keys(&:to_sym),
-              website: data["website"],
-              terms: data["terms"],
-              properties: data["properties"]&.transform_keys(&:to_sym),
-              image: data["image"],
-              animation_url: data["animation_url"],
-              external_url: data["external_url"],
-              attributes: data["attributes"]
-            )
-          }.to raise_error(ArgumentError, /#{Regexp.escape(test_case["error"])}/),
-          "#{test_case["name"]}: expected error '#{test_case["error"]}'"
-        end
-      end
-
-      describe "missing_version" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "missing_version" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              version: data["version"],
-              name: data["name"],
-              symbol: data["symbol"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "invalid_version" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "invalid_version" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              version: data["version"],
-              name: data["name"],
-              symbol: data["symbol"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "missing_name" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "missing_name" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "empty_name" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "empty_name" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "name_too_long" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "name_too_long" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "missing_symbol" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "missing_symbol" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "empty_symbol" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "empty_symbol" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "symbol_too_long" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "symbol_too_long" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "decimals_negative" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "decimals_negative" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              decimals: data["decimals"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "decimals_too_large" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "decimals_too_large" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              decimals: data["decimals"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "description_too_long" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "description_too_long" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              description: data["description"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "website_http" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "website_http" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              website: data["website"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "website_invalid_url" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "website_invalid_url" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              website: data["website"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "icon_http" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "icon_http" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], icon: data["icon"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "icon_invalid_format" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "icon_invalid_format" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(token_type: :reissuable, name: data["name"], symbol: data["symbol"], icon: data["icon"])
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "terms_http" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "terms_http" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              terms: data["terms"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
-        end
-      end
-
-      describe "terms_invalid_url" do
-        let(:test_case) { fixtures["invalid_test_cases"].find { |t| t["name"] == "terms_invalid_url" } }
-
-        it "raises ArgumentError" do
-          data = test_case["metadata"]
-          expect {
-            described_class.new(
-              token_type: :reissuable,
-              name: data["name"],
-              symbol: data["symbol"],
-              terms: data["terms"]
-            )
-          }.to raise_error(ArgumentError, /#{test_case["error"]}/)
+          expect { build_metadata(test_case["metadata"]) }.to raise_error(
+            ArgumentError,
+            /#{Regexp.escape(test_case["error"])}/
+          ), "#{test_case["name"]}: expected error '#{test_case["error"]}'"
         end
       end
     end
