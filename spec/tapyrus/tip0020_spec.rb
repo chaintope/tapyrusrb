@@ -451,13 +451,11 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
         fixtures["valid_test_cases"].each do |test_case|
           metadata = build_metadata(test_case["metadata"])
 
-          expect(metadata.canonicalize).to eq(test_case["canonical"]),
-            "#{test_case["name"]}: canonical mismatch"
-          expect(metadata.hash_hex).to eq(test_case["hash"]),
-            "#{test_case["name"]}: hash mismatch"
+          expect(metadata.canonicalize).to eq(test_case["canonical"]), "#{test_case["name"]}: canonical mismatch"
+          expect(metadata.hash_hex).to eq(test_case["hash"]), "#{test_case["name"]}: hash mismatch"
           if test_case["p2c_address"]
             expect(metadata.derive_p2c_address(base_point)).to eq(test_case["p2c_address"]),
-              "#{test_case["name"]}: p2c_address mismatch"
+            "#{test_case["name"]}: p2c_address mismatch"
           end
         end
       end
@@ -469,7 +467,8 @@ RSpec.describe Tapyrus::TIP0020::Metadata do
           expect { build_metadata(test_case["metadata"]) }.to raise_error(
             ArgumentError,
             /#{Regexp.escape(test_case["error"])}/
-          ), "#{test_case["name"]}: expected error '#{test_case["error"]}'"
+          ),
+          "#{test_case["name"]}: expected error '#{test_case["error"]}'"
         end
       end
     end
