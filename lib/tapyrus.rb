@@ -2,7 +2,6 @@
 # https://github.com/lian/bitcoin-ruby/blob/master/COPYING
 
 require "tapyrus/version"
-require "eventmachine"
 require "ecdsa"
 require "securerandom"
 require "json"
@@ -36,12 +35,10 @@ module Tapyrus
   autoload :ExtKey, "tapyrus/ext_key"
   autoload :ExtPubkey, "tapyrus/ext_key"
   autoload :Opcodes, "tapyrus/opcodes"
-  autoload :Node, "tapyrus/node"
   autoload :Base58, "tapyrus/base58"
   autoload :Secp256k1, "tapyrus/secp256k1"
   autoload :Mnemonic, "tapyrus/mnemonic"
   autoload :ValidationState, "tapyrus/validation"
-  autoload :Network, "tapyrus/network"
   autoload :Store, "tapyrus/store"
   autoload :RPC, "tapyrus/rpc"
   autoload :Wallet, "tapyrus/wallet"

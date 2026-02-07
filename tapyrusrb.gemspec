@@ -21,13 +21,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "ecdsa"
-  spec.add_runtime_dependency "eventmachine"
   spec.add_runtime_dependency "murmurhash3"
   spec.add_runtime_dependency "daemon-spawn"
-  spec.add_runtime_dependency "thor"
   spec.add_runtime_dependency "ffi"
   spec.add_runtime_dependency "leb128", "~> 1.0.0"
-  spec.add_runtime_dependency "eventmachine_httpserver"
   spec.add_runtime_dependency "iniparse"
   spec.add_runtime_dependency "siphash"
   spec.add_runtime_dependency "activesupport", ">= 5.2.3"
