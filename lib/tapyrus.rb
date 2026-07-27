@@ -52,6 +52,7 @@ module Tapyrus
   autoload :Contract, "tapyrus/contract"
   autoload :TIP0137, "tapyrus/tip0137"
   autoload :TIP0020, "tapyrus/tip0020"
+  autoload :PSTT, "tapyrus/pstt"
   autoload :JWS, "tapyrus/jws"
 
   require_relative "tapyrus/constants"
