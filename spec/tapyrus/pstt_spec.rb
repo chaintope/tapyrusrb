@@ -1137,6 +1137,32 @@ RSpec.describe Tapyrus::PSTT do
       expect(parsed.xpubs.keys).to eq([account.to_base58])
       expect(parsed.xpubs.values.first.path).to eq("m/44'/1'/0'")
     end
+
+    it "rejects a malformed derivation path" do
+      expect { Tapyrus::PSTT::KeyOriginInfo.from_path("f05655ac", "m/44'/2377'/0'/0/1abc") }.to raise_error(
+        ArgumentError
+      )
+      expect { Tapyrus::PSTT::KeyOriginInfo.from_path("f05655ac", "m/1'2") }.to raise_error(ArgumentError)
+    end
+
+    # Array#pack("V") truncates a value which does not fit in 4 bytes without raising, so a path
+    # element out of range would be carried through serialization as a different one.
+    it "rejects a derivation path element which is not a 32-bit unsigned integer" do
+      expect { Tapyrus::PSTT::KeyOriginInfo.new(fingerprint: "f05655ac", key_paths: [0x100000000]) }.to raise_error(
+        Tapyrus::PSTT::Error,
+        "Each derivation path element must be a 32-bit unsigned integer."
+      )
+      expect { Tapyrus::PSTT::KeyOriginInfo.new(fingerprint: "f05655ac", key_paths: [-1]) }.to raise_error(
+        Tapyrus::PSTT::Error,
+        "Each derivation path element must be a 32-bit unsigned integer."
+      )
+    end
+
+    it "accepts the largest derivation path element" do
+      origin = Tapyrus::PSTT::KeyOriginInfo.new(fingerprint: "f05655ac", key_paths: [0xffffffff])
+      expect(origin.path).to eq("m/2147483647'")
+      expect(Tapyrus::PSTT::KeyOriginInfo.parse_from_payload(origin.to_payload)).to eq(origin)
+    end
   end
 
   describe "Proprietary" do

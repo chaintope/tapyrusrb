@@ -17,6 +17,12 @@ module Tapyrus
       # @param [Array[Integer]] key_paths the derivation path.
       def initialize(fingerprint:, key_paths: [])
         raise Error, "fingerprint must be 4 bytes." unless fingerprint.htb.bytesize == 4
+        # Each element occupies 4 bytes of the record. Array#pack truncates a larger value to its
+        # lowest 32 bits without raising, which would turn a path this object was built with into
+        # a different one once it is serialized.
+        unless key_paths.all? { |index| index.is_a?(Integer) && index >= 0 && index <= 0xffffffff }
+          raise Error, "Each derivation path element must be a 32-bit unsigned integer."
+        end
         @fingerprint = fingerprint
         @key_paths = key_paths
       end
