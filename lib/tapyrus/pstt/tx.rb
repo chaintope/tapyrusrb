@@ -507,6 +507,7 @@ module Tapyrus
           when GlobalTypes::TX_FEATURES
             PSTT.validate_empty_keydata!(record)
             pstt.features = PSTT.read_i32(record)
+            PSTT.validate_features!(pstt.features)
           when GlobalTypes::FALLBACK_LOCKTIME
             PSTT.validate_empty_keydata!(record)
             pstt.fallback_locktime = PSTT.read_u32(record)

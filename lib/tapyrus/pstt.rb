@@ -290,6 +290,15 @@ module Tapyrus
         end
       end
 
+      # Check that +features+ is a positive value. Tapyrus currently defines only 1, but a
+      # transaction feature which a later version adds is accepted so that this implementation
+      # can carry it through.
+      # @param [Integer] features the value of PSTT_GLOBAL_TX_FEATURES.
+      # @raise [Tapyrus::PSTT::Error] if it is not positive.
+      def validate_features!(features)
+        raise Error, "PSTT_GLOBAL_TX_FEATURES must be greater than 0, but #{features}." unless features.positive?
+      end
+
       # Check that +flags+ sets no reserved bit of PSTT_GLOBAL_TX_MODIFIABLE.
       # @param [Integer] flags the bitfield.
       # @raise [Tapyrus::PSTT::Error] if a reserved bit is set.

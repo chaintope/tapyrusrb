@@ -40,6 +40,26 @@
     }
   },
   {
+    "id": "negative-global-tx-features",
+    "description": "PSTT_GLOBAL_TX_FEATURES is -1, which is not a transaction feature Tapyrus defines.",
+    "pstt": "cHN0dP8BAgT/////AQQBAQEFAQEAAQ4gAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBDwQAAAAAAAEDCECcAAAAAAAAAQQZdqkUAAAAAAAAAAAAAAAAAAAAAAAAAACIrAA=",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_GLOBAL_TX_FEATURES must be greater than 0"
+    }
+  },
+  {
+    "id": "zero-global-tx-features",
+    "description": "PSTT_GLOBAL_TX_FEATURES is 0, which is not a transaction feature Tapyrus defines.",
+    "pstt": "cHN0dP8BAgQAAAAAAQQBAQEFAQEAAQ4gAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBDwQAAAAAAAEDCECcAAAAAAAAAQQZdqkUAAAAAAAAAAAAAAAAAAAAAAAAAACIrAA=",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_GLOBAL_TX_FEATURES must be greater than 0"
+    }
+  },
+  {
     "id": "missing-input-previous-txid",
     "description": "An input map lacks the required PSTT_IN_PREVIOUS_TXID record.",
     "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQEAAQ8EAAAAAAABAwhAnAAAAAAAAAEEGXapFAAAAAAAAAAAAAAAAAAAAAAAAAAAiKwA",
