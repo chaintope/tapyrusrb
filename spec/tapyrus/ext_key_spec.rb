@@ -361,6 +361,30 @@ describe Tapyrus::ExtKey, network: :prod do
     end
   end
 
+  describe "version bytes of a parsed depth 1 key" do
+    it "should keep the version bytes through a round trip" do
+      master = Tapyrus::ExtKey.generate_master("000102030405060708090a0b0c0d0e0f")
+
+      # A depth 1 key which was derived locally derives its version bytes from the purpose.
+      bip49 = master.derive(49, true)
+      expect(bip49.version).to eq(Tapyrus.chain_params.bip49_privkey_p2wpkh_p2sh_version)
+      expect(bip49.ext_pubkey.version).to eq(Tapyrus.chain_params.bip49_pubkey_p2wpkh_p2sh_version)
+
+      # A parsed depth 1 key must keep the version bytes it was serialized with, even when the
+      # purpose would map to other version bytes.
+      bip49.ver = Tapyrus.chain_params.extended_privkey_version
+      restored = Tapyrus::ExtKey.from_base58(bip49.to_base58)
+      expect(restored.version).to eq(Tapyrus.chain_params.extended_privkey_version)
+      expect(restored.to_base58).to eq(bip49.to_base58)
+
+      pub = bip49.ext_pubkey
+      pub.ver = Tapyrus.chain_params.extended_pubkey_version
+      restored_pub = Tapyrus::ExtPubkey.from_base58(pub.to_base58)
+      expect(restored_pub.version).to eq(Tapyrus.chain_params.extended_pubkey_version)
+      expect(restored_pub.to_base58).to eq(pub.to_base58)
+    end
+  end
+
   describe "Test Vector 3" do
     context "ruby" do
       subject do
