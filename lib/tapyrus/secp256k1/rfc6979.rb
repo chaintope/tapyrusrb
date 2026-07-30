@@ -30,10 +30,13 @@ module Tapyrus
         v = Tapyrus.hmac_sha256(k, v)
 
         # 3.2.h
-        t = ""
         10_000.times do
-          v = Tapyrus.hmac_sha256(k, v)
-          t = (t + v)
+          # T is reset for each candidate, otherwise a retry can never produce a value below the order.
+          t = ""
+          while t.bytesize < 32
+            v = Tapyrus.hmac_sha256(k, v)
+            t = (t + v)
+          end
           t_num = t.bth.to_i(16)
           return t_num if 1 <= t_num && t_num < Tapyrus::Secp256k1::GROUP.order
           k = Tapyrus.hmac_sha256(k, v + "00".htb)
