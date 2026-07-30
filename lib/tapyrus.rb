@@ -4,6 +4,7 @@
 require "tapyrus/version"
 require "ecdsa"
 require "securerandom"
+require "stringio"
 require "json"
 require "jwt"
 require "ffi"
