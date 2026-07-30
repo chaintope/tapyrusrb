@@ -16,6 +16,35 @@ describe Schnorr do
     end
   end
 
+  describe "deterministic nonce" do
+    # Known answers taken from the deterministic signature test of tapyrus-core
+    # (src/test/key_tests.cpp), which exercises secp256k1_schnorr_sign, the path a node actually
+    # signs with. Verifying a signature does not depend on how its nonce was derived, so a
+    # sign-then-verify test cannot detect a wrong RFC 6979 algorithm tag. Only these vectors can.
+    let(:message) { Tapyrus.double_sha256("Very deterministic message") }
+
+    it "reproduces the signatures tapyrus-core produces" do
+      [
+        # strSecret1 (5HxWvvfubhXpYYpS3tJkw6fq9jE9j18THftkZjHHfmFiWtmAbrj)
+        [
+          "12b004fff7f4b69ef8650e767f18f11ede158148b425660723b9f9a66e61f747",
+          "0567cbade8656cff3bb08d00913d59363273c32ea66130cf0c9b1be8e874b8bc" \
+            "b0e62372c22e8ecd34ffeadda493beb221e52bf23413cc6c3abdcdfc03d0ed52"
+        ],
+        # strSecret2 (5KC4ejrDjv152FGwP386VD1i2NYc5KkfSMyv1nGy1VGDxGHqVY3)
+        [
+          "b524c28b61c9b2c49b2c7dd4c2d75887abb78768c054bd7c01af4029f6c0d117",
+          "064623e23b59e1bd304156fb20c197eee23e6d10e021664aef3878364d9d5e17" \
+            "5916f7909c9358192e9c1510ebb466b085e726aab0d71c6ef9f298b53ea179aa"
+        ]
+      ].each do |priv, expected|
+        key = Tapyrus::Key.new(priv_key: priv)
+        expect(key.sign(message, algo: :schnorr).bth).to eq(expected)
+        expect(Schnorr.sign(message, priv.to_i(16)).encode.bth).to eq(expected)
+      end
+    end
+  end
+
   describe "compact schnorr" do
     it "should be passed." do
       # Test Vector 1
