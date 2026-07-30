@@ -494,7 +494,9 @@ describe Tapyrus::Script do
 
   describe "#pack_pushdata" do
     it "should encode the boundary sizes minimally" do
-      expect(Tapyrus::Script.pack_pushdata("11".htb * 255)[0, 2]).to eq([Tapyrus::Opcodes::OP_PUSHDATA1, 255].pack("CC"))
+      expect(Tapyrus::Script.pack_pushdata("11".htb * 255)[0, 2]).to eq(
+        [Tapyrus::Opcodes::OP_PUSHDATA1, 255].pack("CC")
+      )
       expect(Tapyrus::Script.pack_pushdata("11".htb * 256)[0, 3]).to eq(
         [Tapyrus::Opcodes::OP_PUSHDATA2, 256].pack("Cv")
       )
