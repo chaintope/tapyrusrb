@@ -21,12 +21,12 @@ module Tapyrus
       def self.parse_from_payload(payload)
         buf = StringIO.new(payload)
         mode = buf.read(1).unpack("c").first
-        version = buf.read(8).unpack("Q").first
+        version = buf.read(8).unpack("Q<").first
         new(mode, version)
       end
 
       def to_payload
-        [mode, version].pack("cQ")
+        [mode, version].pack("cQ<")
       end
 
       def high?

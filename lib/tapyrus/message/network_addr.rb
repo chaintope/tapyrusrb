@@ -35,7 +35,7 @@ module Tapyrus
         has_time = buf.size > 26
         addr = new(time: nil)
         addr.time = buf.read(4).unpack("V").first if has_time
-        addr.services = buf.read(8).unpack("Q").first
+        addr.services = buf.read(8).unpack("Q<").first
         addr.ip_addr = IPAddr.new_ntoh(buf.read(16))
         addr.port = buf.read(2).unpack("n").first
         addr
@@ -57,7 +57,7 @@ module Tapyrus
         p = ""
         p << [time].pack("V") unless skip_time
         addr = ip_addr.ipv4? ? ip_addr.ipv4_mapped : ip_addr
-        p << [services].pack("Q") << addr.hton << [port].pack("n")
+        p << [services].pack("Q<") << addr.hton << [port].pack("n")
       end
     end
   end

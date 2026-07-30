@@ -13,11 +13,11 @@ module Tapyrus
       end
 
       def self.parse_from_payload(payload)
-        new(payload.unpack("Q").first)
+        new(payload.unpack("Q<").first)
       end
 
       def to_payload
-        [fee_rate].pack("Q")
+        [fee_rate].pack("Q<")
       end
     end
   end

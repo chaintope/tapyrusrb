@@ -27,7 +27,7 @@ module Tapyrus
       # parse inventory payload
       def self.parse_from_payload(payload)
         raise Error, "invalid inventory size." if payload.bytesize != 36
-        identifier = payload[0..4].unpack("V").first
+        identifier = payload[0..3].unpack("V").first
         hash = payload[4..-1].bth # internal byte order
         new(identifier, hash)
       end

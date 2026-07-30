@@ -23,7 +23,7 @@ module Tapyrus
       elsif i <= 0xffffffff
         [0xfe, i].pack("CV")
       elsif i <= 0xffffffffffffffff
-        [0xff, i].pack("CQ")
+        [0xff, i].pack("CQ<")
       else
         raise "int(#{i}) too large!"
       end
@@ -37,7 +37,7 @@ module Tapyrus
       when 0xfe
         payload.unpack("xVa*")
       when 0xff
-        payload.unpack("xQa*")
+        payload.unpack("xQ<a*")
       else
         payload.unpack("Ca*")
       end
@@ -52,7 +52,7 @@ module Tapyrus
       when 0xfe
         buf.read(4)&.unpack("V")&.first
       when 0xff
-        buf.read(8)&.unpack("Q")&.first
+        buf.read(8)&.unpack("Q<")&.first
       else
         uchar
       end

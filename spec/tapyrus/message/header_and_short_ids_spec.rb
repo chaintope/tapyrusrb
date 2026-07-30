@@ -15,5 +15,17 @@ describe Tapyrus::Message::HeaderAndShortIDs do
         161_020_309_083_421
       )
     end
+
+    context "short id with leading zero bytes" do
+      it "should serialize short id as 6 bytes little endian" do
+        message = Tapyrus::Message::HeaderAndShortIDs.new(subject.header, 123_456_789, [0xabcdef12, 0x123456789abc])
+        payload = message.to_payload
+        offset = subject.header.to_payload.bytesize + 8 + 1 # header + nonce + short_ids count
+        expect(payload[offset...(offset + 6)].bth).to eq("12efcdab0000")
+        expect(payload[(offset + 6)...(offset + 12)].bth).to eq("bc9a78563412")
+        parsed = Tapyrus::Message::HeaderAndShortIDs.parse_from_payload(payload)
+        expect(parsed.short_ids).to eq(message.short_ids)
+      end
+    end
   end
 end
