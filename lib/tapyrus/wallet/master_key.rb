@@ -80,7 +80,7 @@ module Tapyrus
         encrypted_data = ""
         encrypted_data << enc.update(seed)
         encrypted_data << enc.final
-        @seed = encrypted_data
+        @seed = encrypted_data.bth
         @encrypted = true
       end
 
@@ -91,7 +91,7 @@ module Tapyrus
         dec.decrypt
         dec.key, dec.iv = key_iv(dec, passphrase)
         decrypted_data = ""
-        decrypted_data << dec.update(seed)
+        decrypted_data << dec.update(seed.htb)
         decrypted_data << dec.final
         @seed = decrypted_data
         @encrypted = false
