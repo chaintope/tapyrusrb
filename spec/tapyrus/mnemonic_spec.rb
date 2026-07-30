@@ -114,6 +114,19 @@ describe Tapyrus::Mnemonic, network: :prod do
   end
 
   describe "#to_seed" do
+    # BIP-39 requires that mnemonic sentences and passphrases are normalized using NFKD.
+    context "mnemonic and passphrase are not normalized" do
+      subject { Tapyrus::Mnemonic.new("japanese") }
+      let(:words) { (["あいこくしん"] * 11 + ["あおぞら"]).map { |w| w.unicode_normalize(:nfc) } }
+      let(:passphrase) { "㍍ガバヴァぱばぐゞちぢ十人十色".unicode_normalize(:nfc) }
+      it "should be normalized to NFKD" do
+        expect(subject.to_entropy(words)).to eq("00000000000000000000000000000000")
+        expect(subject.to_seed(words, passphrase: passphrase)).to eq(
+          "a262d6fb6122ecf45be09c50492b31f92e9beb7d9a845987a02cefda57a15f9c467a17872029a9e92299b5cbdf306e3a0ee620245cbd508959b6cb7ca637bd55"
+        )
+      end
+    end
+
     context "lower case" do
       it "should be generate" do
         expect(

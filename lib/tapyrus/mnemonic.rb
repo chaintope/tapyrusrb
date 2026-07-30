@@ -24,7 +24,7 @@ module Tapyrus
       mnemonic =
         words
           .map do |w|
-            index = word_master.index(w.downcase)
+            index = word_master.index(normalize(w).downcase)
             raise IndexError, "word not found in words list." unless index
             index.to_s(2).rjust(11, "0")
           end
@@ -55,8 +55,8 @@ module Tapyrus
     def to_seed(mnemonic, passphrase: "")
       to_entropy(mnemonic)
       OpenSSL::PKCS5.pbkdf2_hmac(
-        mnemonic.join(" ").downcase,
-        "mnemonic" + passphrase,
+        normalize(mnemonic.join(" ")).downcase,
+        "mnemonic" + normalize(passphrase),
         2048,
         64,
         OpenSSL::Digest::SHA512.new
@@ -75,7 +75,12 @@ module Tapyrus
 
     # load word list contents
     def load_words
-      File.readlines("#{WORD_DIR}/#{word_list}.txt").map(&:strip)
+      File.readlines("#{WORD_DIR}/#{word_list}.txt", encoding: Encoding::UTF_8).map { |w| normalize(w.strip) }
+    end
+
+    # BIP-39 requires that mnemonic sentences and passphrases are normalized using NFKD.
+    def normalize(str)
+      str.unicode_normalize(:nfkd)
     end
   end
 end
