@@ -471,6 +471,40 @@ describe Tapyrus::Script do
         "OP_HASH160 b6ca66aa538d28518852b2104d01b8b499fc9b23 OP_EQUAL OP_IF 021525ca2c0cbd42de7e4f5793c79887fbc8b136b5fe98b279581ef6959307f9e9 OP_ELSE 1000 OP_CSV OP_DROP 032ad705d98318241852ba9394a90e85f6afc8f7b5f445675040318a9d9ea29e35 OP_ENDIF OP_CHECKSIG"
       )
     end
+
+    context "pushed data consists of digits only" do
+      it "should be parsed as pushed data" do
+        # hash160 and sha256 which consist of digits only must not be parsed as a script number.
+        p2pkh = Tapyrus::Script.to_p2pkh("11" * 20)
+        expect(Tapyrus::Script.from_string(p2pkh.to_s).to_payload).to eq(p2pkh.to_payload)
+        p2sh = Tapyrus::Script.to_p2sh("12" * 20)
+        expect(Tapyrus::Script.from_string(p2sh.to_s).to_payload).to eq(p2sh.to_payload)
+        sha256 = Tapyrus::Script.new << "13" * 32
+        expect(Tapyrus::Script.from_string(sha256.to_s).to_payload).to eq(sha256.to_payload)
+      end
+
+      it "should be parsed as a script number if it is short enough" do
+        # a locktime such as OP_CLTV operand must be parsed as a script number.
+        script = Tapyrus::Script.from_string("1767225600 OP_CHECKLOCKTIMEVERIFY")
+        expect(script.to_payload).to eq("0400b95569b1".htb)
+        expect(Tapyrus::Script.from_string("0 6234").to_payload).to eq("00025a18".htb)
+      end
+    end
+  end
+
+  describe "#pack_pushdata" do
+    it "should encode the boundary sizes minimally" do
+      expect(Tapyrus::Script.pack_pushdata("11".htb * 255)[0, 2]).to eq([Tapyrus::Opcodes::OP_PUSHDATA1, 255].pack("CC"))
+      expect(Tapyrus::Script.pack_pushdata("11".htb * 256)[0, 3]).to eq(
+        [Tapyrus::Opcodes::OP_PUSHDATA2, 256].pack("Cv")
+      )
+      expect(Tapyrus::Script.pack_pushdata("11".htb * 65_535)[0, 3]).to eq(
+        [Tapyrus::Opcodes::OP_PUSHDATA2, 65_535].pack("Cv")
+      )
+      expect(Tapyrus::Script.pack_pushdata("11".htb * 65_536)[0, 5]).to eq(
+        [Tapyrus::Opcodes::OP_PUSHDATA4, 65_536].pack("CV")
+      )
+    end
   end
 
   describe "#push_only?" do
