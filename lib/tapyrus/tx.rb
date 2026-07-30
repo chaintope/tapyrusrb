@@ -47,6 +47,10 @@ module Tapyrus
       to_hex.to_i(16)
     end
 
+    def eql?(other)
+      other.is_a?(Tx) && self == other
+    end
+
     def tx_hash
       Tapyrus.double_sha256(to_payload).bth
     end
@@ -118,9 +122,9 @@ module Tapyrus
     # verify input signature.
     # @param [Integer] input_index
     # @param [Tapyrus::Script] script_pubkey the script pubkey for target input.
-    # @param [Array] flags the flags used when execute script interpreter.
+    # @param [Integer] flags the flags used when execute script interpreter.
     def verify_input_sig(input_index, script_pubkey, flags: STANDARD_SCRIPT_VERIFY_FLAGS)
-      flags << SCRIPT_VERIFY_P2SH if script_pubkey.p2sh?
+      flags |= SCRIPT_VERIFY_P2SH if script_pubkey.p2sh?
       verify_input_sig_for_legacy(input_index, script_pubkey, flags)
     end
 

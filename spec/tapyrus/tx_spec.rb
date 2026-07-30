@@ -302,6 +302,52 @@ describe Tapyrus::Tx do
     end
   end
 
+  describe Tapyrus::TxOut do
+    describe "parse from payload" do
+      it "should parse value as unsigned integer" do
+        # the maximum value which fits in 8 bytes must not be parsed as a negative value.
+        tx_out = Tapyrus::TxOut.parse_from_payload(("ff" * 8 + "00").htb)
+        expect(tx_out.value).to eq(0xffffffffffffffff)
+        expect(tx_out.dust?).to be false
+        expect(tx_out.to_payload).to eq(("ff" * 8 + "00").htb)
+      end
+    end
+  end
+
+  describe "#verify_input_sig" do
+    it "should enforce P2SH evaluation even if the flags do not contain SCRIPT_VERIFY_P2SH" do
+      key = Tapyrus::Key.generate
+      redeem_script = Tapyrus::Script.to_multisig_script(1, [key.pubkey])
+      p2sh = Tapyrus::Script.to_p2sh(redeem_script.to_hash160)
+      tx = Tapyrus::Tx.new
+      tx.inputs << Tapyrus::TxIn.new(out_point: Tapyrus::OutPoint.from_txid("11" * 32, 0))
+      tx.outputs << Tapyrus::TxOut.new(value: 1_000, script_pubkey: Tapyrus::Script.to_p2pkh(key.hash160))
+
+      sighash = tx.sighash_for_input(0, redeem_script)
+      sig = key.sign(sighash) + [Tapyrus::SIGHASH_TYPE[:all]].pack("C")
+      tx.inputs[0].script_sig = Tapyrus::Script.new << Tapyrus::Opcodes::OP_0 << sig << redeem_script.to_payload
+      expect(tx.verify_input_sig(0, p2sh, flags: Tapyrus::SCRIPT_VERIFY_NONE)).to be true
+
+      # An invalid signature inside the redeem script must fail even though the hash of the
+      # redeem script matches the scriptPubkey.
+      garbage = ("00".htb * 71) + [Tapyrus::SIGHASH_TYPE[:all]].pack("C")
+      tx.inputs[0].script_sig = Tapyrus::Script.new << Tapyrus::Opcodes::OP_0 << garbage << redeem_script.to_payload
+      expect(tx.verify_input_sig(0, p2sh, flags: Tapyrus::SCRIPT_VERIFY_NONE)).to be false
+    end
+  end
+
+  describe "#eql?" do
+    it "should be able to use two equal transactions interchangeably as Hash keys" do
+      tx1 =
+        Tapyrus::Tx.parse_from_payload(
+          "010000000201e4a0f1fa83c642b91feafae36a0f8fded4158dfa6fd650e046b4364b805684000000006b483045022045c65646abc12c71352335dbec2824b2dbdef9253366b4b83439b2190ce098d2022100eed0b70371d3892f865b43e2bb713ec9e887a50d38f47e8416220daf826d0ab201210259f6658325c4e3ca6fb38f657ffcbf4b1c45ef4f0c1dd86d5f6c0cebb0e09520ffffffff31137db564a7fad07c9db5b6b862786589977c68d1270819030a9079941ca6c9010000006b48304502204354565632eedd30fb9ca5c22bb70ef848afd74f7bed354d267705a6e71ea885022100e6ea6250d29dc109cb59ac66318f1cb2768c13fb0daca7c3d91a3b8d0991e0cb01210259f6658325c4e3ca6fb38f657ffcbf4b1c45ef4f0c1dd86d5f6c0cebb0e09520ffffffff02801d2c04000000001976a914322653c91d6038e08b6d971e4560842c155c8a8888ac80248706000000001976a9143b9722f91a2e50d913dadc3a6a8a88a58a7b859788ac00000000".htb
+        )
+      tx2 = Tapyrus::Tx.parse_from_payload(tx1.to_payload)
+      expect(tx1.eql?(tx2)).to be true
+      expect({ tx1 => 1 }[tx2]).to eq(1)
+    end
+  end
+
   describe "generate sighash" do
     sighash_json = fixture_file("sighash.json").select { |j| j.size > 2 }
     sighash_json.each do |json|
