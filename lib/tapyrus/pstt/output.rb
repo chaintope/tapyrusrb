@@ -54,8 +54,7 @@ module Tapyrus
           case record.type
           when OutputTypes::REDEEM_SCRIPT
             PSTT.validate_empty_keydata!(record)
-            output.redeem_script =
-              PSTT.parse_field("PSTT_OUT_REDEEM_SCRIPT") { Tapyrus::Script.parse_from_payload(record.value) }
+            output.redeem_script = PSTT.parse_script_field("PSTT_OUT_REDEEM_SCRIPT", record.value)
           when OutputTypes::BIP32_DERIVATION
             PSTT.validate_pubkey_keydata!(record)
             output.bip32_derivations[record.keydata.bth] = KeyOriginInfo.parse_from_payload(record.value)
@@ -65,8 +64,7 @@ module Tapyrus
             PSTT.validate_amount!(output.amount)
           when OutputTypes::SCRIPT
             PSTT.validate_empty_keydata!(record)
-            output.script_pubkey =
-              PSTT.parse_field("PSTT_OUT_SCRIPT") { Tapyrus::Script.parse_from_payload(record.value) }
+            output.script_pubkey = PSTT.parse_script_field("PSTT_OUT_SCRIPT", record.value)
           when OutputTypes::PROPRIETARY
             output.proprietaries << Proprietary.parse_from_record(record)
           else

@@ -272,6 +272,24 @@ module Tapyrus
         raise Error, "#{name} is malformed. #{e.message}"
       end
 
+      # Parse the value of a script field.
+      #
+      # Tapyrus::Script.parse_from_payload accepts a pushdata which runs past the end of the payload
+      # and drops it, so a value such as 4d0001 parses without an error and serializes back as 00. A
+      # Combiner must not change a record it did not produce, so a value which does not serialize back
+      # to the bytes it was read from is rejected here instead.
+      # @param [String] name the name of the field, used in the error message.
+      # @param [String] payload the value of the record with binary format.
+      # @return [Tapyrus::Script] the script.
+      # @raise [Tapyrus::PSTT::Error] if the value is not a script, or is not the serialization of one.
+      def parse_script_field(name, payload)
+        script = parse_field(name) { Tapyrus::Script.parse_from_payload(payload) }
+        unless script.to_payload == payload
+          raise Error, "#{name} is malformed. The value is not the serialization of a script."
+        end
+        script
+      end
+
       # Check that +hash_type+ is one of the sighash types TIP-0174 defines.
       # @param [Integer] hash_type a sighash type.
       # @raise [Tapyrus::PSTT::Error] if it is not.

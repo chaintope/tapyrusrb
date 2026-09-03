@@ -115,15 +115,13 @@ module Tapyrus
             PSTT.validate_sighash_type!(input.sighash_type)
           when InputTypes::REDEEM_SCRIPT
             PSTT.validate_empty_keydata!(record)
-            input.redeem_script =
-              PSTT.parse_field("PSTT_IN_REDEEM_SCRIPT") { Tapyrus::Script.parse_from_payload(record.value) }
+            input.redeem_script = PSTT.parse_script_field("PSTT_IN_REDEEM_SCRIPT", record.value)
           when InputTypes::BIP32_DERIVATION
             PSTT.validate_pubkey_keydata!(record)
             input.bip32_derivations[record.keydata.bth] = KeyOriginInfo.parse_from_payload(record.value)
           when InputTypes::FINAL_SCRIPTSIG
             PSTT.validate_empty_keydata!(record)
-            input.final_script_sig =
-              PSTT.parse_field("PSTT_IN_FINAL_SCRIPTSIG") { Tapyrus::Script.parse_from_payload(record.value) }
+            input.final_script_sig = PSTT.parse_script_field("PSTT_IN_FINAL_SCRIPTSIG", record.value)
           when InputTypes::RIPEMD160, InputTypes::HASH160
             raise Error, "The preimage hash must be 20 bytes." unless record.keydata.bytesize == 20
             input.preimages_for(record.type)[record.keydata.bth] = record.value
