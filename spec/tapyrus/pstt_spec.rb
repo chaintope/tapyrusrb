@@ -92,6 +92,20 @@ RSpec.describe Tapyrus::PSTT do
         )
       end
 
+      it "detects a script field which is not the serialization of a script" do
+        {
+          "input-redeem-script-not-a-script" => "PSTT_IN_REDEEM_SCRIPT",
+          "input-final-scriptsig-not-a-script" => "PSTT_IN_FINAL_SCRIPTSIG",
+          "output-redeem-script-not-a-script" => "PSTT_OUT_REDEEM_SCRIPT",
+          "output-script-not-a-script" => "PSTT_OUT_SCRIPT"
+        }.each do |id, field|
+          expect { Tapyrus::PSTT::Tx.from_base64(invalid_vector(id)) }.to raise_error(
+            Tapyrus::PSTT::Error,
+            "#{field} is malformed. The value is not the serialization of a script."
+          )
+        end
+      end
+
       it "detects a keytype which is not minimally encoded" do
         expect { Tapyrus::PSTT::Tx.from_base64(invalid_vector("non-minimal-keytype")) }.to raise_error(
           Tapyrus::PSTT::Error,
@@ -363,6 +377,19 @@ RSpec.describe Tapyrus::PSTT do
         Tapyrus::PSTT::Error,
         /PSTT_OUT_AMOUNT must be between/
       )
+    end
+
+    it "keeps a script field whose pushdata is not minimally encoded" do
+      # 4c05 is a PUSHDATA1 of 5 bytes, which 05 also expresses. Both are scripts, so the record
+      # must reach the next role with the bytes it was written with.
+      script = Tapyrus::Script.parse_from_payload("4c050102030405".htb)
+      pstt = one_input_pstt
+      pstt.inputs.first.redeem_script = script
+      payload = pstt.to_payload
+
+      parsed = Tapyrus::PSTT::Tx.parse_from_payload(payload)
+      expect(parsed.inputs.first.redeem_script.to_payload.bth).to eq("4c050102030405")
+      expect(parsed.to_payload).to eq(payload)
     end
   end
 

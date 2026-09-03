@@ -240,6 +240,46 @@
     }
   },
   {
+    "id": "input-redeem-script-not-a-script",
+    "description": "PSTT_IN_REDEEM_SCRIPT carries 4d0001, a PUSHDATA2 whose length runs past the end of the value. Tapyrus::Script drops the pushdata, so the record would serialize back as 00.",
+    "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQIAAQQDTQABAQ4geCTV5dcUOipMfUFAlCGn4hY8MWRwPqiSbffTGnvs0dQBDwQAAAAAAAEDCGDqAAAAAAAAAQQZdqkUVxopLcEbtHFwMPBNVkWsQvKuYN+IrAABAwhYmAAAAAAAAAEEGXapFOVxZknojyIueLwhSn+ibr05gJzRiKwA",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_IN_REDEEM_SCRIPT is not the serialization of a script"
+    }
+  },
+  {
+    "id": "input-final-scriptsig-not-a-script",
+    "description": "PSTT_IN_FINAL_SCRIPTSIG carries 4d0001, a PUSHDATA2 whose length runs past the end of the value. Tapyrus::Script drops the pushdata, so the record would serialize back as 00.",
+    "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQIAAQcDTQABAQ4geCTV5dcUOipMfUFAlCGn4hY8MWRwPqiSbffTGnvs0dQBDwQAAAAAAAEDCGDqAAAAAAAAAQQZdqkUVxopLcEbtHFwMPBNVkWsQvKuYN+IrAABAwhYmAAAAAAAAAEEGXapFOVxZknojyIueLwhSn+ibr05gJzRiKwA",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_IN_FINAL_SCRIPTSIG is not the serialization of a script"
+    }
+  },
+  {
+    "id": "output-redeem-script-not-a-script",
+    "description": "PSTT_OUT_REDEEM_SCRIPT carries 4d0001, a PUSHDATA2 whose length runs past the end of the value. Tapyrus::Script drops the pushdata, so the record would serialize back as 00.",
+    "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQIAAQ4geCTV5dcUOipMfUFAlCGn4hY8MWRwPqiSbffTGnvs0dQBDwQAAAAAAAEAA00AAQEDCGDqAAAAAAAAAQQZdqkUVxopLcEbtHFwMPBNVkWsQvKuYN+IrAABAwhYmAAAAAAAAAEEGXapFOVxZknojyIueLwhSn+ibr05gJzRiKwA",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_OUT_REDEEM_SCRIPT is not the serialization of a script"
+    }
+  },
+  {
+    "id": "output-script-not-a-script",
+    "description": "PSTT_OUT_SCRIPT carries 4d0001, a PUSHDATA2 whose length runs past the end of the value. Tapyrus::Script drops the pushdata, so the record would serialize back as 00.",
+    "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQIAAQ4geCTV5dcUOipMfUFAlCGn4hY8MWRwPqiSbffTGnvs0dQBDwQAAAAAAAEDCGDqAAAAAAAAAQQDTQABAAEDCFiYAAAAAAAAAQQZdqkU5XFmSeiPIi54vCFKf6JuvTmAnNGIrAA=",
+    "expected": {
+      "valid": false,
+      "stage": "parse",
+      "reason": "PSTT_OUT_SCRIPT is not the serialization of a script"
+    }
+  },
+  {
     "id": "truncated-value",
     "description": "The final output map's PSTT_OUT_SCRIPT record declares a valuelen one byte longer than the data actually present in the buffer.",
     "pstt": "cHN0dP8BAgQBAAAAAQQBAQEFAQEAAQ4gAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBDwQAAAAAAAEDCECcAAAAAAAAAQQadqkUAAAAAAAAAAAAAAAAAAAAAAAAAACIrA==",
