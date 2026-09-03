@@ -48,7 +48,7 @@ module Tapyrus
         end_index = start_index + value_length - padding_length
         padding_value = data[40...(40 + padding_length)]
         raise ArgumentError, "Invalid mnemonic. padding must only zero." unless padding_value.to_i(2) == 0
-        s.value = data[start_index...end_index].to_i(2).to_even_length_hex
+        s.value = data[start_index...end_index].to_i(2).to_s(16).rjust((value_length - padding_length) / 4, "0")
         s.checksum = data[(40 + value_length)..-1].to_i(2)
         s
       end
@@ -105,8 +105,8 @@ module Tapyrus
         end
         s << member_index.to_bits(4)
         s << (member_threshold - 1).to_bits(4)
-        value_length = value.to_i(16).bit_length
-        padding_length = RADIX_BITS - (value_length % RADIX_BITS)
+        value_length = value.htb.bytesize * 8
+        padding_length = (RADIX_BITS - (value_length % RADIX_BITS)) % RADIX_BITS
         s << value.to_i(16).to_bits(value_length + padding_length)
         s << checksum.to_bits(30) if include_checksum
         s.chars.each_slice(10).map { |index| index.join.to_i(2) }

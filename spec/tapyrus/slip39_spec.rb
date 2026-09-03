@@ -216,4 +216,33 @@ describe Tapyrus::SLIP39 do
       expect(Tapyrus::SLIP39::SSS.recover_secret(shares, passphrase: "TREZOR")).not_to eq(master_secret_128)
     end
   end
+
+  describe "share value with leading zero byte" do
+    def build_share(value)
+      share = Tapyrus::SLIP39::Share.new
+      share.id = 1234
+      share.iteration_exp = 0
+      share.group_index = 0
+      share.group_threshold = 1
+      share.group_count = 1
+      share.member_index = 0
+      share.member_threshold = 1
+      share.value = value
+      share.checksum = share.calculate_checksum
+      share
+    end
+
+    it "should round trip through mnemonic words." do
+      ["00" + "11" * 15, "0000" + "22" * 30, "00" * 15 + "01"].each do |value|
+        share = build_share(value)
+        words = share.to_words
+        recovered = Tapyrus::SLIP39::Share.from_words(words)
+        expect(recovered.value).to eq(value)
+      end
+    end
+
+    it "should generate the same number of words as a value without a leading zero byte." do
+      expect(build_share("00" + "11" * 31).to_words.size).to eq(build_share("ff" * 32).to_words.size)
+    end
+  end
 end
