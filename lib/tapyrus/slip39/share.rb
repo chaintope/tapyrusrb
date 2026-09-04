@@ -105,6 +105,12 @@ module Tapyrus
         end
         s << member_index.to_bits(4)
         s << (member_threshold - 1).to_bits(4)
+        # from_words derives the padding length from the number of value words modulo 16, which only
+        # matches the padding written here when the value is an even number of bytes. An odd one is
+        # read back as a different value instead of being rejected.
+        unless value.htb.bytesize.even?
+          raise ArgumentError, "The length of the share value in bytes must be an even number."
+        end
         value_length = value.htb.bytesize * 8
         padding_length = (RADIX_BITS - (value_length % RADIX_BITS)) % RADIX_BITS
         s << value.to_i(16).to_bits(value_length + padding_length)
